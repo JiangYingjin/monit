@@ -38,7 +38,9 @@ func (machineApi *MachineApi) CreateMachine(c *gin.Context) {
 		global.GVA_LOG.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)
 	} else {
-		response.OkWithMessage("创建成功", c)
+		result := make(map[string]interface{})
+		result["machine_id"] = machine.Id
+		response.OkWithDetailed(result, "创建成功", c)
 	}
 }
 
