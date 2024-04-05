@@ -25,6 +25,12 @@ type Login struct {
 	CaptchaId string `json:"captchaId"` // 验证码ID
 }
 
+// Machine login structure
+type MachineLoginReq struct {
+	MachineID string `json:"machine_id"` // 用户名
+	Password  string `json:"password"`   // 密码
+}
+
 // Modify password structure
 type ChangePasswordReq struct {
 	ID          uint   `json:"-"`           // 从 JWT 中提取 user id，避免越权

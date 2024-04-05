@@ -3123,18 +3123,11 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/Customize.Machine"
+                            "$ref": "#/definitions/request.GetDataReq"
                         }
                     }
                 ],
-                "responses": {
-                    "200": {
-                        "description": "{\"success\":true,\"data\":{},\"msg\":\"创建成功\"}",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
+                "responses": {}
             }
         },
         "/machine/deleteMachine": {
@@ -7206,6 +7199,32 @@ const docTemplate = `{
                 "id": {
                     "description": "主键ID",
                     "type": "integer"
+                }
+            }
+        },
+        "request.GetDataReq": {
+            "type": "object",
+            "required": [
+                "data_type_ids",
+                "end_time",
+                "machine_ids",
+                "start_time"
+            ],
+            "properties": {
+                "data_type_ids": {
+                    "type": "string"
+                },
+                "end_time": {
+                    "type": "string"
+                },
+                "machine_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "start_time": {
+                    "type": "string"
                 }
             }
         },

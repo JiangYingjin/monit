@@ -874,6 +874,24 @@ definitions:
         description: 主键ID
         type: integer
     type: object
+  request.GetDataReq:
+    properties:
+      data_type_ids:
+        type: string
+      end_time:
+        type: string
+      machine_ids:
+        items:
+          type: string
+        type: array
+      start_time:
+        type: string
+    required:
+    - data_type_ids
+    - end_time
+    - machine_ids
+    - start_time
+    type: object
   request.IdsReq:
     properties:
       ids:
@@ -3525,14 +3543,10 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/Customize.Machine'
+          $ref: '#/definitions/request.GetDataReq'
       produces:
       - application/json
-      responses:
-        "200":
-          description: '{"success":true,"data":{},"msg":"创建成功"}'
-          schema:
-            type: string
+      responses: {}
       security:
       - ApiKeyAuth: []
       summary: 创建Machine

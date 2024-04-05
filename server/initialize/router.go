@@ -82,10 +82,14 @@ func Routers() *gin.Engine {
 	{
 
 	}
+
+	MachineGroup := Router.Group(global.GVA_CONFIG.System.RouterPrefix)
+	MachineGroup.Use(middleware.MachineJWTAuth())
 	{
 		CustomizeRouter := router.RouterGroupApp.Customize
 
-		CustomizeRouter.InitMyMachineRouter(PublicGroup)
+		CustomizeRouter.InitMyMachineLoginRouter(PublicGroup)
+		CustomizeRouter.InitMyMachineRouter(MachineGroup)
 
 		CustomizeRouter.InitMachineRouter(PrivateGroup)
 		CustomizeRouter.InitDataTypeRouter(PrivateGroup)

@@ -1,11 +1,18 @@
 package request
 
-import "time"
+import (
+	"github.com/flipped-aurora/gin-vue-admin/server/model/Customize"
+)
 
-type MachineDataReq struct {
-	MachineIDs []string   `json:"machineIDs" form:"machineIDs"`
-	StartTime  *time.Time `json:"startTime" form:"startTime"`
-	EndTime    *time.Time `json:"endTime" form:"endTime"`
+type GetDataReq struct {
+	DataTypeID string   `json:"data_type_id" form:"data_type_id" binding:"required"`
+	MachineIDs []string `json:"machine_ids" form:"machine_ids" binding:"required"`
+	StartTime  string   `json:"start_time" form:"start_time" binding:"required"`
+	EndTime    string   `json:"end_time" form:"end_time" binding:"required"`
+}
+
+type GetDataRsp struct {
+	Data map[string][]Customize.Data `json:"data"` // key: machine_id
 }
 
 type MachineLoginReq struct {
