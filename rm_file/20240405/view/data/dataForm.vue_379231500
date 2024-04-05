@@ -8,7 +8,7 @@
         <el-form-item label="值:" prop="value">
           <el-input-number v-model="formData.value" :precision="2" :clearable="true"></el-input-number>
        </el-form-item>
-        <el-form-item label="机器ID:" prop="machineID">
+        <el-form-item label="ValueType:" prop="machineID">
           <el-input v-model.number="formData.machineID" :clearable="true" placeholder="请输入" />
        </el-form-item>
         <el-form-item>

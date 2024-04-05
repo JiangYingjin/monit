@@ -43,7 +43,7 @@
         
         <el-table-column align="left" label="数据类型" prop="dataTypeID" width="120" />
         <el-table-column align="left" label="值" prop="value" width="120" />
-        <el-table-column align="left" label="机器ID" prop="machineID" width="120" />
+        <el-table-column align="left" label="ValueType" prop="machineID" width="120" />
         <el-table-column align="left" label="操作" fixed="right" min-width="240">
             <template #default="scope">
             <el-button type="primary" link class="table-button" @click="getDetails(scope.row)">
@@ -85,8 +85,8 @@
             <el-form-item label="值:"  prop="value" >
               <el-input-number v-model="formData.value"  style="width:100%" :precision="2" :clearable="true"  />
             </el-form-item>
-            <el-form-item label="机器ID:"  prop="machineID" >
-              <el-input v-model.number="formData.machineID" :clearable="true" placeholder="请输入机器ID" />
+            <el-form-item label="ValueType:"  prop="machineID" >
+              <el-input v-model.number="formData.machineID" :clearable="true" placeholder="请输入ValueType" />
             </el-form-item>
           </el-form>
     </el-drawer>
@@ -104,7 +104,7 @@
                 <el-descriptions-item label="值">
                         {{ formData.value }}
                 </el-descriptions-item>
-                <el-descriptions-item label="机器ID">
+                <el-descriptions-item label="ValueType">
                         {{ formData.machineID }}
                 </el-descriptions-item>
         </el-descriptions>
