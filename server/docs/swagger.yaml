@@ -9,30 +9,26 @@ definitions:
         type: string
       createdBy:
         type: integer
+      dataTypeID:
+        description: 数据类型
+        type: integer
       deletedBy:
         type: integer
-      description:
-        description: description
-        type: string
-      id:
-        description: id
-        type: integer
-      name:
-        description: name
+      machineID:
+        description: 机器ID
         type: integer
       updatedAt:
         description: 更新时间
         type: string
       updatedBy:
         type: integer
-      valueType:
-        description: ValueType
-        type: integer
+      value:
+        description: 值
+        type: number
     required:
-    - description
-    - id
-    - name
-    - valueType
+    - dataTypeID
+    - machineID
+    - value
     type: object
   Customize.DataType:
     properties:
@@ -47,27 +43,19 @@ definitions:
       deletedBy:
         type: integer
       description:
-        description: description
+        description: 描述
         type: string
-      id:
-        description: id
-        type: integer
       name:
-        description: name
+        description: 名称
         type: string
       updatedAt:
         description: 更新时间
         type: string
       updatedBy:
         type: integer
-      valueType:
-        description: ValueType
-        type: string
     required:
     - description
-    - id
     - name
-    - valueType
     type: object
   Customize.Machine:
     properties:
@@ -82,31 +70,27 @@ definitions:
       deletedBy:
         type: integer
       description:
-        description: description
+        description: 描述
         type: string
-      id:
-        description: id
-        type: integer
+      ip_addr:
+        description: IP地址
+        type: string
       name:
-        description: name
+        description: 名字
         type: string
       password:
-        description: Password
+        description: 密钥
         type: string
       updatedAt:
         description: 更新时间
         type: string
       updatedBy:
         type: integer
-      valueType:
-        description: ValueType
-        type: string
     required:
     - description
-    - id
+    - ip_addr
     - name
     - password
-    - valueType
     type: object
   config.AliyunOSS:
     properties:
@@ -3000,22 +2984,17 @@ paths:
       - in: query
         name: createdBy
         type: integer
+      - description: 数据类型
+        in: query
+        name: dataTypeID
+        required: true
+        type: integer
       - in: query
         name: deletedBy
         type: integer
-      - description: description
+      - description: 机器ID
         in: query
-        name: description
-        required: true
-        type: string
-      - description: id
-        in: query
-        name: id
-        required: true
-        type: integer
-      - description: name
-        in: query
-        name: name
+        name: machineID
         required: true
         type: integer
       - description: 更新时间
@@ -3025,11 +3004,11 @@ paths:
       - in: query
         name: updatedBy
         type: integer
-      - description: ValueType
+      - description: 值
         in: query
-        name: valueType
+        name: value
         required: true
-        type: integer
+        type: number
       produces:
       - application/json
       responses:
@@ -3181,17 +3160,12 @@ paths:
       - in: query
         name: deletedBy
         type: integer
-      - description: description
+      - description: 描述
         in: query
         name: description
         required: true
         type: string
-      - description: id
-        in: query
-        name: id
-        required: true
-        type: integer
-      - description: name
+      - description: 名称
         in: query
         name: name
         required: true
@@ -3203,11 +3177,6 @@ paths:
       - in: query
         name: updatedBy
         type: integer
-      - description: ValueType
-        in: query
-        name: valueType
-        required: true
-        type: string
       produces:
       - application/json
       responses:
@@ -3627,22 +3596,22 @@ paths:
       - in: query
         name: deletedBy
         type: integer
-      - description: description
+      - description: 描述
         in: query
         name: description
         required: true
         type: string
-      - description: id
+      - description: IP地址
         in: query
-        name: id
+        name: ip_addr
         required: true
-        type: integer
-      - description: name
+        type: string
+      - description: 名字
         in: query
         name: name
         required: true
         type: string
-      - description: Password
+      - description: 密钥
         in: query
         name: password
         required: true
@@ -3654,11 +3623,6 @@ paths:
       - in: query
         name: updatedBy
         type: integer
-      - description: ValueType
-        in: query
-        name: valueType
-        required: true
-        type: string
       produces:
       - application/json
       responses:

@@ -2211,27 +2211,20 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
+                        "description": "数据类型",
+                        "name": "dataTypeID",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
                         "name": "deletedBy",
                         "in": "query"
                     },
                     {
-                        "type": "string",
-                        "description": "description",
-                        "name": "description",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
                         "type": "integer",
-                        "description": "id",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "name",
-                        "name": "name",
+                        "description": "机器ID",
+                        "name": "machineID",
                         "in": "query",
                         "required": true
                     },
@@ -2247,9 +2240,9 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
-                        "type": "integer",
-                        "description": "ValueType",
-                        "name": "valueType",
+                        "type": "number",
+                        "description": "值",
+                        "name": "value",
                         "in": "query",
                         "required": true
                     }
@@ -2504,21 +2497,14 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "description",
+                        "description": "描述",
                         "name": "description",
                         "in": "query",
                         "required": true
                     },
                     {
-                        "type": "integer",
-                        "description": "id",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
                         "type": "string",
-                        "description": "name",
+                        "description": "名称",
                         "name": "name",
                         "in": "query",
                         "required": true
@@ -2533,13 +2519,6 @@ const docTemplate = `{
                         "type": "integer",
                         "name": "updatedBy",
                         "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "ValueType",
-                        "name": "valueType",
-                        "in": "query",
-                        "required": true
                     }
                 ],
                 "responses": {
@@ -3265,28 +3244,28 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "description",
+                        "description": "描述",
                         "name": "description",
                         "in": "query",
                         "required": true
                     },
                     {
-                        "type": "integer",
-                        "description": "id",
-                        "name": "id",
+                        "type": "string",
+                        "description": "IP地址",
+                        "name": "ip_addr",
                         "in": "query",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "name",
+                        "description": "名字",
                         "name": "name",
                         "in": "query",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Password",
+                        "description": "密钥",
                         "name": "password",
                         "in": "query",
                         "required": true
@@ -3301,13 +3280,6 @@ const docTemplate = `{
                         "type": "integer",
                         "name": "updatedBy",
                         "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "ValueType",
-                        "name": "valueType",
-                        "in": "query",
-                        "required": true
                     }
                 ],
                 "responses": {
@@ -5986,10 +5958,9 @@ const docTemplate = `{
         "Customize.Data": {
             "type": "object",
             "required": [
-                "description",
-                "id",
-                "name",
-                "valueType"
+                "dataTypeID",
+                "machineID",
+                "value"
             ],
             "properties": {
                 "ID": {
@@ -6003,19 +5974,15 @@ const docTemplate = `{
                 "createdBy": {
                     "type": "integer"
                 },
+                "dataTypeID": {
+                    "description": "数据类型",
+                    "type": "integer"
+                },
                 "deletedBy": {
                     "type": "integer"
                 },
-                "description": {
-                    "description": "description",
-                    "type": "string"
-                },
-                "id": {
-                    "description": "id",
-                    "type": "integer"
-                },
-                "name": {
-                    "description": "name",
+                "machineID": {
+                    "description": "机器ID",
                     "type": "integer"
                 },
                 "updatedAt": {
@@ -6025,9 +5992,9 @@ const docTemplate = `{
                 "updatedBy": {
                     "type": "integer"
                 },
-                "valueType": {
-                    "description": "ValueType",
-                    "type": "integer"
+                "value": {
+                    "description": "值",
+                    "type": "number"
                 }
             }
         },
@@ -6035,9 +6002,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "description",
-                "id",
-                "name",
-                "valueType"
+                "name"
             ],
             "properties": {
                 "ID": {
@@ -6055,15 +6020,11 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "description": {
-                    "description": "description",
+                    "description": "描述",
                     "type": "string"
                 },
-                "id": {
-                    "description": "id",
-                    "type": "integer"
-                },
                 "name": {
-                    "description": "name",
+                    "description": "名称",
                     "type": "string"
                 },
                 "updatedAt": {
@@ -6072,10 +6033,6 @@ const docTemplate = `{
                 },
                 "updatedBy": {
                     "type": "integer"
-                },
-                "valueType": {
-                    "description": "ValueType",
-                    "type": "string"
                 }
             }
         },
@@ -6083,10 +6040,9 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "description",
-                "id",
+                "ip_addr",
                 "name",
-                "password",
-                "valueType"
+                "password"
             ],
             "properties": {
                 "ID": {
@@ -6104,19 +6060,19 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "description": {
-                    "description": "description",
+                    "description": "描述",
                     "type": "string"
                 },
-                "id": {
-                    "description": "id",
-                    "type": "integer"
+                "ip_addr": {
+                    "description": "IP地址",
+                    "type": "string"
                 },
                 "name": {
-                    "description": "name",
+                    "description": "名字",
                     "type": "string"
                 },
                 "password": {
-                    "description": "Password",
+                    "description": "密钥",
                     "type": "string"
                 },
                 "updatedAt": {
@@ -6125,10 +6081,6 @@ const docTemplate = `{
                 },
                 "updatedBy": {
                     "type": "integer"
-                },
-                "valueType": {
-                    "description": "ValueType",
-                    "type": "string"
                 }
             }
         },
