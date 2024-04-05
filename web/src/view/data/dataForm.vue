@@ -2,14 +2,14 @@
   <div>
     <div class="gva-form-box">
       <el-form :model="formData" ref="elFormRef" label-position="right" :rules="rule" label-width="80px">
-        <el-form-item label="name:" prop="name">
-          <el-input v-model.number="formData.name" :clearable="true" placeholder="请输入" />
+        <el-form-item label="数据类型:" prop="dataTypeID">
+          <el-input v-model.number="formData.dataTypeID" :clearable="true" placeholder="请输入" />
        </el-form-item>
-        <el-form-item label="description:" prop="description">
-          <el-input v-model="formData.description" :clearable="true"  placeholder="请输入description" />
+        <el-form-item label="值:" prop="value">
+          <el-input-number v-model="formData.value" :precision="2" :clearable="true"></el-input-number>
        </el-form-item>
-        <el-form-item label="ValueType:" prop="valueType">
-          <el-input v-model.number="formData.valueType" :clearable="true" placeholder="请输入" />
+        <el-form-item label="ValueType:" prop="machineID">
+          <el-input v-model.number="formData.machineID" :clearable="true" placeholder="请输入" />
        </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="save">保存</el-button>
@@ -42,23 +42,23 @@ const router = useRouter()
 
 const type = ref('')
 const formData = ref({
-            name: 0,
-            description: '',
-            valueType: 0,
+            dataTypeID: 0,
+            value: 0,
+            machineID: 0,
         })
 // 验证规则
 const rule = reactive({
-               name : [{
+               dataTypeID : [{
                    required: true,
                    message: '',
                    trigger: ['input','blur'],
                }],
-               description : [{
+               value : [{
                    required: true,
                    message: '',
                    trigger: ['input','blur'],
                }],
-               valueType : [{
+               machineID : [{
                    required: true,
                    message: '',
                    trigger: ['input','blur'],

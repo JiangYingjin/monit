@@ -2,11 +2,14 @@
   <div>
     <div class="gva-form-box">
       <el-form :model="formData" ref="elFormRef" label-position="right" :rules="rule" label-width="80px">
-        <el-form-item label="名称:" prop="name">
-          <el-input v-model="formData.name" :clearable="true"  placeholder="请输入名称" />
+        <el-form-item label="name:" prop="name">
+          <el-input v-model="formData.name" :clearable="true"  placeholder="请输入name" />
        </el-form-item>
-        <el-form-item label="描述:" prop="description">
-          <el-input v-model="formData.description" :clearable="true"  placeholder="请输入描述" />
+        <el-form-item label="description:" prop="description">
+          <el-input v-model="formData.description" :clearable="true"  placeholder="请输入description" />
+       </el-form-item>
+        <el-form-item label="ValueType:" prop="valueType">
+          <el-input v-model="formData.valueType" :clearable="true"  placeholder="请输入ValueType" />
        </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="save">保存</el-button>
@@ -41,6 +44,7 @@ const type = ref('')
 const formData = ref({
             name: '',
             description: '',
+            valueType: '',
         })
 // 验证规则
 const rule = reactive({
@@ -50,6 +54,11 @@ const rule = reactive({
                    trigger: ['input','blur'],
                }],
                description : [{
+                   required: true,
+                   message: '',
+                   trigger: ['input','blur'],
+               }],
+               valueType : [{
                    required: true,
                    message: '',
                    trigger: ['input','blur'],

@@ -41,9 +41,9 @@
             <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
         </el-table-column>
         
-        <el-table-column align="left" label="name" prop="name" width="120" />
-        <el-table-column align="left" label="description" prop="description" width="120" />
-        <el-table-column align="left" label="ValueType" prop="valueType" width="120" />
+        <el-table-column align="left" label="数据类型" prop="dataTypeID" width="120" />
+        <el-table-column align="left" label="值" prop="value" width="120" />
+        <el-table-column align="left" label="ValueType" prop="machineID" width="120" />
         <el-table-column align="left" label="操作" fixed="right" min-width="240">
             <template #default="scope">
             <el-button type="primary" link class="table-button" @click="getDetails(scope.row)">
@@ -79,14 +79,14 @@
             </template>
 
           <el-form :model="formData" label-position="top" ref="elFormRef" :rules="rule" label-width="80px">
-            <el-form-item label="name:"  prop="name" >
-              <el-input v-model.number="formData.name" :clearable="true" placeholder="请输入name" />
+            <el-form-item label="数据类型:"  prop="dataTypeID" >
+              <el-input v-model.number="formData.dataTypeID" :clearable="true" placeholder="请输入数据类型" />
             </el-form-item>
-            <el-form-item label="description:"  prop="description" >
-              <el-input v-model="formData.description" :clearable="true"  placeholder="请输入description" />
+            <el-form-item label="值:"  prop="value" >
+              <el-input-number v-model="formData.value"  style="width:100%" :precision="2" :clearable="true"  />
             </el-form-item>
-            <el-form-item label="ValueType:"  prop="valueType" >
-              <el-input v-model.number="formData.valueType" :clearable="true" placeholder="请输入ValueType" />
+            <el-form-item label="ValueType:"  prop="machineID" >
+              <el-input v-model.number="formData.machineID" :clearable="true" placeholder="请输入ValueType" />
             </el-form-item>
           </el-form>
     </el-drawer>
@@ -98,14 +98,14 @@
              </div>
          </template>
         <el-descriptions :column="1" border>
-                <el-descriptions-item label="name">
-                        {{ formData.name }}
+                <el-descriptions-item label="数据类型">
+                        {{ formData.dataTypeID }}
                 </el-descriptions-item>
-                <el-descriptions-item label="description">
-                        {{ formData.description }}
+                <el-descriptions-item label="值">
+                        {{ formData.value }}
                 </el-descriptions-item>
                 <el-descriptions-item label="ValueType">
-                        {{ formData.valueType }}
+                        {{ formData.machineID }}
                 </el-descriptions-item>
         </el-descriptions>
     </el-drawer>
@@ -133,32 +133,27 @@ defineOptions({
 
 // 自动化生成的字典（可能为空）以及字段
 const formData = ref({
-        name: 0,
-        description: '',
-        valueType: 0,
+        dataTypeID: 0,
+        value: 0,
+        machineID: 0,
         })
 
 
 // 验证规则
 const rule = reactive({
-               name : [{
+               dataTypeID : [{
                    required: true,
                    message: '',
                    trigger: ['input','blur'],
                },
               ],
-               description : [{
+               value : [{
                    required: true,
                    message: '',
                    trigger: ['input','blur'],
                },
-               {
-                   whitespace: true,
-                   message: '不能只输入空格',
-                   trigger: ['input', 'blur'],
-              }
               ],
-               valueType : [{
+               machineID : [{
                    required: true,
                    message: '',
                    trigger: ['input','blur'],
@@ -352,9 +347,9 @@ const getDetails = async (row) => {
 const closeDetailShow = () => {
   detailShow.value = false
   formData.value = {
-          name: 0,
-          description: '',
-          valueType: 0,
+          dataTypeID: 0,
+          value: 0,
+          machineID: 0,
           }
 }
 
@@ -369,9 +364,9 @@ const openDialog = () => {
 const closeDialog = () => {
     dialogFormVisible.value = false
     formData.value = {
-        name: 0,
-        description: '',
-        valueType: 0,
+        dataTypeID: 0,
+        value: 0,
+        machineID: 0,
         }
 }
 // 弹窗确定

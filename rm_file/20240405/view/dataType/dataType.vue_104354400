@@ -41,8 +41,9 @@
             <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
         </el-table-column>
         
-        <el-table-column align="left" label="名称" prop="name" width="120" />
-        <el-table-column align="left" label="描述" prop="description" width="120" />
+        <el-table-column align="left" label="name" prop="name" width="120" />
+        <el-table-column align="left" label="description" prop="description" width="120" />
+        <el-table-column align="left" label="ValueType" prop="valueType" width="120" />
         <el-table-column align="left" label="操作" fixed="right" min-width="240">
             <template #default="scope">
             <el-button type="primary" link class="table-button" @click="getDetails(scope.row)">
@@ -78,11 +79,14 @@
             </template>
 
           <el-form :model="formData" label-position="top" ref="elFormRef" :rules="rule" label-width="80px">
-            <el-form-item label="名称:"  prop="name" >
-              <el-input v-model="formData.name" :clearable="true"  placeholder="请输入名称" />
+            <el-form-item label="name:"  prop="name" >
+              <el-input v-model="formData.name" :clearable="true"  placeholder="请输入name" />
             </el-form-item>
-            <el-form-item label="描述:"  prop="description" >
-              <el-input v-model="formData.description" :clearable="true"  placeholder="请输入描述" />
+            <el-form-item label="description:"  prop="description" >
+              <el-input v-model="formData.description" :clearable="true"  placeholder="请输入description" />
+            </el-form-item>
+            <el-form-item label="ValueType:"  prop="valueType" >
+              <el-input v-model="formData.valueType" :clearable="true"  placeholder="请输入ValueType" />
             </el-form-item>
           </el-form>
     </el-drawer>
@@ -94,11 +98,14 @@
              </div>
          </template>
         <el-descriptions :column="1" border>
-                <el-descriptions-item label="名称">
+                <el-descriptions-item label="name">
                         {{ formData.name }}
                 </el-descriptions-item>
-                <el-descriptions-item label="描述">
+                <el-descriptions-item label="description">
                         {{ formData.description }}
+                </el-descriptions-item>
+                <el-descriptions-item label="ValueType">
+                        {{ formData.valueType }}
                 </el-descriptions-item>
         </el-descriptions>
     </el-drawer>
@@ -128,6 +135,7 @@ defineOptions({
 const formData = ref({
         name: '',
         description: '',
+        valueType: '',
         })
 
 
@@ -145,6 +153,17 @@ const rule = reactive({
               }
               ],
                description : [{
+                   required: true,
+                   message: '',
+                   trigger: ['input','blur'],
+               },
+               {
+                   whitespace: true,
+                   message: '不能只输入空格',
+                   trigger: ['input', 'blur'],
+              }
+              ],
+               valueType : [{
                    required: true,
                    message: '',
                    trigger: ['input','blur'],
@@ -345,6 +364,7 @@ const closeDetailShow = () => {
   formData.value = {
           name: '',
           description: '',
+          valueType: '',
           }
 }
 
@@ -361,6 +381,7 @@ const closeDialog = () => {
     formData.value = {
         name: '',
         description: '',
+        valueType: '',
         }
 }
 // 弹窗确定
