@@ -2,9 +2,6 @@
   <div>
     <div class="gva-form-box">
       <el-form :model="formData" ref="elFormRef" label-position="right" :rules="rule" label-width="80px">
-        <el-form-item label="id:" prop="id">
-          <el-input v-model.number="formData.id" :clearable="false" placeholder="请输入" />
-       </el-form-item>
         <el-form-item label="name:" prop="name">
           <el-input v-model="formData.name" :clearable="true"  placeholder="请输入name" />
        </el-form-item>
@@ -45,18 +42,12 @@ const router = useRouter()
 
 const type = ref('')
 const formData = ref({
-            id: 0,
             name: '',
             description: '',
             valueType: '',
         })
 // 验证规则
 const rule = reactive({
-               id : [{
-                   required: true,
-                   message: '',
-                   trigger: ['input','blur'],
-               }],
                name : [{
                    required: true,
                    message: '',

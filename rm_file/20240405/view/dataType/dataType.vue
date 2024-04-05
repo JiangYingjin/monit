@@ -41,6 +41,7 @@
             <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
         </el-table-column>
         
+        <el-table-column align="left" label="id" prop="id" width="120" />
         <el-table-column align="left" label="name" prop="name" width="120" />
         <el-table-column align="left" label="description" prop="description" width="120" />
         <el-table-column align="left" label="ValueType" prop="valueType" width="120" />
@@ -79,6 +80,9 @@
             </template>
 
           <el-form :model="formData" label-position="top" ref="elFormRef" :rules="rule" label-width="80px">
+            <el-form-item label="id:"  prop="id" >
+              <el-input v-model.number="formData.id" :clearable="false" placeholder="请输入id" />
+            </el-form-item>
             <el-form-item label="name:"  prop="name" >
               <el-input v-model="formData.name" :clearable="true"  placeholder="请输入name" />
             </el-form-item>
@@ -98,6 +102,9 @@
              </div>
          </template>
         <el-descriptions :column="1" border>
+                <el-descriptions-item label="id">
+                        {{ formData.id }}
+                </el-descriptions-item>
                 <el-descriptions-item label="name">
                         {{ formData.name }}
                 </el-descriptions-item>
@@ -133,6 +140,7 @@ defineOptions({
 
 // 自动化生成的字典（可能为空）以及字段
 const formData = ref({
+        id: 0,
         name: '',
         description: '',
         valueType: '',
@@ -141,6 +149,12 @@ const formData = ref({
 
 // 验证规则
 const rule = reactive({
+               id : [{
+                   required: true,
+                   message: '',
+                   trigger: ['input','blur'],
+               },
+              ],
                name : [{
                    required: true,
                    message: '',
@@ -362,6 +376,7 @@ const getDetails = async (row) => {
 const closeDetailShow = () => {
   detailShow.value = false
   formData.value = {
+          id: 0,
           name: '',
           description: '',
           valueType: '',
@@ -379,6 +394,7 @@ const openDialog = () => {
 const closeDialog = () => {
     dialogFormVisible.value = false
     formData.value = {
+        id: 0,
         name: '',
         description: '',
         valueType: '',

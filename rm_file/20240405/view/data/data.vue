@@ -41,6 +41,7 @@
             <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
         </el-table-column>
         
+        <el-table-column align="left" label="id" prop="id" width="120" />
         <el-table-column align="left" label="name" prop="name" width="120" />
         <el-table-column align="left" label="description" prop="description" width="120" />
         <el-table-column align="left" label="ValueType" prop="valueType" width="120" />
@@ -50,7 +51,7 @@
                 <el-icon style="margin-right: 5px"><InfoFilled /></el-icon>
                 查看详情
             </el-button>
-            <el-button type="primary" link icon="edit" class="table-button" @click="updateDataTypeFunc(scope.row)">变更</el-button>
+            <el-button type="primary" link icon="edit" class="table-button" @click="updateDataFunc(scope.row)">变更</el-button>
             <el-button type="primary" link icon="delete" @click="deleteRow(scope.row)">删除</el-button>
             </template>
         </el-table-column>
@@ -79,14 +80,17 @@
             </template>
 
           <el-form :model="formData" label-position="top" ref="elFormRef" :rules="rule" label-width="80px">
+            <el-form-item label="id:"  prop="id" >
+              <el-input v-model.number="formData.id" :clearable="false" placeholder="请输入id" />
+            </el-form-item>
             <el-form-item label="name:"  prop="name" >
-              <el-input v-model="formData.name" :clearable="true"  placeholder="请输入name" />
+              <el-input v-model.number="formData.name" :clearable="true" placeholder="请输入name" />
             </el-form-item>
             <el-form-item label="description:"  prop="description" >
               <el-input v-model="formData.description" :clearable="true"  placeholder="请输入description" />
             </el-form-item>
             <el-form-item label="ValueType:"  prop="valueType" >
-              <el-input v-model="formData.valueType" :clearable="true"  placeholder="请输入ValueType" />
+              <el-input v-model.number="formData.valueType" :clearable="true" placeholder="请输入ValueType" />
             </el-form-item>
           </el-form>
     </el-drawer>
@@ -98,6 +102,9 @@
              </div>
          </template>
         <el-descriptions :column="1" border>
+                <el-descriptions-item label="id">
+                        {{ formData.id }}
+                </el-descriptions-item>
                 <el-descriptions-item label="name">
                         {{ formData.name }}
                 </el-descriptions-item>
@@ -114,13 +121,13 @@
 
 <script setup>
 import {
-  createDataType,
-  deleteDataType,
-  deleteDataTypeByIds,
-  updateDataType,
-  findDataType,
-  getDataTypeList
-} from '@/api/dataType'
+  createData,
+  deleteData,
+  deleteDataByIds,
+  updateData,
+  findData,
+  getDataList
+} from '@/api/data'
 
 // 全量引入格式化工具 请按需保留
 import { getDictFunc, formatDate, formatBoolean, filterDict, ReturnArrImg, onDownloadFile } from '@/utils/format'
@@ -128,29 +135,31 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { ref, reactive } from 'vue'
 
 defineOptions({
-    name: 'DataType'
+    name: 'Data'
 })
 
 // 自动化生成的字典（可能为空）以及字段
 const formData = ref({
-        name: '',
+        id: 0,
+        name: 0,
         description: '',
-        valueType: '',
+        valueType: 0,
         })
 
 
 // 验证规则
 const rule = reactive({
+               id : [{
+                   required: true,
+                   message: '',
+                   trigger: ['input','blur'],
+               },
+              ],
                name : [{
                    required: true,
                    message: '',
                    trigger: ['input','blur'],
                },
-               {
-                   whitespace: true,
-                   message: '不能只输入空格',
-                   trigger: ['input', 'blur'],
-              }
               ],
                description : [{
                    required: true,
@@ -168,11 +177,6 @@ const rule = reactive({
                    message: '',
                    trigger: ['input','blur'],
                },
-               {
-                   whitespace: true,
-                   message: '不能只输入空格',
-                   trigger: ['input', 'blur'],
-              }
               ],
 })
 
@@ -232,7 +236,7 @@ const handleCurrentChange = (val) => {
 
 // 查询
 const getTableData = async() => {
-  const table = await getDataTypeList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+  const table = await getDataList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
   if (table.code === 0) {
     tableData.value = table.data.list
     total.value = table.data.total
@@ -267,7 +271,7 @@ const deleteRow = (row) => {
         cancelButtonText: '取消',
         type: 'warning'
     }).then(() => {
-            deleteDataTypeFunc(row)
+            deleteDataFunc(row)
         })
     }
 
@@ -290,7 +294,7 @@ const onDelete = async() => {
         multipleSelection.value.map(item => {
           IDs.push(item.ID)
         })
-      const res = await deleteDataTypeByIds({ IDs })
+      const res = await deleteDataByIds({ IDs })
       if (res.code === 0) {
         ElMessage({
           type: 'success',
@@ -308,19 +312,19 @@ const onDelete = async() => {
 const type = ref('')
 
 // 更新行
-const updateDataTypeFunc = async(row) => {
-    const res = await findDataType({ ID: row.ID })
+const updateDataFunc = async(row) => {
+    const res = await findData({ ID: row.ID })
     type.value = 'update'
     if (res.code === 0) {
-        formData.value = res.data.redataType
+        formData.value = res.data.redata
         dialogFormVisible.value = true
     }
 }
 
 
 // 删除行
-const deleteDataTypeFunc = async (row) => {
-    const res = await deleteDataType({ ID: row.ID })
+const deleteDataFunc = async (row) => {
+    const res = await deleteData({ ID: row.ID })
     if (res.code === 0) {
         ElMessage({
                 type: 'success',
@@ -350,9 +354,9 @@ const openDetailShow = () => {
 // 打开详情
 const getDetails = async (row) => {
   // 打开弹窗
-  const res = await findDataType({ ID: row.ID })
+  const res = await findData({ ID: row.ID })
   if (res.code === 0) {
-    formData.value = res.data.redataType
+    formData.value = res.data.redata
     openDetailShow()
   }
 }
@@ -362,9 +366,10 @@ const getDetails = async (row) => {
 const closeDetailShow = () => {
   detailShow.value = false
   formData.value = {
-          name: '',
+          id: 0,
+          name: 0,
           description: '',
-          valueType: '',
+          valueType: 0,
           }
 }
 
@@ -379,9 +384,10 @@ const openDialog = () => {
 const closeDialog = () => {
     dialogFormVisible.value = false
     formData.value = {
-        name: '',
+        id: 0,
+        name: 0,
         description: '',
-        valueType: '',
+        valueType: 0,
         }
 }
 // 弹窗确定
@@ -391,13 +397,13 @@ const enterDialog = async () => {
               let res
               switch (type.value) {
                 case 'create':
-                  res = await createDataType(formData.value)
+                  res = await createData(formData.value)
                   break
                 case 'update':
-                  res = await updateDataType(formData.value)
+                  res = await updateData(formData.value)
                   break
                 default:
-                  res = await createDataType(formData.value)
+                  res = await createData(formData.value)
                   break
               }
               if (res.code === 0) {

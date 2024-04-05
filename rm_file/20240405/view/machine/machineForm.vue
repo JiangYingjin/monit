@@ -2,14 +2,20 @@
   <div>
     <div class="gva-form-box">
       <el-form :model="formData" ref="elFormRef" label-position="right" :rules="rule" label-width="80px">
+        <el-form-item label="id:" prop="id">
+          <el-input v-model.number="formData.id" :clearable="false" placeholder="请输入" />
+       </el-form-item>
         <el-form-item label="name:" prop="name">
-          <el-input v-model.number="formData.name" :clearable="true" placeholder="请输入" />
+          <el-input v-model="formData.name" :clearable="true"  placeholder="请输入name" />
        </el-form-item>
         <el-form-item label="description:" prop="description">
           <el-input v-model="formData.description" :clearable="true"  placeholder="请输入description" />
        </el-form-item>
         <el-form-item label="ValueType:" prop="valueType">
-          <el-input v-model.number="formData.valueType" :clearable="true" placeholder="请输入" />
+          <el-input v-model="formData.valueType" :clearable="true"  placeholder="请输入ValueType" />
+       </el-form-item>
+        <el-form-item label="Password:" prop="password">
+          <el-input v-model="formData.password" :clearable="true"  placeholder="请输入Password" />
        </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="save">保存</el-button>
@@ -22,13 +28,13 @@
 
 <script setup>
 import {
-  createData,
-  updateData,
-  findData
-} from '@/api/data'
+  createMachine,
+  updateMachine,
+  findMachine
+} from '@/api/machine'
 
 defineOptions({
-    name: 'DataForm'
+    name: 'MachineForm'
 })
 
 // 自动获取字典
@@ -42,12 +48,19 @@ const router = useRouter()
 
 const type = ref('')
 const formData = ref({
-            name: 0,
+            id: 0,
+            name: '',
             description: '',
-            valueType: 0,
+            valueType: '',
+            password: '',
         })
 // 验证规则
 const rule = reactive({
+               id : [{
+                   required: true,
+                   message: '',
+                   trigger: ['input','blur'],
+               }],
                name : [{
                    required: true,
                    message: '',
@@ -63,6 +76,11 @@ const rule = reactive({
                    message: '',
                    trigger: ['input','blur'],
                }],
+               password : [{
+                   required: true,
+                   message: '',
+                   trigger: ['input','blur'],
+               }],
 })
 
 const elFormRef = ref()
@@ -71,9 +89,9 @@ const elFormRef = ref()
 const init = async () => {
  // 建议通过url传参获取目标数据ID 调用 find方法进行查询数据操作 从而决定本页面是create还是update 以下为id作为url参数示例
     if (route.query.id) {
-      const res = await findData({ ID: route.query.id })
+      const res = await findMachine({ ID: route.query.id })
       if (res.code === 0) {
-        formData.value = res.data.redata
+        formData.value = res.data.remachine
         type.value = 'update'
       }
     } else {
@@ -89,13 +107,13 @@ const save = async() => {
             let res
            switch (type.value) {
              case 'create':
-               res = await createData(formData.value)
+               res = await createMachine(formData.value)
                break
              case 'update':
-               res = await updateData(formData.value)
+               res = await updateMachine(formData.value)
                break
              default:
-               res = await createData(formData.value)
+               res = await createMachine(formData.value)
                break
            }
            if (res.code === 0) {

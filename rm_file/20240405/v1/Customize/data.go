@@ -11,30 +11,30 @@ import (
 	"go.uber.org/zap"
 )
 
-type MachineApi struct {
+type DataApi struct {
 }
 
-var machineService = service.ServiceGroupApp.CustomizeServiceGroup.MachineService
+var dataService = service.ServiceGroupApp.CustomizeServiceGroup.DataService
 
-// CreateMachine 创建Machine
-// @Tags Machine
-// @Summary 创建Machine
+// CreateData 创建Data
+// @Tags Data
+// @Summary 创建Data
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data body Customize.Machine true "创建Machine"
+// @Param data body Customize.Data true "创建Data"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"创建成功"}"
-// @Router /machine/createMachine [post]
-func (machineApi *MachineApi) CreateMachine(c *gin.Context) {
-	var machine Customize.Machine
-	err := c.ShouldBindJSON(&machine)
+// @Router /data/createData [post]
+func (dataApi *DataApi) CreateData(c *gin.Context) {
+	var data Customize.Data
+	err := c.ShouldBindJSON(&data)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	machine.CreatedBy = utils.GetUserID(c)
+	data.CreatedBy = utils.GetUserID(c)
 
-	if err := machineService.CreateMachine(&machine); err != nil {
+	if err := dataService.CreateData(&data); err != nil {
 		global.GVA_LOG.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)
 	} else {
@@ -42,19 +42,19 @@ func (machineApi *MachineApi) CreateMachine(c *gin.Context) {
 	}
 }
 
-// DeleteMachine 删除Machine
-// @Tags Machine
-// @Summary 删除Machine
+// DeleteData 删除Data
+// @Tags Data
+// @Summary 删除Data
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data body Customize.Machine true "删除Machine"
+// @Param data body Customize.Data true "删除Data"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
-// @Router /machine/deleteMachine [delete]
-func (machineApi *MachineApi) DeleteMachine(c *gin.Context) {
+// @Router /data/deleteData [delete]
+func (dataApi *DataApi) DeleteData(c *gin.Context) {
 	ID := c.Query("ID")
 	userID := utils.GetUserID(c)
-	if err := machineService.DeleteMachine(ID, userID); err != nil {
+	if err := dataService.DeleteData(ID, userID); err != nil {
 		global.GVA_LOG.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
 	} else {
@@ -62,18 +62,18 @@ func (machineApi *MachineApi) DeleteMachine(c *gin.Context) {
 	}
 }
 
-// DeleteMachineByIds 批量删除Machine
-// @Tags Machine
-// @Summary 批量删除Machine
+// DeleteDataByIds 批量删除Data
+// @Tags Data
+// @Summary 批量删除Data
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"批量删除成功"}"
-// @Router /machine/deleteMachineByIds [delete]
-func (machineApi *MachineApi) DeleteMachineByIds(c *gin.Context) {
+// @Router /data/deleteDataByIds [delete]
+func (dataApi *DataApi) DeleteDataByIds(c *gin.Context) {
 	IDs := c.QueryArray("IDs[]")
 	userID := utils.GetUserID(c)
-	if err := machineService.DeleteMachineByIds(IDs, userID); err != nil {
+	if err := dataService.DeleteDataByIds(IDs, userID); err != nil {
 		global.GVA_LOG.Error("批量删除失败!", zap.Error(err))
 		response.FailWithMessage("批量删除失败", c)
 	} else {
@@ -81,25 +81,25 @@ func (machineApi *MachineApi) DeleteMachineByIds(c *gin.Context) {
 	}
 }
 
-// UpdateMachine 更新Machine
-// @Tags Machine
-// @Summary 更新Machine
+// UpdateData 更新Data
+// @Tags Data
+// @Summary 更新Data
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data body Customize.Machine true "更新Machine"
+// @Param data body Customize.Data true "更新Data"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"更新成功"}"
-// @Router /machine/updateMachine [put]
-func (machineApi *MachineApi) UpdateMachine(c *gin.Context) {
-	var machine Customize.Machine
-	err := c.ShouldBindJSON(&machine)
+// @Router /data/updateData [put]
+func (dataApi *DataApi) UpdateData(c *gin.Context) {
+	var data Customize.Data
+	err := c.ShouldBindJSON(&data)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	machine.UpdatedBy = utils.GetUserID(c)
+	data.UpdatedBy = utils.GetUserID(c)
 
-	if err := machineService.UpdateMachine(machine); err != nil {
+	if err := dataService.UpdateData(data); err != nil {
 		global.GVA_LOG.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
 	} else {
@@ -107,42 +107,42 @@ func (machineApi *MachineApi) UpdateMachine(c *gin.Context) {
 	}
 }
 
-// FindMachine 用id查询Machine
-// @Tags Machine
-// @Summary 用id查询Machine
+// FindData 用id查询Data
+// @Tags Data
+// @Summary 用id查询Data
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data query Customize.Machine true "用id查询Machine"
+// @Param data query Customize.Data true "用id查询Data"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
-// @Router /machine/findMachine [get]
-func (machineApi *MachineApi) FindMachine(c *gin.Context) {
+// @Router /data/findData [get]
+func (dataApi *DataApi) FindData(c *gin.Context) {
 	ID := c.Query("ID")
-	if remachine, err := machineService.GetMachine(ID); err != nil {
+	if redata, err := dataService.GetData(ID); err != nil {
 		global.GVA_LOG.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
 	} else {
-		response.OkWithData(gin.H{"remachine": remachine}, c)
+		response.OkWithData(gin.H{"redata": redata}, c)
 	}
 }
 
-// GetMachineList 分页获取Machine列表
-// @Tags Machine
-// @Summary 分页获取Machine列表
+// GetDataList 分页获取Data列表
+// @Tags Data
+// @Summary 分页获取Data列表
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data query CustomizeReq.MachineSearch true "分页获取Machine列表"
+// @Param data query CustomizeReq.DataSearch true "分页获取Data列表"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
-// @Router /machine/getMachineList [get]
-func (machineApi *MachineApi) GetMachineList(c *gin.Context) {
-	var pageInfo CustomizeReq.MachineSearch
+// @Router /data/getDataList [get]
+func (dataApi *DataApi) GetDataList(c *gin.Context) {
+	var pageInfo CustomizeReq.DataSearch
 	err := c.ShouldBindQuery(&pageInfo)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	if list, total, err := machineService.GetMachineInfoList(pageInfo); err != nil {
+	if list, total, err := dataService.GetDataInfoList(pageInfo); err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 	} else {

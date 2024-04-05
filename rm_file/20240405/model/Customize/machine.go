@@ -8,6 +8,7 @@ import (
 // Machine 结构体  Machine
 type Machine struct {
 	global.GVA_MODEL
+	Id          *int   `json:"id" form:"id" gorm:"primarykey;column:id;comment:;" binding:"required"`                 //id
 	Name        string `json:"name" form:"name" gorm:"column:name;comment:;" binding:"required"`                      //name
 	Description string `json:"description" form:"description" gorm:"column:description;comment:;" binding:"required"` //description
 	IPAddr      string `json:"valueType" form:"valueType" gorm:"column:value_type;comment:;" binding:"required"`      //ValueType

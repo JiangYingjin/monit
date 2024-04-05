@@ -41,16 +41,18 @@
             <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
         </el-table-column>
         
+        <el-table-column align="left" label="id" prop="id" width="120" />
         <el-table-column align="left" label="name" prop="name" width="120" />
         <el-table-column align="left" label="description" prop="description" width="120" />
         <el-table-column align="left" label="ValueType" prop="valueType" width="120" />
+        <el-table-column align="left" label="Password" prop="password" width="120" />
         <el-table-column align="left" label="操作" fixed="right" min-width="240">
             <template #default="scope">
             <el-button type="primary" link class="table-button" @click="getDetails(scope.row)">
                 <el-icon style="margin-right: 5px"><InfoFilled /></el-icon>
                 查看详情
             </el-button>
-            <el-button type="primary" link icon="edit" class="table-button" @click="updateDataTypeFunc(scope.row)">变更</el-button>
+            <el-button type="primary" link icon="edit" class="table-button" @click="updateMachineFunc(scope.row)">变更</el-button>
             <el-button type="primary" link icon="delete" @click="deleteRow(scope.row)">删除</el-button>
             </template>
         </el-table-column>
@@ -79,6 +81,9 @@
             </template>
 
           <el-form :model="formData" label-position="top" ref="elFormRef" :rules="rule" label-width="80px">
+            <el-form-item label="id:"  prop="id" >
+              <el-input v-model.number="formData.id" :clearable="false" placeholder="请输入id" />
+            </el-form-item>
             <el-form-item label="name:"  prop="name" >
               <el-input v-model="formData.name" :clearable="true"  placeholder="请输入name" />
             </el-form-item>
@@ -87,6 +92,9 @@
             </el-form-item>
             <el-form-item label="ValueType:"  prop="valueType" >
               <el-input v-model="formData.valueType" :clearable="true"  placeholder="请输入ValueType" />
+            </el-form-item>
+            <el-form-item label="Password:"  prop="password" >
+              <el-input v-model="formData.password" :clearable="true"  placeholder="请输入Password" />
             </el-form-item>
           </el-form>
     </el-drawer>
@@ -98,6 +106,9 @@
              </div>
          </template>
         <el-descriptions :column="1" border>
+                <el-descriptions-item label="id">
+                        {{ formData.id }}
+                </el-descriptions-item>
                 <el-descriptions-item label="name">
                         {{ formData.name }}
                 </el-descriptions-item>
@@ -107,6 +118,9 @@
                 <el-descriptions-item label="ValueType">
                         {{ formData.valueType }}
                 </el-descriptions-item>
+                <el-descriptions-item label="Password">
+                        {{ formData.password }}
+                </el-descriptions-item>
         </el-descriptions>
     </el-drawer>
   </div>
@@ -114,13 +128,13 @@
 
 <script setup>
 import {
-  createDataType,
-  deleteDataType,
-  deleteDataTypeByIds,
-  updateDataType,
-  findDataType,
-  getDataTypeList
-} from '@/api/dataType'
+  createMachine,
+  deleteMachine,
+  deleteMachineByIds,
+  updateMachine,
+  findMachine,
+  getMachineList
+} from '@/api/machine'
 
 // 全量引入格式化工具 请按需保留
 import { getDictFunc, formatDate, formatBoolean, filterDict, ReturnArrImg, onDownloadFile } from '@/utils/format'
@@ -128,19 +142,27 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { ref, reactive } from 'vue'
 
 defineOptions({
-    name: 'DataType'
+    name: 'Machine'
 })
 
 // 自动化生成的字典（可能为空）以及字段
 const formData = ref({
+        id: 0,
         name: '',
         description: '',
         valueType: '',
+        password: '',
         })
 
 
 // 验证规则
 const rule = reactive({
+               id : [{
+                   required: true,
+                   message: '',
+                   trigger: ['input','blur'],
+               },
+              ],
                name : [{
                    required: true,
                    message: '',
@@ -164,6 +186,17 @@ const rule = reactive({
               }
               ],
                valueType : [{
+                   required: true,
+                   message: '',
+                   trigger: ['input','blur'],
+               },
+               {
+                   whitespace: true,
+                   message: '不能只输入空格',
+                   trigger: ['input', 'blur'],
+              }
+              ],
+               password : [{
                    required: true,
                    message: '',
                    trigger: ['input','blur'],
@@ -232,7 +265,7 @@ const handleCurrentChange = (val) => {
 
 // 查询
 const getTableData = async() => {
-  const table = await getDataTypeList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+  const table = await getMachineList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
   if (table.code === 0) {
     tableData.value = table.data.list
     total.value = table.data.total
@@ -267,7 +300,7 @@ const deleteRow = (row) => {
         cancelButtonText: '取消',
         type: 'warning'
     }).then(() => {
-            deleteDataTypeFunc(row)
+            deleteMachineFunc(row)
         })
     }
 
@@ -290,7 +323,7 @@ const onDelete = async() => {
         multipleSelection.value.map(item => {
           IDs.push(item.ID)
         })
-      const res = await deleteDataTypeByIds({ IDs })
+      const res = await deleteMachineByIds({ IDs })
       if (res.code === 0) {
         ElMessage({
           type: 'success',
@@ -308,19 +341,19 @@ const onDelete = async() => {
 const type = ref('')
 
 // 更新行
-const updateDataTypeFunc = async(row) => {
-    const res = await findDataType({ ID: row.ID })
+const updateMachineFunc = async(row) => {
+    const res = await findMachine({ ID: row.ID })
     type.value = 'update'
     if (res.code === 0) {
-        formData.value = res.data.redataType
+        formData.value = res.data.remachine
         dialogFormVisible.value = true
     }
 }
 
 
 // 删除行
-const deleteDataTypeFunc = async (row) => {
-    const res = await deleteDataType({ ID: row.ID })
+const deleteMachineFunc = async (row) => {
+    const res = await deleteMachine({ ID: row.ID })
     if (res.code === 0) {
         ElMessage({
                 type: 'success',
@@ -350,9 +383,9 @@ const openDetailShow = () => {
 // 打开详情
 const getDetails = async (row) => {
   // 打开弹窗
-  const res = await findDataType({ ID: row.ID })
+  const res = await findMachine({ ID: row.ID })
   if (res.code === 0) {
-    formData.value = res.data.redataType
+    formData.value = res.data.remachine
     openDetailShow()
   }
 }
@@ -362,9 +395,11 @@ const getDetails = async (row) => {
 const closeDetailShow = () => {
   detailShow.value = false
   formData.value = {
+          id: 0,
           name: '',
           description: '',
           valueType: '',
+          password: '',
           }
 }
 
@@ -379,9 +414,11 @@ const openDialog = () => {
 const closeDialog = () => {
     dialogFormVisible.value = false
     formData.value = {
+        id: 0,
         name: '',
         description: '',
         valueType: '',
+        password: '',
         }
 }
 // 弹窗确定
@@ -391,13 +428,13 @@ const enterDialog = async () => {
               let res
               switch (type.value) {
                 case 'create':
-                  res = await createDataType(formData.value)
+                  res = await createMachine(formData.value)
                   break
                 case 'update':
-                  res = await updateDataType(formData.value)
+                  res = await updateMachine(formData.value)
                   break
                 default:
-                  res = await createDataType(formData.value)
+                  res = await createMachine(formData.value)
                   break
               }
               if (res.code === 0) {

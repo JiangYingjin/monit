@@ -8,6 +8,7 @@ import (
 // DataType 结构体  DataType
 type DataType struct {
 	global.GVA_MODEL
+	Id          *int   `json:"id" form:"id" gorm:"primarykey;column:id;comment:;" binding:"required"`                 //id
 	Name        string `json:"name" form:"name" gorm:"column:name;comment:;" binding:"required"`                      //name
 	Description string `json:"description" form:"description" gorm:"column:description;comment:;" binding:"required"` //description
 	ValueType   string `json:"valueType" form:"valueType" gorm:"column:value_type;comment:;" binding:"required"`      //ValueType

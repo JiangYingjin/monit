@@ -84,12 +84,11 @@ func Routers() *gin.Engine {
 	}
 	{
 		CustomizeRouter := router.RouterGroupApp.Customize
-		CustomizeRouter.InitDataTypeRouter(PublicGroup)
-
-		CustomizeRouter.InitDataRouter(PublicGroup)
-		CustomizeRouter.InitMachineRouter(PublicGroup)
 
 		CustomizeRouter.InitMyMachineRouter(PublicGroup)
+		CustomizeRouter.InitMachineRouter(PrivateGroup)
+		CustomizeRouter.InitDataRouter(PrivateGroup)
+		CustomizeRouter.InitDataTypeRouter(PrivateGroup)
 	}
 
 	global.GVA_LOG.Info("router register success")

@@ -1,7 +1,7 @@
 package Customize
 
 type RouterGroup struct {
-	DataTypeRouter
-	DataRouter
 	MachineRouter
+	DataRouter
+	DataTypeRouter
 }
