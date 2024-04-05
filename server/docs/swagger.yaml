@@ -876,7 +876,7 @@ definitions:
     type: object
   request.GetDataReq:
     properties:
-      data_type_ids:
+      data_type_id:
         type: string
       end_time:
         type: string
@@ -887,7 +887,7 @@ definitions:
       start_time:
         type: string
     required:
-    - data_type_ids
+    - data_type_id
     - end_time
     - machine_ids
     - start_time
@@ -3682,6 +3682,31 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: 分页获取Machine列表
+      tags:
+      - Machine
+  /machine/machineLogin:
+    post:
+      parameters:
+      - description: MachineID
+        in: body
+        name: MachineID
+        required: true
+        schema:
+          type: string
+      - description: Password
+        in: body
+        name: Password
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"success":true,"data":{},"msg":"登录成功"}'
+          schema:
+            type: string
+      summary: 机器登录
       tags:
       - Machine
   /machine/updateMachine:

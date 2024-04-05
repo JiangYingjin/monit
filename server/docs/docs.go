@@ -3342,6 +3342,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/machine/machineLogin": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Machine"
+                ],
+                "summary": "机器登录",
+                "parameters": [
+                    {
+                        "description": "MachineID",
+                        "name": "MachineID",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Password",
+                        "name": "Password",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"success\":true,\"data\":{},\"msg\":\"登录成功\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/machine/updateMachine": {
             "put": {
                 "security": [
@@ -7205,13 +7244,13 @@ const docTemplate = `{
         "request.GetDataReq": {
             "type": "object",
             "required": [
-                "data_type_ids",
+                "data_type_id",
                 "end_time",
                 "machine_ids",
                 "start_time"
             ],
             "properties": {
-                "data_type_ids": {
+                "data_type_id": {
                     "type": "string"
                 },
                 "end_time": {

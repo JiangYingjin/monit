@@ -18,13 +18,19 @@ type MyMachineApi struct {
 }
 
 // MachineLogin
-// @Tags     Base
-// @Summary  机器登录
-// @Produce   application/json
-// @Param    data  body      systemReq.Login                                             true  "用户名, 密码, 验证码"
-// @Success  200   {object}  response.Response{data=systemRes.LoginResponse,msg=string}  "返回包括用户信息,token,过期时间"
-// @Router   /base/login [post]
-func (b *MyMachineApi) MachineLogin(c *gin.Context) {
+// @Tags Machine
+// @Summary 机器登录
+// @Produce  application/json
+// @Param MachineID body string true "MachineID"
+// @Param Password body string true "Password"
+// @Success 200 {string} string "{"success":true,"data":{},"msg":"登录成功"}"
+// @Router /machine/machineLogin [post]
+//
+//	{
+//		"MachineID": "1",
+//		"Password": "123456"
+//	}
+func (m *MyMachineApi) MachineLogin(c *gin.Context) {
 	var l systemReq.MachineLoginReq
 	err := c.ShouldBindJSON(&l)
 	key := c.ClientIP()
@@ -47,7 +53,7 @@ func (b *MyMachineApi) MachineLogin(c *gin.Context) {
 		response.FailWithMessage("机器ID不存在或者密码错误", c)
 		return
 	}
-	b.TokenNext(c, machine)
+	m.TokenNext(c, machine)
 	return
 }
 
@@ -62,7 +68,7 @@ func (machine MachineClaim) Valid() error {
 }
 
 // TokenNext 登录以后签发jwt
-func (b *MyMachineApi) TokenNext(c *gin.Context, machine Customize.Machine) {
+func (m *MyMachineApi) TokenNext(c *gin.Context, machine Customize.Machine) {
 	j := &utils.JWT{SigningKey: []byte(global.GVA_CONFIG.JWT.SigningKey)} // 唯一签名
 
 	bf, _ := utils.ParseDuration(global.GVA_CONFIG.JWT.BufferTime)
@@ -101,6 +107,15 @@ func (b *MyMachineApi) TokenNext(c *gin.Context, machine Customize.Machine) {
 // @Produce application/json
 // @Param data body CustomizeReq.GetDataReq true "创建Machine"
 // @Router /machine/createMachine [post]
+//
+//	{
+//		"data_type_id": "1",
+//		"machine_ids": [
+//		"1"
+//		],
+//		"start_time": "1980-03-18 07:13:05",
+//		"end_time": "1989-07-28 18:34:43"
+//	}
 func (m *MyMachineApi) GetData(c *gin.Context) {
 	var req CustomizeReq.GetDataReq
 	if err := c.ShouldBindJSON(&req); err != nil {

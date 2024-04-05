@@ -25,6 +25,12 @@ var dataService = service.ServiceGroupApp.CustomizeServiceGroup.DataService
 // @Param data body Customize.Data true "创建Data"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"创建成功"}"
 // @Router /data/createData [post]
+//
+//	{
+//		"dataTypeID": 1,
+//		"machineID": 1,
+//		"value": 1.0
+//	}
 func (dataApi *DataApi) CreateData(c *gin.Context) {
 	var data Customize.Data
 	err := c.ShouldBindJSON(&data)
@@ -32,7 +38,7 @@ func (dataApi *DataApi) CreateData(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	data.CreatedBy = utils.GetUserID(c)
+	data.CreatedBy = uint(*data.MachineID)
 
 	if err := dataService.CreateData(&data); err != nil {
 		global.GVA_LOG.Error("创建失败!", zap.Error(err))
