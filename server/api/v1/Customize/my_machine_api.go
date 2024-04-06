@@ -6,6 +6,8 @@ import (
 	CustomizeReq "github.com/flipped-aurora/gin-vue-admin/server/model/Customize/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
 	systemReq "github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
+	Customize2 "github.com/flipped-aurora/gin-vue-admin/server/service/Customize"
+	"github.com/flipped-aurora/gin-vue-admin/server/service/system"
 	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
@@ -57,6 +59,77 @@ func (m *MyMachineApi) MachineLogin(c *gin.Context) {
 	return
 }
 
+// GetData 获取数据
+// @Tags Machine
+// @Summary 创建Machine
+// @Security ApiKeyAuth
+// @accept application/json
+// @Produce application/json
+// @Param data body CustomizeReq.GetDataReq true "创建Machine"
+// @Router /machine/createMachine [post]
+//
+//	{
+//		"data_type_id": "1",
+//		"machine_ids": [
+//		"1"
+//		],
+//		"start_time": "1980-03-18 07:13:05",
+//		"end_time": "1989-07-28 18:34:43"
+//	}
+func (m *MyMachineApi) GetData(c *gin.Context) {
+	var req CustomizeReq.GetDataReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+
+	for _, machineID := range req.MachineIDs {
+		_, err := machineService.GetMachine(machineID)
+		if err != nil {
+			response.FailWithMessage("machine not found", c)
+			return
+		}
+	}
+
+	result := make(map[string][]Customize.Data)
+	for _, machineID := range req.MachineIDs {
+		tmp := make([]Customize.Data, 0)
+		//global.GVA_DB.Where("machine_id in ?", req.MachineIDs).Where("data_type_id in ?", req.DataTypeID).Find(&Customize.Data{})
+		global.GVA_DB.Model(&Customize.DataType{}).
+			Where("machine_id = ? and data_type_id = ? and created_at between ? and ?", machineID, req.DataTypeID, req.StartTime, req.EndTime).
+			Find(&tmp)
+		result[machineID] = tmp
+	}
+
+	response.OkWithData(CustomizeReq.GetDataRsp{Data: result}, c)
+}
+
+func (m *MyMachineApi) UploadDataHook(data Customize.Data) {
+	// 检测数据是否异常
+
+	// 如果异常则发送告警
+	var warning Customize.MachineWarning
+	global.GVA_DB.Model(&Customize.MachineWarning{}).
+		Where("machine_id = ? and data_type_id = ?", data.MachineID, data.DataTypeID).
+		Find(&warning)
+	if warning != (Customize.MachineWarning{}) && *warning.Limit > *data.Value {
+		userService := system.UserService{}
+		userID, err := strconv.ParseInt(warning.ReporterID, 10, 64)
+		user, err := userService.FindUserById(int(userID))
+		if err != nil {
+			global.GVA_LOG.Error("获取用户信息失败", zap.Error(err))
+			return
+		}
+		warningMessage := "机器ID: " + strconv.FormatUint(uint64(*data.MachineID), 10) + " 数据类型ID: " + strconv.FormatUint(uint64(*data.DataTypeID), 10) + " 数据异常"
+		myMachineService := Customize2.MyMachineService{}
+		err = myMachineService.SendEmail(user.Email, warningMessage)
+		if err != nil {
+			global.GVA_LOG.Error("发送邮件失败", zap.Error(err))
+			return
+		}
+	}
+}
+
 type MachineClaim struct {
 	MachineID  string
 	BufferTime int64
@@ -97,47 +170,4 @@ func (m *MyMachineApi) TokenNext(c *gin.Context, machine Customize.Machine) {
 	rsp["Token"] = machineToken                                        // x-token
 	rsp["ExpiresAt"] = claims.RegisteredClaims.ExpiresAt.Unix() * 1000 // in ms
 	response.OkWithDetailed(rsp, "登录成功", c)
-}
-
-// GetData 获取数据
-// @Tags Machine
-// @Summary 创建Machine
-// @Security ApiKeyAuth
-// @accept application/json
-// @Produce application/json
-// @Param data body CustomizeReq.GetDataReq true "创建Machine"
-// @Router /machine/createMachine [post]
-//
-//	{
-//		"data_type_id": "1",
-//		"machine_ids": [
-//		"1"
-//		],
-//		"start_time": "1980-03-18 07:13:05",
-//		"end_time": "1989-07-28 18:34:43"
-//	}
-func (m *MyMachineApi) GetData(c *gin.Context) {
-	var req CustomizeReq.GetDataReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.FailWithMessage(err.Error(), c)
-		return
-	}
-
-	for _, machineID := range req.MachineIDs {
-		_, err := machineService.GetMachine(machineID)
-		if err != nil {
-			response.FailWithMessage("machine not found", c)
-			return
-		}
-	}
-
-	result := make(map[string][]Customize.Data)
-	for _, machineID := range req.MachineIDs {
-		tmp := make([]Customize.Data, 0)
-		//global.GVA_DB.Where("machine_id in ?", req.MachineIDs).Where("data_type_id in ?", req.DataTypeID).Find(&Customize.Data{})
-		global.GVA_DB.Where("machine_id = ?", machineID).Where("data_type_id = ?", req.DataTypeID).Where("created_at between ? and ?", req.StartTime, req.EndTime).Find(&tmp)
-		result[machineID] = tmp
-	}
-
-	response.OkWithData(CustomizeReq.GetDataRsp{Data: result}, c)
 }

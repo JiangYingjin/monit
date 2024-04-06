@@ -45,9 +45,6 @@
         <el-table-column align="left" label="描述" prop="description" width="120" />
         <el-table-column align="left" label="IP地址" prop="ip_addr" width="120" />
         <el-table-column align="left" label="密钥" prop="password" width="120" />
-        <el-table-column align="left" label="状态" prop="status" width="120">
-            <template #default="scope">{{ formatBoolean(scope.row.status) }}</template>
-        </el-table-column>
         <el-table-column align="left" label="操作" fixed="right" min-width="240">
             <template #default="scope">
             <el-button type="primary" link class="table-button" @click="getDetails(scope.row)">
@@ -95,9 +92,6 @@
             <el-form-item label="密钥:"  prop="password" >
               <el-input v-model="formData.password" :clearable="true"  placeholder="请输入密钥" />
             </el-form-item>
-            <el-form-item label="状态:"  prop="status" >
-              <el-switch v-model="formData.status" active-color="#13ce66" inactive-color="#ff4949" active-text="是" inactive-text="否" clearable ></el-switch>
-            </el-form-item>
           </el-form>
     </el-drawer>
 
@@ -119,9 +113,6 @@
                 </el-descriptions-item>
                 <el-descriptions-item label="密钥">
                         {{ formData.password }}
-                </el-descriptions-item>
-                <el-descriptions-item label="状态">
-                    {{ formatBoolean(formData.status) }}
                 </el-descriptions-item>
         </el-descriptions>
     </el-drawer>
@@ -153,7 +144,6 @@ const formData = ref({
         description: '',
         ip_addr: '',
         password: '',
-        status: false,
         })
 
 
@@ -243,9 +233,6 @@ const onSubmit = () => {
     if (!valid) return
     page.value = 1
     pageSize.value = 10
-    if (searchInfo.value.status === ""){
-        searchInfo.value.status=null
-    }
     getTableData()
   })
 }
@@ -398,7 +385,6 @@ const closeDetailShow = () => {
           description: '',
           ip_addr: '',
           password: '',
-          status: false,
           }
 }
 
@@ -417,7 +403,6 @@ const closeDialog = () => {
         description: '',
         ip_addr: '',
         password: '',
-        status: false,
         }
 }
 // 弹窗确定

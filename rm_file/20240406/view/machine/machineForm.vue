@@ -14,9 +14,6 @@
         <el-form-item label="密钥:" prop="password">
           <el-input v-model="formData.password" :clearable="true"  placeholder="请输入密钥" />
        </el-form-item>
-        <el-form-item label="状态:" prop="status">
-          <el-switch v-model="formData.status" active-color="#13ce66" inactive-color="#ff4949" active-text="是" inactive-text="否" clearable ></el-switch>
-       </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="save">保存</el-button>
           <el-button type="primary" @click="back">返回</el-button>
@@ -52,7 +49,6 @@ const formData = ref({
             description: '',
             ip_addr: '',
             password: '',
-            status: false,
         })
 // 验证规则
 const rule = reactive({

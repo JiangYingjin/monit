@@ -12,7 +12,6 @@ type Machine struct {
 	Description string `json:"description" form:"description" gorm:"column:description;comment:;" binding:"required"` //描述
 	IPAddr      string `json:"ip_addr" form:"ip_addr" gorm:"column:ip_addr;comment:;" binding:"required"`             //IP地址
 	Password    string `json:"password" form:"password" gorm:"column:password;comment:;" binding:"required"`          //密钥
-	Status      *bool  `json:"status" form:"status" gorm:"column:status;comment:;"`                                   //状态
 	CreatedBy   uint   `gorm:"column:created_by;comment:创建者"`
 	UpdatedBy   uint   `gorm:"column:updated_by;comment:更新者"`
 	DeletedBy   uint   `gorm:"column:deleted_by;comment:删除者"`

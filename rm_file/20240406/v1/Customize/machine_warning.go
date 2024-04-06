@@ -11,58 +11,50 @@ import (
 	"go.uber.org/zap"
 )
 
-type DataApi struct {
+type MachineWarningApi struct {
 }
 
-var dataService = service.ServiceGroupApp.CustomizeServiceGroup.DataService
+var machineWarningService = service.ServiceGroupApp.CustomizeServiceGroup.MachineWarningService
 
-// CreateData 创建Data
-// @Tags Data
-// @Summary 创建Data
+// CreateMachineWarning 创建机器告警
+// @Tags MachineWarning
+// @Summary 创建机器告警
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data body Customize.Data true "创建Data"
+// @Param data body Customize.MachineWarning true "创建机器告警"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"创建成功"}"
-// @Router /data/createData [post]
-//
-//	{
-//		"dataTypeID": 1,
-//		"machineID": 1,
-//		"value": 1.0
-//	}
-func (dataApi *DataApi) CreateData(c *gin.Context) {
-	var data Customize.Data
-	err := c.ShouldBindJSON(&data)
+// @Router /machineWarning/createMachineWarning [post]
+func (machineWarningApi *MachineWarningApi) CreateMachineWarning(c *gin.Context) {
+	var machineWarning Customize.MachineWarning
+	err := c.ShouldBindJSON(&machineWarning)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	data.CreatedBy = uint(*data.MachineID)
+	machineWarning.CreatedBy = utils.GetUserID(c)
 
-	if err := dataService.CreateData(&data); err != nil {
+	if err := machineWarningService.CreateMachineWarning(&machineWarning); err != nil {
 		global.GVA_LOG.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)
 	} else {
 		response.OkWithMessage("创建成功", c)
-		myMachineApi := MyMachineApi{}
-		myMachineApi.UploadDataHook(data)
 	}
 }
 
-// DeleteData 删除Data
-// @Tags Data
-// @Summary 删除Data
+// DeleteMachineWarning 删除机器告警
+// @Tags MachineWarning
+// @Summary 删除机器告警
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data body Customize.Data true "删除Data"
+// @Param data body Customize.MachineWarning true "删除机器告警"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"删除成功"}"
-// @Router /data/deleteData [delete]
-func (dataApi *DataApi) DeleteData(c *gin.Context) {
+// @Router /machineWarning/deleteMachineWarning [delete]
+func (machineWarningApi *MachineWarningApi) DeleteMachineWarning(c *gin.Context) {
 	ID := c.Query("ID")
 	userID := utils.GetUserID(c)
-	if err := dataService.DeleteData(ID, userID); err != nil {
+	if err := machineWarningService.DeleteMachineWarning(ID, userID); err != nil {
 		global.GVA_LOG.Error("删除失败!", zap.Error(err))
 		response.FailWithMessage("删除失败", c)
 	} else {
@@ -70,18 +62,18 @@ func (dataApi *DataApi) DeleteData(c *gin.Context) {
 	}
 }
 
-// DeleteDataByIds 批量删除Data
-// @Tags Data
-// @Summary 批量删除Data
+// DeleteMachineWarningByIds 批量删除机器告警
+// @Tags MachineWarning
+// @Summary 批量删除机器告警
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"批量删除成功"}"
-// @Router /data/deleteDataByIds [delete]
-func (dataApi *DataApi) DeleteDataByIds(c *gin.Context) {
+// @Router /machineWarning/deleteMachineWarningByIds [delete]
+func (machineWarningApi *MachineWarningApi) DeleteMachineWarningByIds(c *gin.Context) {
 	IDs := c.QueryArray("IDs[]")
 	userID := utils.GetUserID(c)
-	if err := dataService.DeleteDataByIds(IDs, userID); err != nil {
+	if err := machineWarningService.DeleteMachineWarningByIds(IDs, userID); err != nil {
 		global.GVA_LOG.Error("批量删除失败!", zap.Error(err))
 		response.FailWithMessage("批量删除失败", c)
 	} else {
@@ -89,25 +81,25 @@ func (dataApi *DataApi) DeleteDataByIds(c *gin.Context) {
 	}
 }
 
-// UpdateData 更新Data
-// @Tags Data
-// @Summary 更新Data
+// UpdateMachineWarning 更新机器告警
+// @Tags MachineWarning
+// @Summary 更新机器告警
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data body Customize.Data true "更新Data"
+// @Param data body Customize.MachineWarning true "更新机器告警"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"更新成功"}"
-// @Router /data/updateData [put]
-func (dataApi *DataApi) UpdateData(c *gin.Context) {
-	var data Customize.Data
-	err := c.ShouldBindJSON(&data)
+// @Router /machineWarning/updateMachineWarning [put]
+func (machineWarningApi *MachineWarningApi) UpdateMachineWarning(c *gin.Context) {
+	var machineWarning Customize.MachineWarning
+	err := c.ShouldBindJSON(&machineWarning)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	data.UpdatedBy = utils.GetUserID(c)
+	machineWarning.UpdatedBy = utils.GetUserID(c)
 
-	if err := dataService.UpdateData(data); err != nil {
+	if err := machineWarningService.UpdateMachineWarning(machineWarning); err != nil {
 		global.GVA_LOG.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
 	} else {
@@ -115,42 +107,42 @@ func (dataApi *DataApi) UpdateData(c *gin.Context) {
 	}
 }
 
-// FindData 用id查询Data
-// @Tags Data
-// @Summary 用id查询Data
+// FindMachineWarning 用id查询机器告警
+// @Tags MachineWarning
+// @Summary 用id查询机器告警
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data query Customize.Data true "用id查询Data"
+// @Param data query Customize.MachineWarning true "用id查询机器告警"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
-// @Router /data/findData [get]
-func (dataApi *DataApi) FindData(c *gin.Context) {
+// @Router /machineWarning/findMachineWarning [get]
+func (machineWarningApi *MachineWarningApi) FindMachineWarning(c *gin.Context) {
 	ID := c.Query("ID")
-	if redata, err := dataService.GetData(ID); err != nil {
+	if remachineWarning, err := machineWarningService.GetMachineWarning(ID); err != nil {
 		global.GVA_LOG.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
 	} else {
-		response.OkWithData(gin.H{"redata": redata}, c)
+		response.OkWithData(gin.H{"remachineWarning": remachineWarning}, c)
 	}
 }
 
-// GetDataList 分页获取Data列表
-// @Tags Data
-// @Summary 分页获取Data列表
+// GetMachineWarningList 分页获取机器告警列表
+// @Tags MachineWarning
+// @Summary 分页获取机器告警列表
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data query CustomizeReq.DataSearch true "分页获取Data列表"
+// @Param data query CustomizeReq.MachineWarningSearch true "分页获取机器告警列表"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
-// @Router /data/getDataList [get]
-func (dataApi *DataApi) GetDataList(c *gin.Context) {
-	var pageInfo CustomizeReq.DataSearch
+// @Router /machineWarning/getMachineWarningList [get]
+func (machineWarningApi *MachineWarningApi) GetMachineWarningList(c *gin.Context) {
+	var pageInfo CustomizeReq.MachineWarningSearch
 	err := c.ShouldBindQuery(&pageInfo)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	if list, total, err := dataService.GetDataInfoList(pageInfo); err != nil {
+	if list, total, err := machineWarningService.GetMachineWarningInfoList(pageInfo); err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
 	} else {
