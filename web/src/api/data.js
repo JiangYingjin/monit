@@ -95,3 +95,12 @@ export const getDataList = (params) => {
     params
   })
 }
+
+
+export const getData = (data) => {
+  return service({
+    url: '/data/getData',
+    method: 'post',
+    data
+  })
+}

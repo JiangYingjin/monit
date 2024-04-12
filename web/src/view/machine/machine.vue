@@ -1,129 +1,286 @@
 <template>
   <div>
     <div class="gva-search-box">
-      <el-form ref="elSearchFormRef" :inline="true" :model="searchInfo" class="demo-form-inline" :rules="searchRule" @keyup.enter="onSubmit">
-      <el-form-item label="创建日期" prop="createdAt">
-      <template #label>
-        <span>
-          创建日期
-          <el-tooltip content="搜索范围是开始日期（包含）至结束日期（不包含）">
-            <el-icon><QuestionFilled /></el-icon>
-          </el-tooltip>
-        </span>
-      </template>
-      <el-date-picker v-model="searchInfo.startCreatedAt" type="datetime" placeholder="开始日期" :disabled-date="time=> searchInfo.endCreatedAt ? time.getTime() > searchInfo.endCreatedAt.getTime() : false"></el-date-picker>
-       —
-      <el-date-picker v-model="searchInfo.endCreatedAt" type="datetime" placeholder="结束日期" :disabled-date="time=> searchInfo.startCreatedAt ? time.getTime() < searchInfo.startCreatedAt.getTime() : false"></el-date-picker>
-      </el-form-item>
-      
+      <el-form
+        ref="elSearchFormRef"
+        :inline="true"
+        :model="searchInfo"
+        class="demo-form-inline"
+        :rules="searchRule"
+        @keyup.enter="onSubmit"
+      >
+        <el-form-item
+          label="创建日期"
+          prop="createdAt"
+        >
+          <template #label>
+            <span>
+              创建日期
+              <el-tooltip content="搜索范围是开始日期（包含）至结束日期（不包含）">
+                <el-icon><QuestionFilled /></el-icon>
+              </el-tooltip>
+            </span>
+          </template>
+          <el-date-picker
+            v-model="searchInfo.startCreatedAt"
+            type="datetime"
+            placeholder="开始日期"
+            :disabled-date="time=> searchInfo.endCreatedAt ? time.getTime() > searchInfo.endCreatedAt.getTime() : false"
+          />
+          —
+          <el-date-picker
+            v-model="searchInfo.endCreatedAt"
+            type="datetime"
+            placeholder="结束日期"
+            :disabled-date="time=> searchInfo.startCreatedAt ? time.getTime() < searchInfo.startCreatedAt.getTime() : false"
+          />
+        </el-form-item>
+
         <el-form-item>
-          <el-button type="primary" icon="search" @click="onSubmit">查询</el-button>
-          <el-button icon="refresh" @click="onReset">重置</el-button>
+          <el-button
+            type="primary"
+            icon="search"
+            @click="onSubmit"
+          >查询</el-button>
+          <el-button
+            icon="refresh"
+            @click="onReset"
+          >重置</el-button>
         </el-form-item>
       </el-form>
     </div>
     <div class="gva-table-box">
-        <div class="gva-btn-list">
-            <el-button type="primary" icon="plus" @click="openDialog">新增</el-button>
-            <el-button icon="delete" style="margin-left: 10px;" :disabled="!multipleSelection.length" @click="onDelete">删除</el-button>
-        </div>
-        <el-table
+      <div class="gva-btn-list">
+        <el-button
+          type="primary"
+          icon="plus"
+          @click="openDialog"
+        >新增</el-button>
+        <el-button
+          icon="delete"
+          style="margin-left: 10px;"
+          :disabled="!multipleSelection.length"
+          @click="onDelete"
+        >删除</el-button>
+      </div>
+      <el-table
         ref="multipleTable"
         style="width: 100%"
         tooltip-effect="dark"
         :data="tableData"
         row-key="ID"
         @selection-change="handleSelectionChange"
-        >
-        <el-table-column type="selection" width="55" />
-        
-        <el-table-column align="left" label="日期" width="180">
-            <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
-        </el-table-column>
-        
-        <el-table-column align="left" label="名字" prop="name" width="120" />
-        <el-table-column align="left" label="描述" prop="description" width="120" />
-        <el-table-column align="left" label="IP地址" prop="ip_addr" width="120" />
-        <el-table-column align="left" label="密钥" prop="password" width="120" />
-        <el-table-column align="left" label="状态" prop="status" width="120">
-            <template #default="scope">{{ formatBoolean(scope.row.status) }}</template>
-        </el-table-column>
-        <el-table-column align="left" label="操作" fixed="right" min-width="240">
-            <template #default="scope">
-            <el-button type="primary" link class="table-button" @click="getDetails(scope.row)">
-                <el-icon style="margin-right: 5px"><InfoFilled /></el-icon>
-                查看详情
-            </el-button>
-            <el-button type="primary" link icon="edit" class="table-button" @click="updateMachineFunc(scope.row)">变更</el-button>
-            <el-button type="primary" link icon="delete" @click="deleteRow(scope.row)">删除</el-button>
-            </template>
-        </el-table-column>
-        </el-table>
-        <div class="gva-pagination">
-            <el-pagination
-            layout="total, sizes, prev, pager, next, jumper"
-            :current-page="page"
-            :page-size="pageSize"
-            :page-sizes="[10, 30, 50, 100]"
-            :total="total"
-            @current-change="handleCurrentChange"
-            @size-change="handleSizeChange"
-            />
-        </div>
-    </div>
-    <el-drawer size="800" v-model="dialogFormVisible" :show-close="false" :before-close="closeDialog">
-       <template #title>
-              <div class="flex justify-between items-center">
-                <span class="text-lg">{{type==='create'?'添加':'修改'}}</span>
-                <div>
-                  <el-button type="primary" @click="enterDialog">确 定</el-button>
-                  <el-button @click="closeDialog">取 消</el-button>
-                </div>
-              </div>
-            </template>
+      >
+        <el-table-column
+          type="selection"
+          width="55"
+        />
 
-          <el-form :model="formData" label-position="top" ref="elFormRef" :rules="rule" label-width="80px">
-            <el-form-item label="名字:"  prop="name" >
-              <el-input v-model="formData.name" :clearable="true"  placeholder="请输入名字" />
-            </el-form-item>
-            <el-form-item label="描述:"  prop="description" >
-              <el-input v-model="formData.description" :clearable="true"  placeholder="请输入描述" />
-            </el-form-item>
-            <el-form-item label="IP地址:"  prop="ip_addr" >
-              <el-input v-model="formData.ip_addr" :clearable="true"  placeholder="请输入IP地址" />
-            </el-form-item>
-            <el-form-item label="密钥:"  prop="password" >
-              <el-input v-model="formData.password" :clearable="true"  placeholder="请输入密钥" />
-            </el-form-item>
-            <el-form-item label="状态:"  prop="status" >
-              <el-switch v-model="formData.status" active-color="#13ce66" inactive-color="#ff4949" active-text="是" inactive-text="否" clearable ></el-switch>
-            </el-form-item>
-          </el-form>
+        <el-table-column
+          align="left"
+          label="ID"
+          prop="ID"
+          width="120"
+        />
+
+        <el-table-column
+          align="left"
+          label="日期"
+          width="180"
+        >
+          <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
+        </el-table-column>
+
+        <el-table-column
+          align="left"
+          label="名字"
+          prop="name"
+          width="120"
+        />
+        <el-table-column
+          align="left"
+          label="描述"
+          prop="description"
+          width="120"
+        />
+        <el-table-column
+          align="left"
+          label="IP地址"
+          prop="ip_addr"
+          width="120"
+        />
+        <el-table-column
+          align="left"
+          label="密钥"
+          prop="password"
+          width="120"
+        />
+        <el-table-column
+          align="left"
+          label="状态"
+          prop="status"
+          width="120"
+        >
+          <template #default="scope">{{ formatBoolean(scope.row.status) }}</template>
+        </el-table-column>
+        <el-table-column
+          align="left"
+          label="操作"
+          fixed="right"
+          min-width="240"
+        >
+          <template #default="scope">
+            <el-button
+              type="primary"
+              link
+              class="table-button"
+              @click="getDetails(scope.row)"
+            >
+              <el-icon style="margin-right: 5px"><InfoFilled /></el-icon>
+              查看详情
+            </el-button>
+            <el-button
+              type="primary"
+              link
+              icon="edit"
+              class="table-button"
+              @click="updateMachineFunc(scope.row)"
+            >变更</el-button>
+            <el-button
+              type="primary"
+              link
+              icon="delete"
+              @click="deleteRow(scope.row)"
+            >删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div class="gva-pagination">
+        <el-pagination
+          layout="total, sizes, prev, pager, next, jumper"
+          :current-page="page"
+          :page-size="pageSize"
+          :page-sizes="[10, 30, 50, 100]"
+          :total="total"
+          @current-change="handleCurrentChange"
+          @size-change="handleSizeChange"
+        />
+      </div>
+    </div>
+    <el-drawer
+      v-model="dialogFormVisible"
+      size="800"
+      :show-close="false"
+      :before-close="closeDialog"
+    >
+      <template #title>
+        <div class="flex justify-between items-center">
+          <span class="text-lg">{{ type==='create'?'添加':'修改' }}</span>
+          <div>
+            <el-button
+              type="primary"
+              @click="enterDialog"
+            >确 定</el-button>
+            <el-button @click="closeDialog">取 消</el-button>
+          </div>
+        </div>
+      </template>
+
+      <el-form
+        ref="elFormRef"
+        :model="formData"
+        label-position="top"
+        :rules="rule"
+        label-width="80px"
+      >
+        <el-form-item
+          label="名字:"
+          prop="name"
+        >
+          <el-input
+            v-model="formData.name"
+            :clearable="true"
+            placeholder="请输入名字"
+          />
+        </el-form-item>
+        <el-form-item
+          label="描述:"
+          prop="description"
+        >
+          <el-input
+            v-model="formData.description"
+            :clearable="true"
+            placeholder="请输入描述"
+          />
+        </el-form-item>
+        <el-form-item
+          label="IP地址:"
+          prop="ip_addr"
+        >
+          <el-input
+            v-model="formData.ip_addr"
+            :clearable="true"
+            placeholder="请输入IP地址"
+          />
+        </el-form-item>
+        <el-form-item
+          label="密钥:"
+          prop="password"
+        >
+          <el-input
+            v-model="formData.password"
+            :clearable="true"
+            placeholder="请输入密钥"
+          />
+        </el-form-item>
+        <el-form-item
+          label="状态:"
+          prop="status"
+        >
+          <el-switch
+            v-model="formData.status"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            active-text="是"
+            inactive-text="否"
+            clearable
+          />
+        </el-form-item>
+      </el-form>
     </el-drawer>
 
-    <el-drawer size="800" v-model="detailShow" :before-close="closeDetailShow" title="查看详情" destroy-on-close>
-          <template #title>
-             <div class="flex justify-between items-center">
-               <span class="text-lg">查看详情</span>
-             </div>
-         </template>
-        <el-descriptions :column="1" border>
-                <el-descriptions-item label="名字">
-                        {{ formData.name }}
-                </el-descriptions-item>
-                <el-descriptions-item label="描述">
-                        {{ formData.description }}
-                </el-descriptions-item>
-                <el-descriptions-item label="IP地址">
-                        {{ formData.ip_addr }}
-                </el-descriptions-item>
-                <el-descriptions-item label="密钥">
-                        {{ formData.password }}
-                </el-descriptions-item>
-                <el-descriptions-item label="状态">
-                    {{ formatBoolean(formData.status) }}
-                </el-descriptions-item>
-        </el-descriptions>
+    <el-drawer
+      v-model="detailShow"
+      size="800"
+      :before-close="closeDetailShow"
+      title="查看详情"
+      destroy-on-close
+    >
+      <template #title>
+        <div class="flex justify-between items-center">
+          <span class="text-lg">查看详情</span>
+        </div>
+      </template>
+      <el-descriptions
+        :column="1"
+        border
+      >
+        <el-descriptions-item label="名字">
+          {{ formData.name }}
+        </el-descriptions-item>
+        <el-descriptions-item label="描述">
+          {{ formData.description }}
+        </el-descriptions-item>
+        <el-descriptions-item label="IP地址">
+          {{ formData.ip_addr }}
+        </el-descriptions-item>
+        <el-descriptions-item label="密钥">
+          {{ formData.password }}
+        </el-descriptions-item>
+        <el-descriptions-item label="状态">
+          {{ formatBoolean(formData.status) }}
+        </el-descriptions-item>
+      </el-descriptions>
     </el-drawer>
   </div>
 </template>
@@ -135,74 +292,77 @@ import {
   deleteMachineByIds,
   updateMachine,
   findMachine,
-  getMachineList
+  getMachineList,
+    getData,
 } from '@/api/machine'
 
 // 全量引入格式化工具 请按需保留
 import { getDictFunc, formatDate, formatBoolean, filterDict, ReturnArrImg, onDownloadFile } from '@/utils/format'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ref, reactive } from 'vue'
+import axios from 'axios'
 
 defineOptions({
-    name: 'Machine'
+  name: 'Machine'
 })
 
 // 自动化生成的字典（可能为空）以及字段
 const formData = ref({
-        name: '',
-        description: '',
-        ip_addr: '',
-        password: '',
-        status: false,
-        })
+  name: '',
+  description: '',
+  ip_addr: '',
+  password: '',
+  status: false,
+})
+
 
 
 // 验证规则
 const rule = reactive({
-               name : [{
-                   required: true,
-                   message: '',
-                   trigger: ['input','blur'],
-               },
-               {
-                   whitespace: true,
-                   message: '不能只输入空格',
-                   trigger: ['input', 'blur'],
-              }
-              ],
-               description : [{
-                   required: true,
-                   message: '',
-                   trigger: ['input','blur'],
-               },
-               {
-                   whitespace: true,
-                   message: '不能只输入空格',
-                   trigger: ['input', 'blur'],
-              }
-              ],
-               ip_addr : [{
-                   required: true,
-                   message: '',
-                   trigger: ['input','blur'],
-               },
-               {
-                   whitespace: true,
-                   message: '不能只输入空格',
-                   trigger: ['input', 'blur'],
-              }
-              ],
-               password : [{
-                   required: true,
-                   message: '',
-                   trigger: ['input','blur'],
-               },
-               {
-                   whitespace: true,
-                   message: '不能只输入空格',
-                   trigger: ['input', 'blur'],
-              }
-              ],
+  name: [{
+    required: true,
+    message: '',
+    trigger: ['input', 'blur'],
+  },
+  {
+    whitespace: true,
+    message: '不能只输入空格',
+    trigger: ['input', 'blur'],
+  }
+  ],
+  description: [{
+    required: true,
+    message: '',
+    trigger: ['input', 'blur'],
+  },
+  {
+    whitespace: true,
+    message: '不能只输入空格',
+    trigger: ['input', 'blur'],
+  }
+  ],
+  ip_addr: [{
+    required: true,
+    message: '',
+    trigger: ['input', 'blur'],
+  },
+  {
+    whitespace: true,
+    message: '不能只输入空格',
+    trigger: ['input', 'blur'],
+  }
+  ],
+  password: [{
+    required: true,
+    message: '',
+    trigger: ['input', 'blur'],
+  },
+  {
+    whitespace: true,
+    message: '不能只输入空格',
+    trigger: ['input', 'blur'],
+  }
+  ],
 })
 
 const searchRule = reactive({
@@ -243,8 +403,8 @@ const onSubmit = () => {
     if (!valid) return
     page.value = 1
     pageSize.value = 10
-    if (searchInfo.value.status === ""){
-        searchInfo.value.status=null
+    if (searchInfo.value.status === '') {
+      searchInfo.value.status = null
     }
     getTableData()
   })
@@ -278,30 +438,29 @@ getTableData()
 // ============== 表格控制部分结束 ===============
 
 // 获取需要的字典 可能为空 按需保留
-const setOptions = async () =>{
+const setOptions = async() => {
 }
 
 // 获取需要的字典 可能为空 按需保留
 setOptions()
 
-
 // 多选数据
 const multipleSelection = ref([])
 // 多选
 const handleSelectionChange = (val) => {
-    multipleSelection.value = val
+  multipleSelection.value = val
 }
 
 // 删除行
 const deleteRow = (row) => {
-    ElMessageBox.confirm('确定要删除吗?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-    }).then(() => {
-            deleteMachineFunc(row)
-        })
-    }
+  ElMessageBox.confirm('确定要删除吗?', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    deleteMachineFunc(row)
+  })
+}
 
 // 多选删除
 const onDelete = async() => {
@@ -310,141 +469,180 @@ const onDelete = async() => {
     cancelButtonText: '取消',
     type: 'warning'
   }).then(async() => {
-      const IDs = []
-      if (multipleSelection.value.length === 0) {
-        ElMessage({
-          type: 'warning',
-          message: '请选择要删除的数据'
-        })
-        return
-      }
-      multipleSelection.value &&
+    const IDs = []
+    if (multipleSelection.value.length === 0) {
+      ElMessage({
+        type: 'warning',
+        message: '请选择要删除的数据'
+      })
+      return
+    }
+    multipleSelection.value &&
         multipleSelection.value.map(item => {
           IDs.push(item.ID)
         })
-      const res = await deleteMachineByIds({ IDs })
-      if (res.code === 0) {
-        ElMessage({
-          type: 'success',
-          message: '删除成功'
-        })
-        if (tableData.value.length === IDs.length && page.value > 1) {
-          page.value--
-        }
-        getTableData()
-      }
+    const res = await deleteMachineByIds({ IDs })
+    if (res.code === 0) {
+      ElMessage({
+        type: 'success',
+        message: '删除成功'
       })
+      if (tableData.value.length === IDs.length && page.value > 1) {
+        page.value--
+      }
+      getTableData()
     }
+  })
+}
 
 // 行为控制标记（弹窗内部需要增还是改）
 const type = ref('')
 
 // 更新行
 const updateMachineFunc = async(row) => {
-    const res = await findMachine({ ID: row.ID })
-    type.value = 'update'
-    if (res.code === 0) {
-        formData.value = res.data.remachine
-        dialogFormVisible.value = true
-    }
+  const res = await findMachine({ ID: row.ID })
+  type.value = 'update'
+  if (res.code === 0) {
+    formData.value = res.data.remachine
+    dialogFormVisible.value = true
+  }
 }
 
-
 // 删除行
-const deleteMachineFunc = async (row) => {
-    const res = await deleteMachine({ ID: row.ID })
-    if (res.code === 0) {
-        ElMessage({
-                type: 'success',
-                message: '删除成功'
-            })
-            if (tableData.value.length === 1 && page.value > 1) {
-            page.value--
-        }
-        getTableData()
+const deleteMachineFunc = async(row) => {
+  const res = await deleteMachine({ ID: row.ID })
+  if (res.code === 0) {
+    ElMessage({
+      type: 'success',
+      message: '删除成功'
+    })
+    if (tableData.value.length === 1 && page.value > 1) {
+      page.value--
     }
+    getTableData()
+  }
 }
 
 // 弹窗控制标记
 const dialogFormVisible = ref(false)
 
-
 // 查看详情控制标记
 const detailShow = ref(false)
-
 
 // 打开详情弹窗
 const openDetailShow = () => {
   detailShow.value = true
 }
 
-
 // 打开详情
-const getDetails = async (row) => {
+const getDetails = async(row) => {
   // 打开弹窗
-  const res = await findMachine({ ID: row.ID })
+  const res = await findMachine({ ID: row.ID})
   if (res.code === 0) {
     formData.value = res.data.remachine
     openDetailShow()
   }
 }
 
+// const getData1 = async(row) => {
+//   try {
+//     // 获取当前时间的Date对象
+//     // const endTime = new Date();
+//
+//     // 发送POST请求
+//     const res = await axios.post('/machine/getData', {
+//       machine_ids: row.ID,
+//       data_type_id: '1',
+//       start_time: formatDate(row.CreatedAt), // 使用格式化的开始时间
+//       end_time: formatDate('2024-04-12 15:00:00') // 使用格式化的当前时间作为结束时间
+//     })
+//
+//     if (res.data.code === 0) {
+//       print(res.data)
+//     }
+//   } catch (error) {
+//     console.error('Error:', error)
+//   }
+// }
+// }
+// import axios from 'axios'
+//
+// const data1 = ref({
+//   machine_ids: ['1'],
+//   data_type_id: '1',
+//   start_time: '2024-04-8 15:00:00', // 使用格式化的开始时间
+//   end_time: '2024-04-12 15:00:00', // 使用格式化的当前时间作为结束时间
+// })
+// const getData123 = async(row) => {
+//   // 获取当前时间的Date对象
+//   // const endTime = new Date()
+//
+//   // 打开弹窗
+//   const res = await getData(data1.value)
+//
+//   if (res.code === 0) {
+//     ElMessage({
+//       type: 'success',
+//       message: '成功'
+//     })
+//     print(res)
+//   }
+// }
 
 // 关闭详情弹窗
 const closeDetailShow = () => {
   detailShow.value = false
   formData.value = {
-          name: '',
-          description: '',
-          ip_addr: '',
-          password: '',
-          status: false,
-          }
+    name: '',
+    description: '',
+    ip_addr: '',
+    password: '',
+    status: false,
+  }
 }
-
 
 // 打开弹窗
 const openDialog = () => {
-    type.value = 'create'
-    dialogFormVisible.value = true
+  type.value = 'create'
+  dialogFormVisible.value = true
 }
 
 // 关闭弹窗
 const closeDialog = () => {
-    dialogFormVisible.value = false
-    formData.value = {
-        name: '',
-        description: '',
-        ip_addr: '',
-        password: '',
-        status: false,
-        }
+  dialogFormVisible.value = false
+  formData.value = {
+    name: '',
+    description: '',
+    ip_addr: '',
+    password: '',
+    status: false,
+  }
 }
 // 弹窗确定
-const enterDialog = async () => {
-     elFormRef.value?.validate( async (valid) => {
-             if (!valid) return
-              let res
-              switch (type.value) {
-                case 'create':
-                  res = await createMachine(formData.value)
-                  break
-                case 'update':
-                  res = await updateMachine(formData.value)
-                  break
-                default:
-                  res = await createMachine(formData.value)
-                  break
-              }
-              if (res.code === 0) {
-                ElMessage({
-                  type: 'success',
-                  message: '创建/更改成功'
-                })
-                closeDialog()
-                getTableData()
-              }
+const enterDialog = async() => {
+  elFormRef.value?.validate(async(valid) => {
+    if (!valid) return
+    let res
+    switch (type.value) {
+      case 'create':
+        res = await createMachine(formData.value)
+        break
+      case 'update':
+        res = await updateMachine(formData.value)
+        break
+      default:
+        res = await createMachine(formData.value)
+        break
+    }
+    if (res.code === 0) {
+      ElMessage({
+        type: 'success',
+        message: '创建/更改成功'
       })
+      closeDialog()
+      getTableData()
+    }
+  })
 }
 
 </script>
