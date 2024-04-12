@@ -113,7 +113,7 @@
               type="primary"
               link
               class="table-button"
-              @click="getData123(scope.row)"
+              @click="getDetails(scope.row)"
             >
               <el-icon style="margin-right: 5px"><InfoFilled /></el-icon>
               查看详情
@@ -234,7 +234,11 @@
       </el-descriptions>
     </el-drawer>
   </div>
+  <br>
+
+  <div id="chart" style="width: 600px; height: 400px;"></div>
 </template>
+
 
 <script setup>
 import {
@@ -255,6 +259,32 @@ import { ref, reactive } from 'vue'
 defineOptions({
   name: 'Data'
 })
+
+import { onMounted } from 'vue'; // 使用Vue 3提供的onMounted函数
+import * as echarts from 'echarts'; // 导入echarts库
+
+onMounted(() => {
+  renderChart();
+});
+
+function renderChart() {
+  let chart = echarts.init(document.getElementById('chart'));
+  chart.setOption({
+    // 在这里设置您的图表选项
+    xAxis: {
+      type: 'category',
+      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    },
+    yAxis: {
+      type: 'value'
+    },
+    series: [{
+      data: [820, 932, 901, 934, 1290, 1330, 1320],
+      type: 'line'
+    }]
+  });
+}
+
 
 // 自动化生成的字典（可能为空）以及字段
 const formData = ref({
