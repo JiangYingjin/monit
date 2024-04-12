@@ -6,6 +6,7 @@ import (
 	CustomizeReq "github.com/flipped-aurora/gin-vue-admin/server/model/Customize/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
 	"github.com/flipped-aurora/gin-vue-admin/server/service"
+	Customize2 "github.com/flipped-aurora/gin-vue-admin/server/service/Customize"
 	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -38,6 +39,8 @@ func (machineApi *MachineApi) CreateMachine(c *gin.Context) {
 		global.GVA_LOG.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败", c)
 	} else {
+		myMachineService := Customize2.MyMachineService{}
+		myMachineService.AddMachineHook(machine)
 		response.OkWithMessage("创建成功", c)
 	}
 }
