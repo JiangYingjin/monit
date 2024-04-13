@@ -19,6 +19,34 @@ import (
 type MyMachineApi struct {
 }
 
+func init() {
+	go func() {
+		time.Sleep(5 * time.Second)
+		for {
+			time.Sleep(1 * time.Second)
+
+			dataTypeID := 1
+			value := (float64(utils.RandomInt(1, 1000))) / 200.0
+			machineID := 1
+			data := Customize.Data{
+				DataTypeID: &dataTypeID,
+				Value:      &value,
+				MachineID:  &machineID,
+				CreatedBy:  0,
+				UpdatedBy:  0,
+				DeletedBy:  0,
+			}
+
+			var dataService Customize2.DataService
+			if err := dataService.CreateData(&data); err != nil {
+			} else {
+				var myMachineApi MyMachineApi
+				myMachineApi.UploadDataHook(data)
+			}
+		}
+	}()
+}
+
 // MachineLogin
 // @Tags Machine
 // @Summary 机器登录
@@ -96,7 +124,7 @@ func (m *MyMachineApi) GetData(c *gin.Context) {
 		tmp := make([]Customize.Data, 0)
 		//global.GVA_DB.Where("machine_id in ?", req.MachineIDs).Where("data_type_id in ?", req.DataTypeID).Find(&Customize.Data{})
 		global.GVA_DB.Model(&Customize.Data{}).
-			Where("machine_i_d = ? and data_type_i_d = ? and created_at between ? and ?", machineID, req.DataTypeID, req.StartTime, req.EndTime).
+			Where("machine_i_d = ? and data_type_i_d = ? and created_at `between ? and ?", machineID, req.DataTypeID, req.StartTime, req.EndTime).
 			Find(&tmp)
 		result[machineID] = tmp
 	}
@@ -110,7 +138,7 @@ func (m *MyMachineApi) UploadDataHook(data Customize.Data) {
 	// 如果异常则发送告警
 	var warning Customize.MachineWarning
 	global.GVA_DB.Model(&Customize.MachineWarning{}).
-		Where("machine_id = ? and data_type_id = ?", data.MachineID, data.DataTypeID).
+		Where("machine_i_d = ? and data_type_i_d = ?", data.MachineID, data.DataTypeID).
 		Find(&warning)
 	if warning != (Customize.MachineWarning{}) && *warning.Limit > *data.Value {
 		userService := system.UserService{}
