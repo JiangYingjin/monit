@@ -124,7 +124,7 @@ func (m *MyMachineApi) GetData(c *gin.Context) {
 		tmp := make([]Customize.Data, 0)
 		//global.GVA_DB.Where("machine_id in ?", req.MachineIDs).Where("data_type_id in ?", req.DataTypeID).Find(&Customize.Data{})
 		global.GVA_DB.Model(&Customize.Data{}).
-			Where("machine_i_d = ? and data_type_i_d = ? and created_at `between ? and ?", machineID, req.DataTypeID, req.StartTime, req.EndTime).
+			Where("machine_i_d = ? and data_type_i_d = ? and created_at between ? and ?", machineID, req.DataTypeID, req.StartTime, req.EndTime).
 			Find(&tmp)
 		result[machineID] = tmp
 	}
