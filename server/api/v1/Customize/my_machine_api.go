@@ -122,14 +122,38 @@ func (m *MyMachineApi) GetData(c *gin.Context) {
 	result := make(map[string][]Customize.Data)
 	for _, machineID := range req.MachineIDs {
 		tmp := make([]Customize.Data, 0)
-		//global.GVA_DB.Where("machine_id in ?", req.MachineIDs).Where("data_type_id in ?", req.DataTypeID).Find(&Customize.Data{})
 		global.GVA_DB.Model(&Customize.Data{}).
-			Where("machine_i_d = ? and data_type_i_d = ? and created_at between ? and ?", machineID, req.DataTypeID, req.StartTime, req.EndTime).
+			Where("machine_i_d = ? and data_type_i_d = ? and created_at between ? and ?", machineID, req.DataTypeID, req.StartTime, req.EndTime). // "2024-04-13 14:25:00"
 			Find(&tmp)
 		result[machineID] = tmp
 	}
 
-	response.OkWithData(CustomizeReq.GetDataRsp{Data: result}, c)
+	response.OkWithData(result, c)
+}
+
+type UploadDataMultiReq struct {
+	Data []Customize.Data `json:"data,omitempty"`
+}
+
+func (dataApi *DataApi) CreateDataMulti(c *gin.Context) {
+	var dataArray UploadDataMultiReq
+	err := c.ShouldBindJSON(&dataArray)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+
+	for _, machineData := range dataArray.Data {
+		machineData.CreatedBy = uint(*machineData.MachineID)
+		if err := dataService.CreateData(&machineData); err != nil {
+			global.GVA_LOG.Error("创建失败!", zap.Error(err))
+			response.FailWithMessage("创建失败", c)
+		} else {
+			response.OkWithMessage("创建成功", c)
+			myMachineApi := MyMachineApi{}
+			myMachineApi.UploadDataHook(machineData)
+		}
+	}
 }
 
 func (m *MyMachineApi) UploadDataHook(data Customize.Data) {

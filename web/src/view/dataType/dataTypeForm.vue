@@ -8,6 +8,9 @@
         <el-form-item label="描述:" prop="description">
           <el-input v-model="formData.description" :clearable="true"  placeholder="请输入描述" />
        </el-form-item>
+        <el-form-item label="单位:" prop="units">
+          <el-input v-model="formData.units" :clearable="true"  placeholder="请输入单位" />
+       </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="save">保存</el-button>
           <el-button type="primary" @click="back">返回</el-button>
@@ -41,6 +44,7 @@ const type = ref('')
 const formData = ref({
             name: '',
             description: '',
+            units: '',
         })
 // 验证规则
 const rule = reactive({
@@ -50,6 +54,11 @@ const rule = reactive({
                    trigger: ['input','blur'],
                }],
                description : [{
+                   required: true,
+                   message: '',
+                   trigger: ['input','blur'],
+               }],
+               units : [{
                    required: true,
                    message: '',
                    trigger: ['input','blur'],
