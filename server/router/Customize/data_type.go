@@ -15,13 +15,13 @@ func (s *DataTypeRouter) InitDataTypeRouter(Router *gin.RouterGroup) {
 	dataTypeRouterWithoutRecord := Router.Group("dataType")
 	var dataTypeApi = v1.ApiGroupApp.CustomizeApiGroup.DataTypeApi
 	{
-		dataTypeRouter.POST("createDataType", dataTypeApi.CreateDataType)             // 新建DataType
-		dataTypeRouter.DELETE("deleteDataType", dataTypeApi.DeleteDataType)           // 删除DataType
+		dataTypeRouter.POST("createDataType", dataTypeApi.CreateDataType)   // 新建DataType
+		dataTypeRouter.DELETE("deleteDataType", dataTypeApi.DeleteDataType) // 删除DataType
 		dataTypeRouter.DELETE("deleteDataTypeByIds", dataTypeApi.DeleteDataTypeByIds) // 批量删除DataType
-		dataTypeRouter.PUT("updateDataType", dataTypeApi.UpdateDataType)              // 更新DataType
+		dataTypeRouter.PUT("updateDataType", dataTypeApi.UpdateDataType)    // 更新DataType
 	}
 	{
-		dataTypeRouterWithoutRecord.GET("findDataType", dataTypeApi.FindDataType)       // 根据ID获取DataType
-		dataTypeRouterWithoutRecord.GET("getDataTypeList", dataTypeApi.GetDataTypeList) // 获取DataType列表
+		dataTypeRouterWithoutRecord.GET("findDataType", dataTypeApi.FindDataType)        // 根据ID获取DataType
+		dataTypeRouterWithoutRecord.GET("getDataTypeList", dataTypeApi.GetDataTypeList)  // 获取DataType列表
 	}
 }
