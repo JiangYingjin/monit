@@ -131,6 +131,31 @@ func (m *MyMachineApi) GetData(c *gin.Context) {
 	response.OkWithData(result, c)
 }
 
+type UploadDataMultiReq struct {
+	Data []Customize.Data `json:"data,omitempty"`
+}
+
+func (dataApi *DataApi) CreateDataMulti(c *gin.Context) {
+	var dataArray UploadDataMultiReq
+	err := c.ShouldBindJSON(&dataArray)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+
+	for _, machineData := range dataArray.Data {
+		machineData.CreatedBy = uint(*machineData.MachineID)
+		if err := dataService.CreateData(&machineData); err != nil {
+			global.GVA_LOG.Error("创建失败!", zap.Error(err))
+			response.FailWithMessage("创建失败", c)
+		} else {
+			response.OkWithMessage("创建成功", c)
+			myMachineApi := MyMachineApi{}
+			myMachineApi.UploadDataHook(machineData)
+		}
+	}
+}
+
 func (m *MyMachineApi) UploadDataHook(data Customize.Data) {
 	// 检测数据是否异常
 

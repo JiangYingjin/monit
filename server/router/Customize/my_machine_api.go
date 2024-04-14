@@ -22,4 +22,5 @@ func (s *MachineRouter) InitMyMachineRouter(Router *gin.RouterGroup) {
 
 	routerGroup := Router.Group("machine")
 	routerGroup.POST("uploadData", dataApi.CreateData)
+	routerGroup.POST("uploadDataMulti", dataApi.CreateDataMulti)
 }
