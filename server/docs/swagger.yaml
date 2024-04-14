@@ -81,6 +81,9 @@ definitions:
       password:
         description: 密钥
         type: string
+      status:
+        description: 状态
+        type: boolean
       updatedAt:
         description: 更新时间
         type: string
@@ -91,6 +94,45 @@ definitions:
     - ip_addr
     - name
     - password
+    type: object
+  Customize.MachineWarning:
+    properties:
+      ID:
+        description: 主键ID
+        type: integer
+      createdAt:
+        description: 创建时间
+        type: string
+      createdBy:
+        type: integer
+      dataTypeID:
+        description: 告警数据类型
+        type: integer
+      deletedBy:
+        type: integer
+      description:
+        description: 描述
+        type: string
+      limit:
+        description: 告警阈值
+        type: number
+      machineID:
+        description: 告警机器ID
+        type: integer
+      reporterID:
+        description: 告警联系人ID
+        type: string
+      updatedAt:
+        description: 更新时间
+        type: string
+      updatedBy:
+        type: integer
+    required:
+    - dataTypeID
+    - description
+    - limit
+    - machineID
+    - reporterID
     type: object
   config.AliyunOSS:
     properties:
@@ -3630,6 +3672,10 @@ paths:
         name: password
         required: true
         type: string
+      - description: 状态
+        in: query
+        name: status
+        type: boolean
       - description: 更新时间
         in: query
         name: updatedAt
@@ -3732,6 +3778,189 @@ paths:
       summary: 更新Machine
       tags:
       - Machine
+  /machineWarning/createMachineWarning:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 创建机器告警
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/Customize.MachineWarning'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"success":true,"data":{},"msg":"创建成功"}'
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 创建机器告警
+      tags:
+      - MachineWarning
+  /machineWarning/deleteMachineWarning:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: 删除机器告警
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/Customize.MachineWarning'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"success":true,"data":{},"msg":"删除成功"}'
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 删除机器告警
+      tags:
+      - MachineWarning
+  /machineWarning/deleteMachineWarningByIds:
+    delete:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"success":true,"data":{},"msg":"批量删除成功"}'
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 批量删除机器告警
+      tags:
+      - MachineWarning
+  /machineWarning/findMachineWarning:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 主键ID
+        in: query
+        name: ID
+        type: integer
+      - description: 创建时间
+        in: query
+        name: createdAt
+        type: string
+      - in: query
+        name: createdBy
+        type: integer
+      - description: 告警数据类型
+        in: query
+        name: dataTypeID
+        required: true
+        type: integer
+      - in: query
+        name: deletedBy
+        type: integer
+      - description: 描述
+        in: query
+        name: description
+        required: true
+        type: string
+      - description: 告警阈值
+        in: query
+        name: limit
+        required: true
+        type: number
+      - description: 告警机器ID
+        in: query
+        name: machineID
+        required: true
+        type: integer
+      - description: 告警联系人ID
+        in: query
+        name: reporterID
+        required: true
+        type: string
+      - description: 更新时间
+        in: query
+        name: updatedAt
+        type: string
+      - in: query
+        name: updatedBy
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"success":true,"data":{},"msg":"查询成功"}'
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 用id查询机器告警
+      tags:
+      - MachineWarning
+  /machineWarning/getMachineWarningList:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - in: query
+        name: endCreatedAt
+        type: string
+      - description: 关键字
+        in: query
+        name: keyword
+        type: string
+      - description: 页码
+        in: query
+        name: page
+        type: integer
+      - description: 每页大小
+        in: query
+        name: pageSize
+        type: integer
+      - in: query
+        name: startCreatedAt
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"success":true,"data":{},"msg":"获取成功"}'
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 分页获取机器告警列表
+      tags:
+      - MachineWarning
+  /machineWarning/updateMachineWarning:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: 更新机器告警
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/Customize.MachineWarning'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"success":true,"data":{},"msg":"更新成功"}'
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: 更新机器告警
+      tags:
+      - MachineWarning
   /menu/addBaseMenu:
     post:
       consumes:
