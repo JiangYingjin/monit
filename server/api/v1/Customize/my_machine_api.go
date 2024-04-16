@@ -20,31 +20,31 @@ type MyMachineApi struct {
 }
 
 func init() {
-	go func() {
-		// time.Sleep(5 * time.Second)
-		// for {
-		// 	time.Sleep(10000 * time.Second)
-
-		// 	dataTypeID := 1
-		// 	value := (float64(utils.RandomInt(1, 100))) / 1.0
-		// 	machineID := 1
-		// 	data := Customize.Data{
-		// 		DataTypeID: &dataTypeID,
-		// 		Value:      &value,
-		// 		MachineID:  &machineID,
-		// 		CreatedBy:  0,
-		// 		UpdatedBy:  0,
-		// 		DeletedBy:  0,
-		// 	}
-
-		// 	var dataService Customize2.DataService
-		// 	if err := dataService.CreateData(&data); err != nil {
-		// 	} else {
-		// 		var myMachineApi MyMachineApi
-		// 		myMachineApi.UploadDataHook(data)
-		// 	}
-		// }
-	}()
+	//go func() {
+	//	time.Sleep(5 * time.Second)
+	//	for {
+	//		time.Sleep(1 * time.Second)
+	//
+	//		dataTypeID := 1
+	//		value := (float64(utils.RandomInt(1, 1000))) / 200.0
+	//		machineID := 1
+	//		data := Customize.Data{
+	//			DataTypeID: &dataTypeID,
+	//			Value:      &value,
+	//			MachineID:  &machineID,
+	//			CreatedBy:  0,
+	//			UpdatedBy:  0,
+	//			DeletedBy:  0,
+	//		}
+	//
+	//		var dataService Customize2.DataService
+	//		if err := dataService.CreateData(&data); err != nil {
+	//		} else {
+	//			var myMachineApi MyMachineApi
+	//			myMachineApi.UploadDataHook(data)
+	//		}
+	//	}
+	//}()
 }
 
 // MachineLogin
@@ -132,7 +132,7 @@ func (m *MyMachineApi) GetData(c *gin.Context) {
 }
 
 type UploadDataMultiReq struct {
-	Data []Customize.Data `json:"data,omitempty"`
+	Data []CreateDataReq `json:"data,omitempty"`
 }
 
 func (dataApi *DataApi) CreateDataMulti(c *gin.Context) {
@@ -143,7 +143,13 @@ func (dataApi *DataApi) CreateDataMulti(c *gin.Context) {
 		return
 	}
 
-	for _, machineData := range dataArray.Data {
+	for _, machineDataReq := range dataArray.Data {
+		machineData, err := machineDataReq.ToData()
+		if err != nil {
+			response.FailWithMessage(err.Error(), c)
+			return
+		}
+
 		machineData.CreatedBy = uint(*machineData.MachineID)
 		if err := dataService.CreateData(&machineData); err != nil {
 			global.GVA_LOG.Error("创建失败!", zap.Error(err))

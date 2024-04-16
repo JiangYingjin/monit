@@ -31,6 +31,13 @@ func init() {
 	//myMachineService.MachineHeartBeat()
 }
 
+func ConvertTimestamp(timestamp string) string {
+	// 2006-01-02 15:04:05 to 2006-01-02T15:04:05Z
+	times := strings.Split(timestamp, " ")
+	timestamp = times[0] + "T" + times[1] + "Z"
+	return timestamp
+}
+
 func (m *MyMachineService) AddMachineHook(machine Customize.Machine) {
 	MachinesMap.Store(machine.ID, machine.IPAddr)
 }
