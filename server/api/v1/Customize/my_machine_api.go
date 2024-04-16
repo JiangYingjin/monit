@@ -21,29 +21,29 @@ type MyMachineApi struct {
 
 func init() {
 	go func() {
-		time.Sleep(5 * time.Second)
-		for {
-			time.Sleep(1 * time.Second)
+		// time.Sleep(5 * time.Second)
+		// for {
+		// 	time.Sleep(10000 * time.Second)
 
-			dataTypeID := 1
-			value := (float64(utils.RandomInt(1, 1000))) / 200.0
-			machineID := 1
-			data := Customize.Data{
-				DataTypeID: &dataTypeID,
-				Value:      &value,
-				MachineID:  &machineID,
-				CreatedBy:  0,
-				UpdatedBy:  0,
-				DeletedBy:  0,
-			}
+		// 	dataTypeID := 1
+		// 	value := (float64(utils.RandomInt(1, 100))) / 1.0
+		// 	machineID := 1
+		// 	data := Customize.Data{
+		// 		DataTypeID: &dataTypeID,
+		// 		Value:      &value,
+		// 		MachineID:  &machineID,
+		// 		CreatedBy:  0,
+		// 		UpdatedBy:  0,
+		// 		DeletedBy:  0,
+		// 	}
 
-			var dataService Customize2.DataService
-			if err := dataService.CreateData(&data); err != nil {
-			} else {
-				var myMachineApi MyMachineApi
-				myMachineApi.UploadDataHook(data)
-			}
-		}
+		// 	var dataService Customize2.DataService
+		// 	if err := dataService.CreateData(&data); err != nil {
+		// 	} else {
+		// 		var myMachineApi MyMachineApi
+		// 		myMachineApi.UploadDataHook(data)
+		// 	}
+		// }
 	}()
 }
 
