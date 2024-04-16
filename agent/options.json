@@ -1,0 +1,70 @@
+{
+    "mysql": [
+        {
+            "name": "enable",
+            "repr": "是否启用 MySQL 监控",
+            "type": "bool",
+            "default": 1
+        },
+        {
+            "name": "port",
+            "repr": "MySQL 端口",
+            "type": "int",
+            "default": 3306
+        },
+        {
+            "name": "password",
+            "repr": "MySQL 密码",
+            "type": "str",
+            "default": "root"
+        }
+    ],
+    "redis": [
+        {
+            "name": "enable",
+            "repr": "是否启用 Redis 监控",
+            "type": "bool",
+            "default": 1
+        },
+        {
+            "name": "port",
+            "repr": "Redis 端口",
+            "type": "int",
+            "default": 6379
+        },
+        {
+            "name": "password",
+            "repr": "Redis 密码",
+            "type": "str",
+            "default": "root"
+        }
+    ],
+    "nginx": [
+        {
+            "name": "enable",
+            "repr": "是否启用 Nginx 监控",
+            "type": "bool",
+            "default": 1
+        },
+        {
+            "name": "path",
+            "repr": "Nginx 路径",
+            "type": "str",
+            "default": "/etc/nginx"
+        }
+    ],
+    "php-fpm": [
+        {
+            "name": "enable",
+            "repr": "是否启用 PHP-FPM 监控",
+            "type": "bool",
+            "default": 1
+        },
+        {
+            "name": "path",
+            "repr": "PHP-FPM 路径",
+            "type": "str",
+            "default": "/etc/php/8.3/fpm"
+        }
+    ]
+}

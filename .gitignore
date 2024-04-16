@@ -32,4 +32,9 @@ web/pnpm-lock.yaml
 
 server/server*
 web/web*
-agent
+
+agent/*
+!agent/agent.py
+!agent/remote.py
+!agent/datatype.txt
+!agent/options.json

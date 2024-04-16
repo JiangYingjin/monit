@@ -1,0 +1,100 @@
+cpu.cpu_percent:%:CPU 利用率
+cpu.cpu_freq:MHz:CPU 频率
+
+memory.total:MB:总内存
+memory.available:MB:可用内存
+memory.percent:%:内存利用率
+memory.used:MB:已用内存
+memory.free:MB:空闲内存
+memory.active:MB:活跃内存
+memory.inactive:MB:非活跃内存
+memory.buffers:MB:缓冲区
+memory.cached:MB:缓存
+memory.shared:MB:共享内存
+memory.slab:MB:内核缓存
+memory.swap_total:MB:总交换内存
+memory.swap_used:MB:已用交换内存
+memory.swap_free:MB:空闲交换内存
+memory.swap_percent:%:交换内存利用率
+memory.swap_sin:MB:交换内存扇入
+memory.swap_sout:MB:交换内存扇出
+
+disk.total:GB:磁盘总大小
+disk.used:GB:磁盘已用大小
+disk.free:GB:磁盘空闲大小
+disk.percent:%:磁盘利用率
+
+disk_io.read_count::磁盘读次数
+disk_io.write_count::磁盘写次数
+disk_io.read_bytes:B:磁盘读大小（字节）
+disk_io.write_bytes:B:磁盘写大小（字节）
+disk_io.read_time:ms:磁盘读时长（ms）
+disk_io.write_time:ms:磁盘写时长（ms）
+disk_io.read_merged_count::磁盘合并读次数
+disk_io.write_merged_count::磁盘合并写次数
+disk_io.busy_time:ms:磁盘繁忙时长（ms）
+
+net_io.bytes_sent:B:网络发送字节数
+net_io.bytes_recv:B:网络接收字节数
+net_io.packets_sent::网络发送包数
+net_io.packets_recv::网络接收包数
+net_io.errin::网络接收错误数
+net_io.errout::网络发送错误数
+net_io.dropin::网络接收丢包数
+net_io.dropout::网络发送丢包数
+
+mysql.qps::MySQL QPS
+mysql.tps::MySQL TPS
+mysql.questions::MySQL 每秒处理的 SQL 请求数
+mysql.com_insert::MySQL 每秒完成的 insert 语句数
+mysql.com_update::MySQL 每秒完成的 update 语句数
+mysql.com_update_multi::MySQL 每秒完成的 update 多行语句数
+mysql.com_delete::MySQL 每秒完成的 delete 语句数
+mysql.com_delete_multi::MySQL 每秒完成的 delete 多行语句数
+mysql.com_select::MySQL 每秒完成的 select 语句数
+mysql.innodb_buffer_penetration_percent:%:InnoDB 缓冲池读取穿透率
+mysql.innodb_buffer_pool_read_requests::InnoDB 缓冲池读取请求数
+mysql.innodb_buffer_pool_read_ahead::InnoDB 缓冲池预读请求数
+mysql.innodb_buffer_pool_reads::InnoDB 缓冲池向磁盘读取数
+mysql.slow_queries::MySQL 慢查询数
+mysql.aborted_connects::MySQL 每秒连接失败数
+mysql.threads_connected::MySQL 当前连接数
+mysql.threads_running::MySQL 当前运行线程数
+mysql.connections::MySQL 新增连接数
+
+redis.used_memory:MB:Redis 已用内存
+redis.instantaneous_ops_per_sec::Redis 每秒操作数
+redis.connected_clients::Redis 当前连接数
+redis.blocked_clients::Redis 阻塞客户端数
+redis.allocator_frag_ratio::Redis 分配器碎片比例
+redis.allocator_rss_ratio::Redis 分配器常驻内存比例
+redis.rss_overhead_ratio::Redis 常驻内存开销比例
+redis.reads_processed::Redis 读取次数
+redis.writes_processed::Redis 写入次数
+redis.evicted_keys::Redis 淘汰键数
+redis.rejected_connections::Redis 拒绝连接数
+redis.keyspace_hits::Redis 命中键数
+redis.keyspace_misses::Redis 未命中键数
+redis.net_input_bytes:B:Redis 网络输入字节数
+redis.net_output_bytes:B:Redis 网络输出字节数
+redis.connections_received::Redis 连接数
+redis.commands_processed::Redis 处理命令数
+
+nginx.active_connections::Nginx 活跃连接数
+nginx.server_accepts::Nginx 接受请求数
+nginx.server_handled::Nginx 处理请求数
+nginx.server_requests::Nginx 请求数
+nginx.reading::Nginx 正在读取客户端请求报文首部的连接的连接数
+nginx.writing::Nginx 正在向客户端发送响应报文过程中的连接数
+nginx.waiting::Nginx 已经处理完正在等候下一次请求指令的驻留连接数
+
+phpfpm.accepted_conn::PHP-FPM 接受的连接数
+phpfpm.listen_queue::PHP-FPM 监听队列长度
+phpfpm.max_listen_queue::PHP-FPM 最大监听队列长度
+phpfpm.listen_queue_len:B:PHP-FPM 监听队列总大小
+phpfpm.active_processes::PHP-FPM 活跃进程数
+phpfpm.idle_processes::PHP-FPM 空闲进程数
+phpfpm.total_processes::PHP-FPM 总进程数
+phpfpm.max_active_processes::PHP-FPM 最大活跃进程数
+phpfpm.max_children_reached::PHP-FPM 最大子进程数
+phpfpm.slow_requests::PHP-FPM 慢请求数
