@@ -1806,7 +1806,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "创建时间",
-                        "name": "createdAt",
+                        "name": "created_at",
                         "in": "query"
                     },
                     {
@@ -1836,7 +1836,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "更新时间",
-                        "name": "updatedAt",
+                        "name": "updated_at",
                         "in": "query"
                     }
                 ],
@@ -2071,44 +2071,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/data/createData": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Data"
-                ],
-                "summary": "创建Data",
-                "parameters": [
-                    {
-                        "description": "创建Data",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/Customize.Data"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{\"success\":true,\"data\":{},\"msg\":\"创建成功\"}",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "/data/deleteData": {
             "delete": {
                 "security": [
@@ -2199,14 +2161,14 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
-                        "type": "string",
-                        "description": "创建时间",
-                        "name": "createdAt",
+                        "type": "integer",
+                        "name": "createdBy",
                         "in": "query"
                     },
                     {
-                        "type": "integer",
-                        "name": "createdBy",
+                        "type": "string",
+                        "description": "创建时间",
+                        "name": "created_at",
                         "in": "query"
                     },
                     {
@@ -2229,14 +2191,14 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "type": "string",
-                        "description": "更新时间",
-                        "name": "updatedAt",
+                        "type": "integer",
+                        "name": "updatedBy",
                         "in": "query"
                     },
                     {
-                        "type": "integer",
-                        "name": "updatedBy",
+                        "type": "string",
+                        "description": "更新时间",
+                        "name": "updated_at",
                         "in": "query"
                     },
                     {
@@ -2480,14 +2442,14 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
-                        "type": "string",
-                        "description": "创建时间",
-                        "name": "createdAt",
+                        "type": "integer",
+                        "name": "createdBy",
                         "in": "query"
                     },
                     {
-                        "type": "integer",
-                        "name": "createdBy",
+                        "type": "string",
+                        "description": "创建时间",
+                        "name": "created_at",
                         "in": "query"
                     },
                     {
@@ -2511,13 +2473,20 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "更新时间",
-                        "name": "updatedAt",
-                        "in": "query"
+                        "description": "单位",
+                        "name": "units",
+                        "in": "query",
+                        "required": true
                     },
                     {
                         "type": "integer",
                         "name": "updatedBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "更新时间",
+                        "name": "updated_at",
                         "in": "query"
                     }
                 ],
@@ -3220,14 +3189,14 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
-                        "type": "string",
-                        "description": "创建时间",
-                        "name": "createdAt",
+                        "type": "integer",
+                        "name": "createdBy",
                         "in": "query"
                     },
                     {
-                        "type": "integer",
-                        "name": "createdBy",
+                        "type": "string",
+                        "description": "创建时间",
+                        "name": "created_at",
                         "in": "query"
                     },
                     {
@@ -3264,14 +3233,20 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "type": "string",
-                        "description": "更新时间",
-                        "name": "updatedAt",
+                        "type": "boolean",
+                        "description": "状态",
+                        "name": "status",
                         "in": "query"
                     },
                     {
                         "type": "integer",
                         "name": "updatedBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "更新时间",
+                        "name": "updated_at",
                         "in": "query"
                     }
                 ],
@@ -3406,6 +3381,575 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/Customize.Machine"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"success\":true,\"data\":{},\"msg\":\"更新成功\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/machineService/createMachineService": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "MachineService"
+                ],
+                "summary": "创建数据类型",
+                "parameters": [
+                    {
+                        "description": "创建数据类型",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_flipped-aurora_gin-vue-admin_server_model_Customize.MachineService"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"success\":true,\"data\":{},\"msg\":\"创建成功\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/machineService/deleteMachineService": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "MachineService"
+                ],
+                "summary": "删除数据类型",
+                "parameters": [
+                    {
+                        "description": "删除数据类型",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_flipped-aurora_gin-vue-admin_server_model_Customize.MachineService"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"success\":true,\"data\":{},\"msg\":\"删除成功\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/machineService/deleteMachineServiceByIds": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "MachineService"
+                ],
+                "summary": "批量删除数据类型",
+                "responses": {
+                    "200": {
+                        "description": "{\"success\":true,\"data\":{},\"msg\":\"批量删除成功\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/machineService/findMachineService": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "MachineService"
+                ],
+                "summary": "用id查询数据类型",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "主键ID",
+                        "name": "ID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "createdBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "创建时间",
+                        "name": "created_at",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "deletedBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "机器ID",
+                        "name": "machineID",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "当前机器支持的服务",
+                        "name": "services",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "name": "updatedBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "更新时间",
+                        "name": "updated_at",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"success\":true,\"data\":{},\"msg\":\"查询成功\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/machineService/getMachineServiceList": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "MachineService"
+                ],
+                "summary": "分页获取数据类型列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "endCreatedAt",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "关键字",
+                        "name": "keyword",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页大小",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "startCreatedAt",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"success\":true,\"data\":{},\"msg\":\"获取成功\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/machineService/updateMachineService": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "MachineService"
+                ],
+                "summary": "更新数据类型",
+                "parameters": [
+                    {
+                        "description": "更新数据类型",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_flipped-aurora_gin-vue-admin_server_model_Customize.MachineService"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"success\":true,\"data\":{},\"msg\":\"更新成功\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/machineWarning/createMachineWarning": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "MachineWarning"
+                ],
+                "summary": "创建机器告警",
+                "parameters": [
+                    {
+                        "description": "创建机器告警",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Customize.MachineWarning"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"success\":true,\"data\":{},\"msg\":\"创建成功\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/machineWarning/deleteMachineWarning": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "MachineWarning"
+                ],
+                "summary": "删除机器告警",
+                "parameters": [
+                    {
+                        "description": "删除机器告警",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Customize.MachineWarning"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"success\":true,\"data\":{},\"msg\":\"删除成功\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/machineWarning/deleteMachineWarningByIds": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "MachineWarning"
+                ],
+                "summary": "批量删除机器告警",
+                "responses": {
+                    "200": {
+                        "description": "{\"success\":true,\"data\":{},\"msg\":\"批量删除成功\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/machineWarning/findMachineWarning": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "MachineWarning"
+                ],
+                "summary": "用id查询机器告警",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "主键ID",
+                        "name": "ID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "createdBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "创建时间",
+                        "name": "created_at",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "告警数据类型",
+                        "name": "dataTypeID",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "name": "deletedBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "描述",
+                        "name": "description",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "告警阈值",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "告警机器ID",
+                        "name": "machineID",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "告警联系人ID",
+                        "name": "reporterID",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "name": "updatedBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "更新时间",
+                        "name": "updated_at",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"success\":true,\"data\":{},\"msg\":\"查询成功\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/machineWarning/getMachineWarningList": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "MachineWarning"
+                ],
+                "summary": "分页获取机器告警列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "endCreatedAt",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "关键字",
+                        "name": "keyword",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页大小",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "startCreatedAt",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"success\":true,\"data\":{},\"msg\":\"获取成功\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/machineWarning/updateMachineWarning": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "MachineWarning"
+                ],
+                "summary": "更新机器告警",
+                "parameters": [
+                    {
+                        "description": "更新机器告警",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Customize.MachineWarning"
                         }
                     }
                 ],
@@ -3879,6 +4423,280 @@ const docTemplate = `{
                 }
             }
         },
+        "/serviceTemplate/createServiceTemplate": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ServiceTemplate"
+                ],
+                "summary": "创建命令模板",
+                "parameters": [
+                    {
+                        "description": "创建命令模板",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Customize.ServiceTemplate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"success\":true,\"data\":{},\"msg\":\"创建成功\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/serviceTemplate/deleteServiceTemplate": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ServiceTemplate"
+                ],
+                "summary": "删除命令模板",
+                "parameters": [
+                    {
+                        "description": "删除命令模板",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Customize.ServiceTemplate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"success\":true,\"data\":{},\"msg\":\"删除成功\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/serviceTemplate/deleteServiceTemplateByIds": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ServiceTemplate"
+                ],
+                "summary": "批量删除命令模板",
+                "responses": {
+                    "200": {
+                        "description": "{\"success\":true,\"data\":{},\"msg\":\"批量删除成功\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/serviceTemplate/findServiceTemplate": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ServiceTemplate"
+                ],
+                "summary": "用id查询命令模板",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "主键ID",
+                        "name": "ID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "createdBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "创建时间",
+                        "name": "created_at",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "deletedBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "服务名",
+                        "name": "service",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "命令模板",
+                        "name": "template",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "name": "updatedBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "更新时间",
+                        "name": "updated_at",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"success\":true,\"data\":{},\"msg\":\"查询成功\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/serviceTemplate/getServiceTemplateList": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ServiceTemplate"
+                ],
+                "summary": "分页获取命令模板列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "endCreatedAt",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "关键字",
+                        "name": "keyword",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页大小",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "startCreatedAt",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"success\":true,\"data\":{},\"msg\":\"获取成功\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/serviceTemplate/updateServiceTemplate": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ServiceTemplate"
+                ],
+                "summary": "更新命令模板",
+                "parameters": [
+                    {
+                        "description": "更新命令模板",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Customize.ServiceTemplate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"success\":true,\"data\":{},\"msg\":\"更新成功\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/sysDictionary/createSysDictionary": {
             "post": {
                 "security": [
@@ -4006,7 +4824,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "创建时间",
-                        "name": "createdAt",
+                        "name": "created_at",
                         "in": "query"
                     },
                     {
@@ -4036,7 +4854,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "更新时间",
-                        "name": "updatedAt",
+                        "name": "updated_at",
                         "in": "query"
                     }
                 ],
@@ -4285,7 +5103,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "创建时间",
-                        "name": "createdAt",
+                        "name": "created_at",
                         "in": "query"
                     },
                     {
@@ -4321,7 +5139,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "更新时间",
-                        "name": "updatedAt",
+                        "name": "updated_at",
                         "in": "query"
                     },
                     {
@@ -4384,7 +5202,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "创建时间",
-                        "name": "createdAt",
+                        "name": "created_at",
                         "in": "query"
                     },
                     {
@@ -4438,7 +5256,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "更新时间",
-                        "name": "updatedAt",
+                        "name": "updated_at",
                         "in": "query"
                     },
                     {
@@ -4684,7 +5502,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "创建时间",
-                        "name": "createdAt",
+                        "name": "created_at",
                         "in": "query"
                     },
                     {
@@ -4730,7 +5548,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "更新时间",
-                        "name": "updatedAt",
+                        "name": "updated_at",
                         "in": "query"
                     }
                 ],
@@ -4771,7 +5589,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "创建时间",
-                        "name": "createdAt",
+                        "name": "created_at",
                         "in": "query"
                     },
                     {
@@ -4845,7 +5663,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "更新时间",
-                        "name": "updatedAt",
+                        "name": "updated_at",
                         "in": "query"
                     }
                 ],
@@ -5106,7 +5924,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "创建时间",
-                        "name": "createdAt",
+                        "name": "created_at",
                         "in": "query"
                     },
                     {
@@ -5154,7 +5972,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "更新时间",
-                        "name": "updatedAt",
+                        "name": "updated_at",
                         "in": "query"
                     },
                     {
@@ -5229,7 +6047,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "创建时间",
-                        "name": "createdAt",
+                        "name": "created_at",
                         "in": "query"
                     },
                     {
@@ -5295,7 +6113,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "更新时间",
-                        "name": "updatedAt",
+                        "name": "updated_at",
                         "in": "query"
                     },
                     {
@@ -5999,12 +6817,12 @@ const docTemplate = `{
                     "description": "主键ID",
                     "type": "integer"
                 },
-                "createdAt": {
-                    "description": "创建时间",
-                    "type": "string"
-                },
                 "createdBy": {
                     "type": "integer"
+                },
+                "created_at": {
+                    "description": "创建时间",
+                    "type": "string"
                 },
                 "dataTypeID": {
                     "description": "数据类型",
@@ -6017,12 +6835,12 @@ const docTemplate = `{
                     "description": "机器ID",
                     "type": "integer"
                 },
-                "updatedAt": {
-                    "description": "更新时间",
-                    "type": "string"
-                },
                 "updatedBy": {
                     "type": "integer"
+                },
+                "updated_at": {
+                    "description": "更新时间",
+                    "type": "string"
                 },
                 "value": {
                     "description": "值",
@@ -6034,19 +6852,20 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "description",
-                "name"
+                "name",
+                "units"
             ],
             "properties": {
                 "ID": {
                     "description": "主键ID",
                     "type": "integer"
                 },
-                "createdAt": {
-                    "description": "创建时间",
-                    "type": "string"
-                },
                 "createdBy": {
                     "type": "integer"
+                },
+                "created_at": {
+                    "description": "创建时间",
+                    "type": "string"
                 },
                 "deletedBy": {
                     "type": "integer"
@@ -6059,12 +6878,16 @@ const docTemplate = `{
                     "description": "名称",
                     "type": "string"
                 },
-                "updatedAt": {
-                    "description": "更新时间",
+                "units": {
+                    "description": "单位",
                     "type": "string"
                 },
                 "updatedBy": {
                     "type": "integer"
+                },
+                "updated_at": {
+                    "description": "更新时间",
+                    "type": "string"
                 }
             }
         },
@@ -6081,12 +6904,12 @@ const docTemplate = `{
                     "description": "主键ID",
                     "type": "integer"
                 },
-                "createdAt": {
-                    "description": "创建时间",
-                    "type": "string"
-                },
                 "createdBy": {
                     "type": "integer"
+                },
+                "created_at": {
+                    "description": "创建时间",
+                    "type": "string"
                 },
                 "deletedBy": {
                     "type": "integer"
@@ -6107,12 +6930,107 @@ const docTemplate = `{
                     "description": "密钥",
                     "type": "string"
                 },
-                "updatedAt": {
+                "status": {
+                    "description": "状态",
+                    "type": "boolean"
+                },
+                "updatedBy": {
+                    "type": "integer"
+                },
+                "updated_at": {
                     "description": "更新时间",
+                    "type": "string"
+                }
+            }
+        },
+        "Customize.MachineWarning": {
+            "type": "object",
+            "required": [
+                "dataTypeID",
+                "description",
+                "limit",
+                "machineID",
+                "reporterID"
+            ],
+            "properties": {
+                "ID": {
+                    "description": "主键ID",
+                    "type": "integer"
+                },
+                "createdBy": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "description": "创建时间",
+                    "type": "string"
+                },
+                "dataTypeID": {
+                    "description": "告警数据类型",
+                    "type": "integer"
+                },
+                "deletedBy": {
+                    "type": "integer"
+                },
+                "description": {
+                    "description": "描述",
+                    "type": "string"
+                },
+                "limit": {
+                    "description": "告警阈值",
+                    "type": "number"
+                },
+                "machineID": {
+                    "description": "告警机器ID",
+                    "type": "integer"
+                },
+                "reporterID": {
+                    "description": "告警联系人ID",
                     "type": "string"
                 },
                 "updatedBy": {
                     "type": "integer"
+                },
+                "updated_at": {
+                    "description": "更新时间",
+                    "type": "string"
+                }
+            }
+        },
+        "Customize.ServiceTemplate": {
+            "type": "object",
+            "required": [
+                "service",
+                "template"
+            ],
+            "properties": {
+                "ID": {
+                    "description": "主键ID",
+                    "type": "integer"
+                },
+                "createdBy": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "description": "创建时间",
+                    "type": "string"
+                },
+                "deletedBy": {
+                    "type": "integer"
+                },
+                "service": {
+                    "description": "服务名",
+                    "type": "string"
+                },
+                "template": {
+                    "description": "命令模板",
+                    "type": "string"
+                },
+                "updatedBy": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "description": "更新时间",
+                    "type": "string"
                 }
             }
         },
@@ -7000,7 +7918,7 @@ const docTemplate = `{
                     "description": "主键ID",
                     "type": "integer"
                 },
-                "createdAt": {
+                "created_at": {
                     "description": "创建时间",
                     "type": "string"
                 },
@@ -7028,7 +7946,7 @@ const docTemplate = `{
                     "description": "管理ID",
                     "type": "integer"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "description": "更新时间",
                     "type": "string"
                 }
@@ -7044,7 +7962,7 @@ const docTemplate = `{
                 "chunkTotal": {
                     "type": "integer"
                 },
-                "createdAt": {
+                "created_at": {
                     "description": "创建时间",
                     "type": "string"
                 },
@@ -7066,7 +7984,7 @@ const docTemplate = `{
                 "isFinish": {
                     "type": "boolean"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "description": "更新时间",
                     "type": "string"
                 }
@@ -7079,7 +7997,7 @@ const docTemplate = `{
                     "description": "主键ID",
                     "type": "integer"
                 },
-                "createdAt": {
+                "created_at": {
                     "description": "创建时间",
                     "type": "string"
                 },
@@ -7092,7 +8010,7 @@ const docTemplate = `{
                 "fileChunkPath": {
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "description": "更新时间",
                     "type": "string"
                 }
@@ -7105,7 +8023,7 @@ const docTemplate = `{
                     "description": "主键ID",
                     "type": "integer"
                 },
-                "createdAt": {
+                "created_at": {
                     "description": "创建时间",
                     "type": "string"
                 },
@@ -7121,7 +8039,7 @@ const docTemplate = `{
                     "description": "文件标签",
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "description": "更新时间",
                     "type": "string"
                 },
@@ -7160,6 +8078,44 @@ const docTemplate = `{
                 },
                 "to": {
                     "description": "收件人:多个以英文逗号分隔 例：a@qq.com b@qq.com 正式开发中请把此项目作为参数使用",
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_flipped-aurora_gin-vue-admin_server_model_Customize.MachineService": {
+            "type": "object",
+            "required": [
+                "machineID",
+                "services"
+            ],
+            "properties": {
+                "ID": {
+                    "description": "主键ID",
+                    "type": "integer"
+                },
+                "createdBy": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "description": "创建时间",
+                    "type": "string"
+                },
+                "deletedBy": {
+                    "type": "integer"
+                },
+                "machineID": {
+                    "description": "机器ID",
+                    "type": "integer"
+                },
+                "services": {
+                    "description": "当前机器支持的服务",
+                    "type": "string"
+                },
+                "updatedBy": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "description": "更新时间",
                     "type": "string"
                 }
             }
@@ -7417,7 +8373,7 @@ const docTemplate = `{
                     "description": "api组",
                     "type": "string"
                 },
-                "createdAt": {
+                "created_at": {
                     "description": "创建时间",
                     "type": "string"
                 },
@@ -7453,7 +8409,7 @@ const docTemplate = `{
                     "description": "api路径",
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "description": "更新时间",
                     "type": "string"
                 }
@@ -7802,7 +8758,7 @@ const docTemplate = `{
                 "column": {
                     "type": "string"
                 },
-                "createdAt": {
+                "created_at": {
                     "description": "创建时间",
                     "type": "string"
                 },
@@ -7815,7 +8771,7 @@ const docTemplate = `{
                 "templateID": {
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "description": "更新时间",
                     "type": "string"
                 }
@@ -7921,7 +8877,7 @@ const docTemplate = `{
                     "description": "api组",
                     "type": "string"
                 },
-                "createdAt": {
+                "created_at": {
                     "description": "创建时间",
                     "type": "string"
                 },
@@ -7937,7 +8893,7 @@ const docTemplate = `{
                     "description": "api路径",
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "description": "更新时间",
                     "type": "string"
                 }
@@ -8000,7 +8956,7 @@ const docTemplate = `{
                     "description": "主键ID",
                     "type": "integer"
                 },
-                "createdAt": {
+                "created_at": {
                     "description": "创建时间",
                     "type": "string"
                 },
@@ -8013,7 +8969,7 @@ const docTemplate = `{
                 "packageName": {
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "description": "更新时间",
                     "type": "string"
                 }
@@ -8042,7 +8998,7 @@ const docTemplate = `{
                     "description": "对应前端文件路径",
                     "type": "string"
                 },
-                "createdAt": {
+                "created_at": {
                     "description": "创建时间",
                     "type": "string"
                 },
@@ -8086,7 +9042,7 @@ const docTemplate = `{
                     "description": "排序标记",
                     "type": "integer"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "description": "更新时间",
                     "type": "string"
                 }
@@ -8099,7 +9055,7 @@ const docTemplate = `{
                     "description": "主键ID",
                     "type": "integer"
                 },
-                "createdAt": {
+                "created_at": {
                     "description": "创建时间",
                     "type": "string"
                 },
@@ -8112,7 +9068,7 @@ const docTemplate = `{
                 "sysBaseMenuID": {
                     "type": "integer"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "description": "更新时间",
                     "type": "string"
                 }
@@ -8125,7 +9081,7 @@ const docTemplate = `{
                     "description": "主键ID",
                     "type": "integer"
                 },
-                "createdAt": {
+                "created_at": {
                     "description": "创建时间",
                     "type": "string"
                 },
@@ -8140,7 +9096,7 @@ const docTemplate = `{
                     "description": "地址栏携带参数为params还是query",
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "description": "更新时间",
                     "type": "string"
                 },
@@ -8157,7 +9113,7 @@ const docTemplate = `{
                     "description": "主键ID",
                     "type": "integer"
                 },
-                "createdAt": {
+                "created_at": {
                     "description": "创建时间",
                     "type": "string"
                 },
@@ -8183,7 +9139,7 @@ const docTemplate = `{
                     "description": "字典名（英）",
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "description": "更新时间",
                     "type": "string"
                 }
@@ -8196,7 +9152,7 @@ const docTemplate = `{
                     "description": "主键ID",
                     "type": "integer"
                 },
-                "createdAt": {
+                "created_at": {
                     "description": "创建时间",
                     "type": "string"
                 },
@@ -8220,7 +9176,7 @@ const docTemplate = `{
                     "description": "关联标记",
                     "type": "integer"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "description": "更新时间",
                     "type": "string"
                 },
@@ -8243,7 +9199,7 @@ const docTemplate = `{
                         "$ref": "#/definitions/system.Condition"
                     }
                 },
-                "createdAt": {
+                "created_at": {
                     "description": "创建时间",
                     "type": "string"
                 },
@@ -8273,7 +9229,7 @@ const docTemplate = `{
                     "description": "模板信息",
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "description": "更新时间",
                     "type": "string"
                 }
@@ -8308,7 +9264,7 @@ const docTemplate = `{
                     "description": "对应前端文件路径",
                     "type": "string"
                 },
-                "createdAt": {
+                "created_at": {
                     "description": "创建时间",
                     "type": "string"
                 },
@@ -8355,7 +9311,7 @@ const docTemplate = `{
                     "description": "排序标记",
                     "type": "integer"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "description": "更新时间",
                     "type": "string"
                 }
@@ -8376,7 +9332,7 @@ const docTemplate = `{
                     "description": "请求Body",
                     "type": "string"
                 },
-                "createdAt": {
+                "created_at": {
                     "description": "创建时间",
                     "type": "string"
                 },
@@ -8408,7 +9364,7 @@ const docTemplate = `{
                     "description": "请求状态",
                     "type": "integer"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "description": "更新时间",
                     "type": "string"
                 },
@@ -8449,7 +9405,7 @@ const docTemplate = `{
                     "description": "基础颜色",
                     "type": "string"
                 },
-                "createdAt": {
+                "created_at": {
                     "description": "创建时间",
                     "type": "string"
                 },
@@ -8477,7 +9433,7 @@ const docTemplate = `{
                     "description": "用户侧边主题",
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "description": "更新时间",
                     "type": "string"
                 },

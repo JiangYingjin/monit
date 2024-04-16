@@ -6,4 +6,6 @@ type ApiGroup struct {
 	DataApi
 	MachineApi
 	MachineWarningApi
+	MachineServiceApi
+	ServiceTemplateApi
 }

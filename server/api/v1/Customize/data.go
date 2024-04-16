@@ -6,9 +6,11 @@ import (
 	CustomizeReq "github.com/flipped-aurora/gin-vue-admin/server/model/Customize/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
 	"github.com/flipped-aurora/gin-vue-admin/server/service"
+	Customize2 "github.com/flipped-aurora/gin-vue-admin/server/service/Customize"
 	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"time"
 )
 
 type DataApi struct {
@@ -31,14 +33,45 @@ var dataService = service.ServiceGroupApp.CustomizeServiceGroup.DataService
 //		"machineID": 1,
 //		"value": 1.0
 //	}
+type CreateDataReq struct {
+	DataTypeID *int     `json:"dataTypeID" form:"dataTypeID" gorm:"column:data_type_i_d;comment:;" binding:"required"` //数据类型
+	Value      *float64 `json:"value" form:"value" gorm:"column:value;comment:;" binding:"required"`                   //值
+	MachineID  *int     `json:"machineID" form:"machineID" gorm:"column:machine_i_d;comment:;" binding:"required"`     //机器ID
+	CreatedAt  string   `json:"created_at"`                                                                            // 创建时间
+	UpdatedAt  string   `json:"updated_at"`                                                                            // 更新时间
+}
+
+func (req *CreateDataReq) ToData() (Customize.Data, error) {
+	createdAt, err := time.Parse(time.RFC3339, Customize2.ConvertTimestamp(req.CreatedAt))
+	if err != nil {
+		global.GVA_LOG.Error("创建失败!", zap.Error(err))
+		return Customize.Data{}, err
+	}
+	return Customize.Data{
+		DataTypeID: req.DataTypeID,
+		Value:      req.Value,
+		MachineID:  req.MachineID,
+		GVA_MODEL: global.GVA_MODEL{
+			CreatedAt: createdAt,
+			UpdatedAt: time.Now(),
+		},
+		CreatedBy: uint(*req.MachineID),
+	}, nil
+}
+
 func (dataApi *DataApi) CreateData(c *gin.Context) {
-	var data Customize.Data
-	err := c.ShouldBindJSON(&data)
+	var req CreateDataReq
+	err := c.ShouldBindJSON(&req)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	data.CreatedBy = uint(*data.MachineID)
+
+	data, err := req.ToData()
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
 
 	if err := dataService.CreateData(&data); err != nil {
 		global.GVA_LOG.Error("创建失败!", zap.Error(err))

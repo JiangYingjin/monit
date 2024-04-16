@@ -5,4 +5,6 @@ type RouterGroup struct {
 	DataRouter
 	MachineRouter
 	MachineWarningRouter
+	MachineServiceRouter
+	ServiceTemplateRouter
 }

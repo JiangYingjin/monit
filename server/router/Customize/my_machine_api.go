@@ -2,6 +2,7 @@ package Customize
 
 import (
 	v1 "github.com/flipped-aurora/gin-vue-admin/server/api/v1"
+	"github.com/flipped-aurora/gin-vue-admin/server/api/v1/Customize"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,4 +24,8 @@ func (s *MachineRouter) InitMyMachineRouter(Router *gin.RouterGroup) {
 	routerGroup := Router.Group("machine")
 	routerGroup.POST("uploadData", dataApi.CreateData)
 	routerGroup.POST("uploadDataMulti", dataApi.CreateDataMulti)
+
+	var machineServiceApi Customize.MachineServiceApi
+	routerGroup.POST("createMachineService", machineServiceApi.CreateMachineService) // 新建数据类型
+	routerGroup.PUT("updateMachineService", machineServiceApi.UpdateMachineService)  // 更新数据类型
 }
