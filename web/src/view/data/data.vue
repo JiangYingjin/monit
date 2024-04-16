@@ -87,9 +87,12 @@
         <el-table-column
           align="left"
           label="数据类型"
-          prop="dataTypeID"
           width="120"
-        />
+        >
+          <template #default="scope">
+            {{ dataTypeMap[scope.row.dataTypeID.toString()] }}
+          </template>
+        </el-table-column>
         <el-table-column
           align="left"
           label="值"
@@ -233,12 +236,100 @@
         </el-descriptions-item>
       </el-descriptions>
     </el-drawer>
+    <br>
+
+    <div class="filter-box">
+      <el-form
+        :inline="true"
+        :model="filterForm"
+        class="filter-form"
+        size="small"
+        @submit.native.prevent="handleSubmit"
+      >
+        <el-form-item label="起始时间">
+          <el-date-picker
+            v-model="filterForm.start_time"
+            type="datetime"
+            placeholder="选择起始时间"
+            style="width: 200px;"
+          />
+        </el-form-item>
+        <el-form-item label="结束时间">
+          <el-date-picker
+            v-model="filterForm.end_time"
+            type="datetime"
+            placeholder="选择结束时间"
+            style="width: 200px;"
+          />
+        </el-form-item>
+        <el-form-item label="数据类型">
+          <el-checkbox
+            v-model="allDataTypesChecked"
+            @change="handleAllDataTypesChange"
+          >全选</el-checkbox>
+          <el-select
+            v-model="filterForm.dataType"
+            multiple
+            filterable
+            collapse-tags
+            placeholder="选择数据类型"
+            style="width: 200px;"
+            @change="handleDataTypeChange"
+          >
+            <el-option
+              v-for="type in dataTypes"
+              :key="type.id"
+              :label="type.name"
+              :value="type.id"
+            />
+          </el-select>
+
+        </el-form-item>
+        <el-form-item label="机器">
+          <el-checkbox
+            v-model="allMachinesChecked"
+            @change="handleAllMachinesChange"
+          >全选</el-checkbox>
+          <el-select
+            v-model="filterForm.machines"
+            multiple
+            filterable
+            collapse-tags
+            placeholder="选择机器"
+            style="width: 200px;"
+            @change="handleMachinesChange"
+          >
+            <el-option
+              v-for="machine in machines"
+              :key="machine.id"
+              :label="machine.name"
+              :value="machine.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button
+            type="primary"
+            native-type="submit"
+          >筛选</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+    <!--    <div-->
+    <!--      id="chart"-->
+    <!--      style="width: 800px; height: 300px;"-->
+    <!--    />-->
+    <div
+      v-for="config in chartConfigs"
+      :id="config.id"
+      :key="config.id"
+      style="width: 800px; height: 500px;"
+    />
+    <br>
+    <br>
   </div>
-  <br>
 
-  <div id="chart" style="width: 600px; height: 400px;"></div>
 </template>
-
 
 <script setup>
 import {
@@ -250,41 +341,200 @@ import {
   getDataList,
   getData,
 } from '@/api/data'
+import { getMachineList } from '@/api/machine'
 
 // 全量引入格式化工具 请按需保留
 import { getDictFunc, formatDate, formatBoolean, filterDict, ReturnArrImg, onDownloadFile } from '@/utils/format'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ref, reactive } from 'vue'
+import { nextTick } from 'vue'
 
 defineOptions({
   name: 'Data'
 })
 
-import { onMounted } from 'vue'; // 使用Vue 3提供的onMounted函数
-import * as echarts from 'echarts'; // 导入echarts库
+import { onMounted } from 'vue' // 使用Vue 3提供的onMounted函数
+import * as echarts from 'echarts'
+import { getDataTypeList } from '@/api/dataType'
+import {timestamp} from "@vueuse/core"; // 导入echarts库
 
 onMounted(() => {
-  renderChart();
-});
+  // getData123()
+  // renderChart()
+})
 
-function renderChart() {
-  let chart = echarts.init(document.getElementById('chart'));
-  chart.setOption({
-    // 在这里设置您的图表选项
-    xAxis: {
-      type: 'category',
-      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-    },
-    yAxis: {
-      type: 'value'
-    },
-    series: [{
-      data: [820, 932, 901, 934, 1290, 1330, 1320],
-      type: 'line'
-    }]
-  });
+function renderCharts() {
+  chartConfigs.value.forEach(config => {
+    // echarts.dispose(document.getElementById(config.id))
+    const chart = echarts.init(document.getElementById(config.id), 'light', { width: 600, height: 400 })
+    chart.setOption({
+      title: {
+        text: config.title,
+        left: 'center',
+        top: '10px'
+      },
+      legend: {
+        data: config.data.map(series => series),
+        right: 20, // 调整图例到右边的距离
+        top: 20, // 调整图例到顶部的距离// 根据配置的数据动态生成 legend 数据
+      },
+      xAxis: {
+        type: 'time',
+        // data: globalTimeList,
+      },
+      yAxis: {
+        type: 'value',
+        // max: 10 // 设置y轴最大值为100
+      },
+      // 其他配置项
+    })
+    // 渲染图表数据
+    chart.setOption({
+      series: config.data.map(series => ({
+        type: 'line',
+        name: series.name,
+        data: series.data.map(item => [item.time, item.value]),
+        // 其他配置...
+      }))
+    })
+  })
 }
 
+function renderChart() {
+  echarts.dispose(document.getElementById('chart'))
+  const chart = echarts.init(document.getElementById('chart'), 'light')
+  console.log(seriesData)
+
+  // const seriesData1 = [
+  //   {
+  //     name: 'Series 1',
+  //     data: [
+  //       { time: '2024-04-16 09:00', value: 10 },
+  //       { time: '2024-04-16 10:00', value: 20 },
+  //       { time: '2024-04-16 11:00', value: 30 },
+  //       // 其他数据...
+  //     ]
+  //   },
+  //   {
+  //     name: 'Series 2',
+  //     data: [
+  //       { time: '2024-04-16 09:00', value: 15 },
+  //       { time: '2024-04-16 10:00', value: 25 },
+  //       { time: '2024-04-16 11:00', value: 35 },
+  //       // 其他数据...
+  //     ]
+  //   },
+  //   // 其他时间序列数据...
+  // ]
+  const series = seriesData.map(series => ({
+    type: 'line',
+    name: series.name,
+    data: series.data.map(item => [item.time, item.value]),
+    // 其他配置...
+  }))
+
+  console.log(series)
+  console.log()
+  chart.setOption({
+    // 在这里设置您的图表选项
+    title: {
+      text: 'CPU占用率', // 标题文本
+      left: 'center', // 标题水平居中
+      top: '10px' // 标题距离顶部的距离
+    },
+    // legend: {
+    //   data: ['Machine 1', 'Machine 2', 'Machine 3'], // 图例的数据项名称
+    //   top: '30px', // 图例距离顶部的距离
+    //   left: 'center' // 图例水平居中
+    // },
+    xAxis: {
+      type: 'time',
+      // data: globalTimeList,
+    },
+    yAxis: {
+      type: 'value',
+      // max: 10 // 设置y轴最大值为100
+    },
+
+    series: series
+    // data: {
+    //   labels: labels,
+    //   datasets: [
+    // //     {
+    //       label: 'Machine 1 CPU Usage',
+    //       data: machine1Data,
+    //       borderColor: 'rgba(255, 99, 132, 1)',
+    //       borderWidth: 1,
+    //       fill: false
+    //     },
+    //     {
+    //       label: 'Machine 2 CPU Usage',
+    //       data: machine2Data,
+    //       borderColor: 'rgba(54, 162, 235, 1)',
+    //       borderWidth: 1,
+    //       fill: false
+    //     },
+    //     {
+    //       label: 'Machine 3 CPU Usage',
+    //       data: machine3Data,
+    //       borderColor: 'rgba(75, 192, 192, 1)',
+    //       borderWidth: 1,
+    //       fill: false
+    //     }
+    //   ]
+    // },
+  })
+
+  //
+  // // Create chart
+  // const ctx = document.getElementById('chart').getContext('2d');
+  // const cpuChart = new Chart(ctx, {
+  //   type: 'line',
+  //   data: {
+  //     labels: labels,
+  //     datasets: [
+  //       {
+  //         label: 'Machine 1 CPU Usage',
+  //         data: machine1Data,
+  //         borderColor: 'rgba(255, 99, 132, 1)',
+  //         borderWidth: 1,
+  //         fill: false
+  //       },
+  //       {
+  //         label: 'Machine 2 CPU Usage',
+  //         data: machine2Data,
+  //         borderColor: 'rgba(54, 162, 235, 1)',
+  //         borderWidth: 1,
+  //         fill: false
+  //       },
+  //       {
+  //         label: 'Machine 3 CPU Usage',
+  //         data: machine3Data,
+  //         borderColor: 'rgba(75, 192, 192, 1)',
+  //         borderWidth: 1,
+  //         fill: false
+  //       }
+  //     ]
+  //   },
+  //   options: {
+  //     scales: {
+  //       x: {
+  //         type: 'time',
+  //         time: {
+  //           unit: 'minute'
+  //         }
+  //       },
+  //       y: {
+  //         beginAtZero: true,
+  //         title: {
+  //           display: true,
+  //           text: 'CPU Usage (%)'
+  //         }
+  //       }
+  //     }
+  //   }
+  // })
+}
 
 // 自动化生成的字典（可能为空）以及字段
 const formData = ref({
@@ -340,6 +590,10 @@ const total = ref(0)
 const pageSize = ref(10)
 const tableData = ref([])
 const searchInfo = ref({})
+const responseData = ref({})
+
+const machineList = ref([])
+const dataTypeList = ref([])
 
 // 重置
 const onReset = () => {
@@ -543,32 +797,182 @@ const enterDialog = async() => {
   })
 }
 
+// 图线筛选框
+const filterForm = ref({
+  start_time: '', // 使用格式化的开始时间间
+  end_time: '', // 使用格式化的当前时间作为结束时
+  dataType: '',
+  machines: [] // 这里改为数组，以便支持多选
+})
 
+// 假设数据类型和机器的选项从后端获取，这里模拟一些示例数据
+const dataTypes = ref([])
 
+const machines = ref([])
+
+const allDataTypesChecked = ref(false)
+const allMachinesChecked = ref(false)
+const handleAllDataTypesChange = (checked) => {
+  if (checked) {
+    filterForm.value.dataType = dataTypes.value.map(type => type.id)
+  } else {
+    filterForm.value.dataType = []
+  }
+}
+
+const handleAllMachinesChange = (checked) => {
+  if (checked) {
+    filterForm.value.machines = machines.value.map(machine => machine.id)
+  } else {
+    filterForm.value.machines = []
+  }
+}
+// 监听数据类型选择框的变化
+const handleDataTypeChange = (value) => {
+  allDataTypesChecked.value = value.length === dataTypes.value.length
+}
+
+// 监听机器选择框的变化
+const handleMachinesChange = (value) => {
+  allMachinesChecked.value = value.length === machines.value.length
+}
+
+// 监听表单提交事件
+const handleSubmit = () => {
+  // 获取筛选条件
+  if (filterForm.value.start_time && filterForm.value.end_time) {
+    data1.value.start_time = formatDate(filterForm.value.start_time)
+    data1.value.end_time = formatDate(filterForm.value.end_time)
+  }
+  data1.value.machine_ids = filterForm.value.machines
+  // data1.value.data_type_id = filterForm.value.dataType
+  // for (let i = 0; i < filterForm.value.dataType.length; i++) {
+  //   data1.value.data_type_id = filterForm.value.dataType[i]
+  // }
+  getData123()
+
+  // 根据筛选条件请求数据并更新图表
+  // fetchDataAndRenderChart(startTime, endTime, dataType, machines)
+}
+const data2 = ref({
+  machine_ids: ['1'],
+  data_type_id: '1',
+  start_time: '2024-04-16 02:00:33', // 使用格式化的开始时间间
+  end_time: '2024-04-16 02:02:33', // 使用格式化的当前时间作为结束时
+  // start_time: '',
+  // end_time: '',
+
+})
 const data1 = ref({
   machine_ids: ['1'],
   data_type_id: '1',
-  start_time: '2024-04-8 15:00:00', // 使用格式化的开始时间
-  end_time: '2024-04-12 15:00:00', // 使用格式化的当前时间作为结束时间
+  start_time: '2024-04-16 02:00:33', // 使用格式化的开始时间间
+  end_time: '2024-04-16 02:00:43', // 使用格式化的当前时间作为结束时
+  // start_time: '',
+  // end_time: '',
+
 })
-const getData123 = async(row) => {
+
+
+const globalTimeList = []
+const globalValuesList = []
+const chartConfigs = ref([])
+const getData123 = async() => {
   // 获取当前时间的Date对象
   // const endTime = new Date()
-
+  //
+  // console.log(formatDate(searchInfo.value.startCreatedAt))
+  // if (searchInfo.value.startCreatedAt && searchInfo.value.endCreatedAt) {
+  //   data1.value.start_time = formatDate(searchInfo.value.startCreatedAt)
+  //   data1.value.end_time = formatDate(searchInfo.value.endCreatedAt)
+  // }
+  // console.log(data1.value.end_time)
   // 打开弹窗
-  const res = await getData(data1.value)
-
-  if (res.code === 0) {
-    ElMessage({
-      type: 'success',
-      message: '成功'
-    })
-    console.log(res)
+  chartConfigs.value.length = 0
+  for (const i in filterForm.value.dataType) {
+    console.log(1111)
+    console.log(filterForm.value.dataType[i])
+    data1.value.data_type_id = filterForm.value.dataType[i].toString()
+    const res = await getData(data1.value)
+    if (res.code === 0) {
+      // ElMessage({
+      //   type: 'success',
+      //   message: '成功'
+      // })
+      responseData.value = res.data
+      const time_dic = {
+      }
+      const seriesData = []
+      for (const key in responseData.value) {
+        time_dic[key] = []
+        // val_dic[key] = []
+        console.log(responseData.value)
+        console.log(key)
+        responseData.value[key].forEach(item => {
+          time_dic[key].push({ time: formatDate(item.CreatedAt), value: item.value })
+        })
+        console.log(time_dic[key])
+        console.log(key)
+        seriesData.push({ name: machineMap[key], data: time_dic[key] })
+        console.log(seriesData)
+        console.log(time_dic[key])
+      }
+      chartConfigs.value.push({ id: filterForm.value.dataType[i].toString(), title: dataTypeMap[filterForm.value.dataType[i]], data: seriesData })
+      // globalTimeList.length = 0 // 清空时间列表数组
+      // globalValuesList.length = 0 // 清空数值列表数组
+      // globalTimeList.push(...time)
+      // globalValuesList.push(...values)
+    }
   }
+  console.log(chartConfigs.value)
+  nextTick(() => {
+    // 在 DOM 更新完成后执行绘制图表的操作
+    renderCharts()
+  })
 }
+const machineMap = []
+
+const getCurrentMachines = async() => {
+  const table = await getMachineList({ page: 0, pageSize: 10000 })
+  if (table.code === 0) {
+    machineList.value = table.data.list
+    machines.value = machineList.value.map(item => ({
+      id: item.ID.toString(),
+      name: item.name
+    }))
+  }
+  machines.value.forEach(item => {
+    machineMap[item.id] = item.name
+  })
+}
+
+getCurrentMachines()
+const dataTypeMap = {}
+const getCurrentDataTypes = async() => {
+  const table = await getDataTypeList({ page: 0, pageSize: 10000 })
+  if (table.code === 0) {
+    dataTypeList.value = table.data.list
+    dataTypes.value = dataTypeList.value.map(item => ({
+      id: item.ID.toString(),
+      name: item.name
+    }))
+  }
+
+  dataTypes.value.forEach(item => {
+    dataTypeMap[item.id] = item.name
+  })
+}
+
+getCurrentDataTypes()
 
 </script>
 
 <style>
+
+  /* 样式可根据需要自定义 */
+.chart-container {
+  width: 100%;
+  height: 400px; /* 图表容器高度 */
+}
 
 </style>

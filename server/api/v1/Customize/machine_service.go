@@ -36,7 +36,7 @@ func (machineServiceApi *MachineServiceApi) CreateMachineService(c *gin.Context)
 
 	if err := machineServiceService.CreateMachineService(&machineService); err != nil {
 		global.GVA_LOG.Error("创建失败!", zap.Error(err))
-		response.FailWithMessage("创建失败", c)
+		response.FailWithMessage("创建失败: "+err.Error(), c)
 	} else {
 		response.OkWithMessage("创建成功", c)
 	}
@@ -99,9 +99,17 @@ func (machineServiceApi *MachineServiceApi) UpdateMachineService(c *gin.Context)
 	}
 	machineService.UpdatedBy = utils.GetUserID(c)
 
-	if err := machineServiceService.UpdateMachineService(machineService); err != nil {
+	var oldMachineService Customize.MachineService
+	err = global.GVA_DB.Where("machine_i_d = ?", machineService.MachineID).First(&oldMachineService).Error
+	if err != nil {
+		response.FailWithMessage("该数据不存在", c)
+		return
+	}
+	oldMachineService.Services = machineService.Services
+
+	if err = machineServiceService.UpdateMachineService(oldMachineService); err != nil {
 		global.GVA_LOG.Error("更新失败!", zap.Error(err))
-		response.FailWithMessage("更新失败", c)
+		response.FailWithMessage("更新失败: "+err.Error(), c)
 	} else {
 		response.OkWithMessage("更新成功", c)
 	}
