@@ -27,5 +27,5 @@ func (s *MachineRouter) InitMyMachineRouter(Router *gin.RouterGroup) {
 
 	var machineServiceApi Customize.MachineServiceApi
 	routerGroup.POST("createMachineService", machineServiceApi.CreateMachineService) // 新建数据类型
-	routerGroup.PUT("updateMachineService", machineServiceApi.UpdateMachineService)  // 更新数据类型
+	routerGroup.POST("updateMachineService", machineServiceApi.UpdateMachineService) // 更新数据类型
 }
