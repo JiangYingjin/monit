@@ -29,3 +29,7 @@ yarn-error.log*
 *.iml
 web/.pnpm-debug.log
 web/pnpm-lock.yaml
+
+server/server*
+web/web*
+agent
