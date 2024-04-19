@@ -109,6 +109,7 @@ logging.info(f"入参：{args}")
 
 # ===================== Agent 类 =====================
 
+
 class Agent:
     def __init__(self, machine_id: int = None, password: str = None):
 
@@ -1509,7 +1510,7 @@ if args.subcommand == "uninstall":
         # 删除 hosts 文件中的 monit 部分
         hosts_path = "/etc/hosts"
         hosts = open(hosts_path, "r", encoding="utf-8").read()
-        print(re.search(pattern,hosts, flags=re.DOTALL))
+        print(re.search(pattern, hosts, flags=re.DOTALL))
         hosts = re.sub(pattern, "", hosts, flags=re.DOTALL)
         open(hosts_path, "w", encoding="utf-8").write(hosts)
         print("hosts 文件已清除 monit 痕迹")
@@ -1520,7 +1521,7 @@ if args.subcommand == "uninstall":
         except:
             nginx_conf_path = "/etc/nginx/nginx.conf"
         nginx_conf = open(nginx_conf_path, "r", encoding="utf-8").read()
-        print(re.search(pattern,nginx_conf, flags=re.DOTALL))
+        print(re.search(pattern, nginx_conf, flags=re.DOTALL))
         nginx_conf = re.sub(pattern, "", nginx_conf, flags=re.DOTALL)
         open(nginx_conf_path, "w", encoding="utf-8").write(nginx_conf)
         print("nginx 配置文件已清除 monit 痕迹")
@@ -1528,7 +1529,7 @@ if args.subcommand == "uninstall":
         # 删除 php-fpm 配置文件中的 monit 部分
         phpfpm_conf_path = config["php-fpm"]["path"]
         phpfpm_conf = open(phpfpm_conf_path, "r", encoding="utf-8").read()
-        print(re.search(pattern,phpfpm_conf, flags=re.DOTALL))
+        print(re.search(pattern, phpfpm_conf, flags=re.DOTALL))
         phpfpm_conf = re.sub(pattern, "", phpfpm_conf, flags=re.DOTALL)
         open(phpfpm_conf_path, "w", encoding="utf-8").write(phpfpm_conf)
         print("php-fpm 配置文件已清除 monit 痕迹")
@@ -1570,29 +1571,3 @@ if args.subcommand == "uninstall":
 if not args.subcommand:
     agent = Agent()
     parser.print_help()
-
-    # # 从 options.json 中读入
-    # with open(f"{agent.cwd}/options.json", "r", encoding="utf-8") as f:
-    #     options = json.load(f)
-
-    # # 删除表中所有数据
-    # agent.mysql_exec(
-    #     "TRUNCATE TABLE service_template;",
-    #     host="gz-cynosdbmysql-grp-5r17wgzb.sql.tencentcdb.com",
-    #     port=26316,
-    #     passwd="aA877783019",
-    #     database="gva",
-    # )
-
-    # # 插入到数据库中
-    # for service, opt in options.items():
-    #     # 将 opt 转换成 JSON
-    #     opt = json.dumps(opt, ensure_ascii=False)
-    #     agent.mysql_exec(
-    #         "INSERT INTO service_template (service, template) VALUES (%s, %s);",
-    #         (service, opt),
-    #         host="gz-cynosdbmysql-grp-5r17wgzb.sql.tencentcdb.com",
-    #         port=26316,
-    #         passwd="aA877783019",
-    #         database="gva",
-    #     )
