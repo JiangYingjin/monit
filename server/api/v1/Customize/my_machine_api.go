@@ -131,6 +131,26 @@ func (m *MyMachineApi) GetData(c *gin.Context) {
 	response.OkWithData(result, c)
 }
 
+func (m *MyMachineApi) UpdateMachineService(c *gin.Context) {
+	var machine struct {
+		MachineID uint     `json:"machineID" binding:"required"`
+		Services  []string `json:"services" binding:"required"`
+	}
+	err := c.ShouldBindJSON(&machine)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+
+	err = global.GVA_DB.Model(&Customize.Machine{}).Where("id = ?", machine.MachineID).Update("service", machine.Services).Error
+	if err != nil {
+		global.GVA_LOG.Error("更新失败!", zap.Error(err))
+		response.FailWithMessage("更新失败: "+err.Error(), c)
+	} else {
+		response.OkWithMessage("更新成功", c)
+	}
+}
+
 type UploadDataMultiReq struct {
 	Data []CreateDataReq `json:"data,omitempty"`
 }
@@ -162,10 +182,9 @@ func (dataApi *DataApi) CreateDataMulti(c *gin.Context) {
 	}
 }
 
+// 检测数据是否异常，如果异常则发送告警
 func (m *MyMachineApi) UploadDataHook(data Customize.Data) {
-	// 检测数据是否异常
 
-	// 如果异常则发送告警
 	var warning Customize.MachineWarning
 	global.GVA_DB.Model(&Customize.MachineWarning{}).
 		Where("machine_i_d = ? and data_type_i_d = ?", data.MachineID, data.DataTypeID).

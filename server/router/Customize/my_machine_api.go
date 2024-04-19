@@ -25,7 +25,6 @@ func (s *MachineRouter) InitMyMachineRouter(Router *gin.RouterGroup) {
 	routerGroup.POST("uploadData", dataApi.CreateData)
 	routerGroup.POST("uploadDataMulti", dataApi.CreateDataMulti)
 
-	var machineServiceApi Customize.MachineServiceApi
-	routerGroup.POST("createMachineService", machineServiceApi.CreateMachineService) // 新建数据类型
+	var machineServiceApi Customize.MyMachineApi
 	routerGroup.POST("updateMachineService", machineServiceApi.UpdateMachineService) // 更新数据类型
 }
