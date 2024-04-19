@@ -8,8 +8,8 @@ import (
 // 数据类型 结构体  MachineService
 type MachineService struct {
 	global.GVA_MODEL
-	MachineID *int   `json:"machineID" form:"machineID" gorm:"column:machine_i_d;comment:;" binding:"required"` //机器ID
-	Services  string `json:"services" form:"services" gorm:"column:services;comment:;" binding:"required"`      //当前机器支持的服务
+	MachineID *int   `json:"machineID" form:"machineID" gorm:"column:machine_i_d;comment:;" binding:"required"`      //机器ID
+	Services  string `json:"services" form:"services" gorm:"type:json;column:services;comment:;" binding:"required"` //当前机器支持的服务
 	CreatedBy uint   `gorm:"column:created_by;comment:创建者"`
 	UpdatedBy uint   `gorm:"column:updated_by;comment:更新者"`
 	DeletedBy uint   `gorm:"column:deleted_by;comment:删除者"`
