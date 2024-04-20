@@ -1,6 +1,7 @@
 package Customize
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/Customize"
@@ -12,7 +13,9 @@ import (
 	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/spf13/cast"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 	"strconv"
 	"time"
 )
@@ -132,10 +135,14 @@ func (m *MyMachineApi) GetData(c *gin.Context) {
 	response.OkWithData(result, c)
 }
 
+type MachineServiceStatus struct {
+	Service map[string]bool `json:"service"`
+}
+
 type PropStatus struct {
-	Name  string `json:"name"`
-	Value string `json:"value"`
-	Type  string `json:"type"`
+	Name  string      `json:"name"`
+	Value interface{} `json:"value"`
+	Type  string      `json:"type"`
 }
 
 type SetMachineServiceReq struct {
@@ -143,13 +150,14 @@ type SetMachineServiceReq struct {
 	Services  map[string][]PropStatus `json:"services" binding:"required"`
 }
 
-func (s *SetMachineServiceReq) ToParamString() {
+func (s *SetMachineServiceReq) ToParamString() []string {
 	var result []string
 	for name, propStatus := range s.Services {
 		for _, prop := range propStatus {
-			result = append(result, fmt.Sprintf("--%s-%s=%s", name, prop.Name, prop.Value))
+			result = append(result, fmt.Sprintf("--%v-%v=%v", name, prop.Name, prop.Value))
 		}
 	}
+	return result
 }
 
 // SetMachineService 开启/关闭某个进程的监听服务
@@ -160,69 +168,65 @@ func (s *SetMachineServiceReq) ToParamString() {
 // @Param services body SetMachineServiceReq true "services"
 // @Router /machine/setMachineService [post]
 func (m *MyMachineApi) SetMachineService(c *gin.Context) {
-	//var newServiceReq SetMachineServiceReq
-	//err := c.ShouldBindJSON(&newServiceReq)
-	//if err != nil {
-	//	response.FailWithMessage(err.Error(), c)
-	//	return
-	//}
-	//
-	//err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
-	//	var machine Customize.Machine
-	//	if err := tx.Model(&Customize.Machine{}).Where("id =", newServiceReq.MachineID).Find(&machine).Error; err != nil {
-	//		return err
-	//	}
-	//
-	//	var oldServices SetMachineServiceReq
-	//	err = json.Unmarshal([]byte(machine.Service), &oldServices)
-	//	if err != nil {
-	//		return err
-	//	}
-	//
-	//	for name, propStatus := range oldServices.Services {
-	//		var serviceInDB Customize.ServiceTemplate
-	//		if err := tx.Model(&Customize.ServiceTemplate{}).Where("service =", name).Find(&serviceInDB).Error; err != nil {
-	//			return err
-	//		}
-	//
-	//		newService, ok := newServiceReq.Services[name]
-	//		if !ok {
-	//			continue
-	//		}
-	//
-	//		for i, prop := range propStatus {
-	//			if prop.Name != newService[i].Name {
-	//				return errors.New("name not match")
-	//			}
-	//
-	//			switch prop.Type {
-	//			case "bool":
-	//				_, err = strconv.ParseBool(prop.Value)
-	//			case "int":
-	//				_, err = strconv.ParseInt(prop.Value, 10, 64)
-	//			case "str":
-	//				break
-	//			default:
-	//				return errors.New("unknown type")
-	//			}
-	//			if err != nil {
-	//				return err
-	//			}
-	//
-	//			oldServices.Services[name][i].Value = newService[i].Value
-	//		}
-	//	}
-	//
-	//	machine.Service = cast.ToString(oldServices)
-	//	err = tx.Save(&machine).Error
-	//	return nil
-	//})
-	//if err != nil {
-	//	response.FailWithMessage(err.Error(), c)
-	//	return
-	//} else {
-	//	response.OkWithMessage("更新成功", c)
-	//}
+	var newServiceReq SetMachineServiceReq
+	err := c.ShouldBindJSON(&newServiceReq)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+
+	var agentParam []string
+
+	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+		// 获取机器服务监听状态
+		var machine Customize.Machine
+		if err := tx.Model(&Customize.Machine{}).Where("id = ?", newServiceReq.MachineID).Find(&machine).Error; err != nil {
+			return err
+		}
+
+		var myMachineService Customize2.MyMachineService
+		agentParam = myMachineService.FormCmdParams(
+			machine.IPAddr,
+			"--password="+machine.Password,
+			"configure")
+
+		var machineServiceStatus map[string]bool
+		err = json.Unmarshal([]byte(machine.Service), &machineServiceStatus)
+		if err != nil {
+			return err
+		}
+
+		// 更新服务监听状态
+		for name, _ := range machineServiceStatus {
+			props, ok := newServiceReq.Services[name]
+			if !ok {
+				continue
+			}
+
+			if props[0].Name != "enable" {
+				return fmt.Errorf("props does not start with enable")
+			}
+			machineServiceStatus[name] = cast.ToBool(props[0].Value)
+		}
+
+		machineServiceByte, _ := json.Marshal(machineServiceStatus)
+		machine.Service = string(machineServiceByte)
+		err = tx.Save(&machine).Error
+		return nil
+	})
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+
+	agentParam = append(agentParam, newServiceReq.ToParamString()...)
+	var myMachineService Customize2.MyMachineService
+	_, err = myMachineService.ExecuteCmd(agentParam)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	response.OkWithMessage("设置成功", c)
 }
 
 func (m *MyMachineApi) UpdateMachineService(c *gin.Context) {

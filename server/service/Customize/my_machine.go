@@ -1,13 +1,13 @@
 package Customize
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/Customize"
 	"github.com/go-ping/ping"
 	"os/exec"
-	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -95,17 +95,27 @@ func (machineService *MyMachineService) SendEmail(to string, body string) (err e
 	return err
 }
 
+func (machineService *MyMachineService) FormCmdParams(host string, params ...string) []string {
+	cmdParams := make([]string, 0, len(params)+1)
+	cmdParams = append(cmdParams, "-")
+	cmdParams = append(cmdParams, "--host="+host)
+	cmdParams = append(cmdParams, "--port=22")
+	cmdParams = append(cmdParams, params...)
+	return cmdParams
+}
+
 func (machineService *MyMachineService) ExecuteCmd(params []string) (string, error) {
-	var terminalName string
-	if runtime.GOOS == "windows" {
-		terminalName = "cmd"
-	} else {
-		terminalName = "sh"
-	}
-	cmdExec := exec.Command(terminalName, "-c", "curl -sL file.jiangyj.tech/proj/monit/remote.py | python - "+strings.Join(params, " "))
-	outputByte, err := cmdExec.CombinedOutput()
+	curlCmd := exec.Command("curl", "-sL", "file.jiangyj.tech/proj/monit/remote.py")
+	pythonScript, _ := curlCmd.CombinedOutput()
+
+	pythonCmd := exec.Command("python", params...)
+	pythonCmd.Stdin = bytes.NewReader(pythonScript)
+
+	// 执行python命令并等待结果
+	outputByte, err := pythonCmd.CombinedOutput()
+
 	if err != nil {
-		global.GVA_LOG.Error("ExecuteSSH error: " + err.Error())
+		global.GVA_LOG.Error("execute cmd error: " + err.Error())
 		return "", err
 	} else {
 		output := string(outputByte)
