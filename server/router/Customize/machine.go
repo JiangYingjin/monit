@@ -20,7 +20,8 @@ func (s *MachineRouter) InitMachineRouter(Router *gin.RouterGroup) {
 		machineRouter.DELETE("deleteMachine", machineApi.DeleteMachine)           // 删除Machine
 		machineRouter.DELETE("deleteMachineByIds", machineApi.DeleteMachineByIds) // 批量删除Machine
 		machineRouter.PUT("updateMachine", machineApi.UpdateMachine)              // 更新Machine
-		machineRouter.POST("setMachineService", myMachineApi.SetMachineService)   // 更新Machine
+
+		machineRouter.POST("setMachineService", myMachineApi.SetMachineService) // 设置服务监听状态
 	}
 	{
 		machineRouterWithoutRecord.GET("findMachine", machineApi.FindMachine)       // 根据ID获取Machine

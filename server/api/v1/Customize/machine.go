@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 type MachineApi struct {
@@ -44,22 +45,16 @@ func (machineApi *MachineApi) CreateMachine(c *gin.Context) {
 	}
 
 	//	curl -sL file.jiangyj.tech/proj/monit/remote.py | python - --host=<host> --port=22 --password=<passwd> install --machine-id=<machine-id>
-	cmds := []string{
-		"--host=" + machine.IPAddr,
-		"--port=22",
-		"--password=" + machine.Password,
-		"install",
-		"--machine-id=" + cast.ToString(machine.ID),
-	}
 	myMachineService := Customize2.MyMachineService{}
-	output, err := myMachineService.ExecuteCmd(cmds)
+	output, err := myMachineService.ExecuteCmd(myMachineService.FormCmdParams(
+		machine.IPAddr,
+		"--password="+machine.Password,
+		"install",
+		"--machine-id="+cast.ToString(machine.ID)))
 	if err != nil {
 		global.GVA_LOG.Error("创建失败（InstallAgent error）: " + err.Error())
 		response.FailWithMessage("创建失败（InstallAgent error）:"+err.Error(), c)
-		err = global.GVA_DB.Unscoped().Delete(&Customize.Machine{}, "id = ?", machine.ID).Error
-		if err != nil {
-			global.GVA_LOG.Error("删除机器失败", zap.Error(err))
-		}
+		_ = machineService.DeleteMachine(cast.ToString(machine.ID), utils.GetUserID(c))
 		return
 	} else {
 		global.GVA_LOG.Info("创建成功（InstallAgent success）: " + output)
@@ -79,8 +74,33 @@ func (machineApi *MachineApi) CreateMachine(c *gin.Context) {
 func (machineApi *MachineApi) DeleteMachine(c *gin.Context) {
 	ID := c.Query("ID")
 	userID := utils.GetUserID(c)
-	if err := machineService.DeleteMachine(ID, userID); err != nil {
-		global.GVA_LOG.Error("删除失败!", zap.Error(err))
+
+	err := global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+		machine, err := machineService.GetMachine(ID)
+		if err != nil {
+			global.GVA_LOG.Error("删除失败!", zap.Error(err))
+			return err
+		}
+
+		myMachineService := Customize2.MyMachineService{}
+		_, err = myMachineService.ExecuteCmd(myMachineService.FormCmdParams(
+			machine.IPAddr,
+			"--password="+machine.Password,
+			"uninstall",
+		))
+
+		if err != nil {
+			global.GVA_LOG.Error("卸载Agent失败: " + err.Error())
+			err = nil
+		}
+
+		if err = machineService.DeleteMachine(ID, userID); err != nil {
+			global.GVA_LOG.Error("删除失败!", zap.Error(err))
+		}
+		return nil
+	})
+
+	if err != nil {
 		response.FailWithMessage("删除失败", c)
 	} else {
 		response.OkWithMessage("删除成功", c)

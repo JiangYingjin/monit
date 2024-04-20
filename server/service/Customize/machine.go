@@ -24,7 +24,7 @@ func (machineService *MachineService) DeleteMachine(ID string, userID uint) (err
 		if err := tx.Model(&Customize.Machine{}).Where("id = ?", ID).Update("deleted_by", userID).Error; err != nil {
 			return err
 		}
-		if err = tx.Delete(&Customize.Machine{}, "id = ?", ID).Error; err != nil {
+		if err = tx.Unscoped().Delete(&Customize.Machine{}, "id = ?", ID).Error; err != nil {
 			return err
 		}
 		return nil
