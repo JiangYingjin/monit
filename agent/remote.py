@@ -1,6 +1,6 @@
 #!python
 
-import subprocess, argparse, importlib, sys, os
+import subprocess, argparse, importlib, sys, os, requests
 
 
 def install_module(module_name: str):
@@ -147,11 +147,18 @@ if args.subcommand == "install":
         )
         print("Agent 所需依赖已安装完毕")
 
+    # 获取本机的公网地址
+    ip_api = "https://searchplugin.csdn.net/api/v1/ip/get"
+    server_ip = requests.get(ip_api).json()["data"]["ip"]
+    print("服务端 IP 地址为:", server_ip)
+    print(f"后续监控数据将发送至 {server_ip}:8888")
+    print("请注意开启服务端的公网 8888 端口，否则 Agent 发送数据将失败")
+
     # 将 machine_id 传给 agent.py 存储
     print("machine_id:", args.machine_id)
     print("password:", args.password)
     remote_exec(
-        f"python /usr/local/monit/agent.py init --machine-id {args.machine_id} --password {args.password}"
+        f"python /usr/local/monit/agent.py init --server-ip {server_ip} --machine-id {args.machine_id} --password {args.password}"
     )
 
 if args.subcommand == "configure":
