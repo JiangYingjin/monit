@@ -87,20 +87,34 @@ def remote_exec(command: str, silent=False):
     return out, err
 
 
+# 获取运行本命令的主机系统
+import platform
+
+system = platform.system()
+
 if args.subcommand == "install":
 
     print("正在安装 Agent ...")
 
     # 获取运行本文件的用户 home 目录
-    home = subprocess.check_output("echo $HOME", shell=True).decode().strip()
+    home = subprocess.check_output(
+        "echo $HOME" if system == "Linux" else "echo %USERPROFILE%", shell=True
+    ).decode()
+    home = home.strip().replace("\\", "/")
     # 检查本机是否存在 ~/.ssh/id_rsa.pub 文件
     if not os.path.exists(f"{home}/.ssh/id_rsa.pub"):
         print("本机不存在 ~/.ssh/id_rsa.pub 文件，先生成密钥对")
         # 生成密钥对并设置权限
-        subprocess.check_call(
-            f"mkdir {home}/.ssh && chmod 700 {home}/.ssh && ssh-keygen -t rsa -f {home}/.ssh/id_rsa -N '' && chmod 600 {home}/.ssh/id_rsa",
-            shell=True,
-        )
+        if system == "Linux":
+            subprocess.check_call(
+                f"mkdir {home}/.ssh && chmod 700 {home}/.ssh && ssh-keygen -t rsa -f {home}/.ssh/id_rsa -N '' && chmod 600 {home}/.ssh/id_rsa",
+                shell=True,
+            )
+        elif system == "Windows":
+            subprocess.check_call(
+                f"if not exist '{home}/.ssh' mkdir '{home}/.ssh' && ssh-keygen -t rsa -b 4096 -C 'Monit-Server' -f {home}/.ssh/id_rsa -q -N ''",
+                shell=True,
+            )
         print("密钥对已生成")
 
     # 获取本机公钥
