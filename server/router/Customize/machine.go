@@ -14,14 +14,17 @@ func (s *MachineRouter) InitMachineRouter(Router *gin.RouterGroup) {
 	machineRouter := Router.Group("machine").Use(middleware.OperationRecord())
 	machineRouterWithoutRecord := Router.Group("machine")
 	var machineApi = v1.ApiGroupApp.CustomizeApiGroup.MachineApi
+	var myMachineApi = v1.ApiGroupApp.CustomizeApiGroup.MyMachineApi
 	{
 		machineRouter.POST("createMachine", machineApi.CreateMachine)             // 新建Machine
 		machineRouter.DELETE("deleteMachine", machineApi.DeleteMachine)           // 删除Machine
 		machineRouter.DELETE("deleteMachineByIds", machineApi.DeleteMachineByIds) // 批量删除Machine
 		machineRouter.PUT("updateMachine", machineApi.UpdateMachine)              // 更新Machine
+		machineRouter.POST("setMachineService", myMachineApi.SetMachineService)   // 更新Machine
 	}
 	{
 		machineRouterWithoutRecord.GET("findMachine", machineApi.FindMachine)       // 根据ID获取Machine
 		machineRouterWithoutRecord.GET("getMachineList", machineApi.GetMachineList) // 获取Machine列表
+
 	}
 }

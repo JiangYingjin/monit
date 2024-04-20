@@ -6,8 +6,10 @@ import (
 	CustomizeReq "github.com/flipped-aurora/gin-vue-admin/server/model/Customize/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
 	"github.com/flipped-aurora/gin-vue-admin/server/service"
+	Customize2 "github.com/flipped-aurora/gin-vue-admin/server/service/Customize"
 	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/cast"
 	"go.uber.org/zap"
 )
 
@@ -33,13 +35,36 @@ func (machineApi *MachineApi) CreateMachine(c *gin.Context) {
 		return
 	}
 	machine.CreatedBy = utils.GetUserID(c)
+	machine.Service = "[]"
 
-	if err := machineService.CreateMachine(&machine); err != nil {
+	if err = machineService.CreateMachine(&machine); err != nil {
 		global.GVA_LOG.Error("创建失败!", zap.Error(err))
-		response.FailWithMessage("创建失败", c)
-	} else {
-		response.OkWithMessage("创建成功", c)
+		response.FailWithMessage("创建失败: "+err.Error(), c)
+		return
 	}
+
+	//	curl -sL file.jiangyj.tech/proj/monit/remote.py | python - --host=<host> --port=22 --password=<passwd> install --machine-id=<machine-id>
+	cmds := []string{
+		"--host=" + machine.IPAddr,
+		"--port=22",
+		"--password=" + machine.Password,
+		"install",
+		"--machine-id=" + cast.ToString(machine.ID),
+	}
+	myMachineService := Customize2.MyMachineService{}
+	output, err := myMachineService.ExecuteCmd(cmds)
+	if err != nil {
+		global.GVA_LOG.Error("创建失败（InstallAgent error）: " + err.Error())
+		response.FailWithMessage("创建失败（InstallAgent error）:"+err.Error(), c)
+		err = global.GVA_DB.Unscoped().Delete(&Customize.Machine{}, "id = ?", machine.ID).Error
+		if err != nil {
+			global.GVA_LOG.Error("删除机器失败", zap.Error(err))
+		}
+		return
+	} else {
+		global.GVA_LOG.Info("创建成功（InstallAgent success）: " + output)
+	}
+	response.OkWithMessage("创建成功", c)
 }
 
 // DeleteMachine 删除Machine

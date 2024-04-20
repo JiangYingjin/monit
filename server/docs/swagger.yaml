@@ -85,8 +85,11 @@ definitions:
       password:
         description: 密钥
         type: string
+      service:
+        description: 服务
+        type: string
       status:
-        description: 状态
+        description: 在线状态
         type: boolean
       updated_at:
         description: 更新时间
@@ -138,6 +141,15 @@ definitions:
     - machineID
     - reporterID
     type: object
+  Customize.PropStatus:
+    properties:
+      name:
+        type: string
+      type:
+        type: string
+      value:
+        type: string
+    type: object
   Customize.ServiceTemplate:
     properties:
       ID:
@@ -164,6 +176,20 @@ definitions:
     required:
     - service
     - template
+    type: object
+  Customize.SetMachineServiceReq:
+    properties:
+      machineID:
+        type: integer
+      services:
+        additionalProperties:
+          items:
+            $ref: '#/definitions/Customize.PropStatus'
+          type: array
+        type: object
+    required:
+    - machineID
+    - services
     type: object
   config.AliyunOSS:
     properties:
@@ -894,33 +920,6 @@ definitions:
       to:
         description: 收件人:多个以英文逗号分隔 例：a@qq.com b@qq.com 正式开发中请把此项目作为参数使用
         type: string
-    type: object
-  github_com_flipped-aurora_gin-vue-admin_server_model_Customize.MachineService:
-    properties:
-      ID:
-        description: 主键ID
-        type: integer
-      created_at:
-        description: 创建时间
-        type: string
-      createdBy:
-        type: integer
-      deletedBy:
-        type: integer
-      machineID:
-        description: 机器ID
-        type: integer
-      services:
-        description: 当前机器支持的服务
-        type: string
-      updated_at:
-        description: 更新时间
-        type: string
-      updatedBy:
-        type: integer
-    required:
-    - machineID
-    - services
     type: object
   request.AddMenuAuthorityInfo:
     properties:
@@ -3712,7 +3711,11 @@ paths:
         name: password
         required: true
         type: string
-      - description: 状态
+      - description: 服务
+        in: query
+        name: service
+        type: string
+      - description: 在线状态
         in: query
         name: status
         type: boolean
@@ -3795,6 +3798,27 @@ paths:
       summary: 机器登录
       tags:
       - Machine
+  /machine/setMachineService:
+    post:
+      parameters:
+      - description: MachineID
+        in: body
+        name: machineID
+        required: true
+        schema:
+          type: integer
+      - description: services
+        in: body
+        name: services
+        required: true
+        schema:
+          $ref: '#/definitions/Customize.SetMachineServiceReq'
+      produces:
+      - application/json
+      responses: {}
+      summary: 设置机器监控状态
+      tags:
+      - Machine
   /machine/updateMachine:
     put:
       consumes:
@@ -3818,174 +3842,6 @@ paths:
       summary: 更新Machine
       tags:
       - Machine
-  /machineService/createMachineService:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: 创建数据类型
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/github_com_flipped-aurora_gin-vue-admin_server_model_Customize.MachineService'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: '{"success":true,"data":{},"msg":"创建成功"}'
-          schema:
-            type: string
-      security:
-      - ApiKeyAuth: []
-      summary: 创建数据类型
-      tags:
-      - MachineService
-  /machineService/deleteMachineService:
-    delete:
-      consumes:
-      - application/json
-      parameters:
-      - description: 删除数据类型
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/github_com_flipped-aurora_gin-vue-admin_server_model_Customize.MachineService'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: '{"success":true,"data":{},"msg":"删除成功"}'
-          schema:
-            type: string
-      security:
-      - ApiKeyAuth: []
-      summary: 删除数据类型
-      tags:
-      - MachineService
-  /machineService/deleteMachineServiceByIds:
-    delete:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: '{"success":true,"data":{},"msg":"批量删除成功"}'
-          schema:
-            type: string
-      security:
-      - ApiKeyAuth: []
-      summary: 批量删除数据类型
-      tags:
-      - MachineService
-  /machineService/findMachineService:
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - description: 主键ID
-        in: query
-        name: ID
-        type: integer
-      - in: query
-        name: createdBy
-        type: integer
-      - description: 创建时间
-        in: query
-        name: created_at
-        type: string
-      - in: query
-        name: deletedBy
-        type: integer
-      - description: 机器ID
-        in: query
-        name: machineID
-        required: true
-        type: integer
-      - description: 当前机器支持的服务
-        in: query
-        name: services
-        required: true
-        type: string
-      - in: query
-        name: updatedBy
-        type: integer
-      - description: 更新时间
-        in: query
-        name: updated_at
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: '{"success":true,"data":{},"msg":"查询成功"}'
-          schema:
-            type: string
-      security:
-      - ApiKeyAuth: []
-      summary: 用id查询数据类型
-      tags:
-      - MachineService
-  /machineService/getMachineServiceList:
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - in: query
-        name: endCreatedAt
-        type: string
-      - description: 关键字
-        in: query
-        name: keyword
-        type: string
-      - description: 页码
-        in: query
-        name: page
-        type: integer
-      - description: 每页大小
-        in: query
-        name: pageSize
-        type: integer
-      - in: query
-        name: startCreatedAt
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: '{"success":true,"data":{},"msg":"获取成功"}'
-          schema:
-            type: string
-      security:
-      - ApiKeyAuth: []
-      summary: 分页获取数据类型列表
-      tags:
-      - MachineService
-  /machineService/updateMachineService:
-    put:
-      consumes:
-      - application/json
-      parameters:
-      - description: 更新数据类型
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/github_com_flipped-aurora_gin-vue-admin_server_model_Customize.MachineService'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: '{"success":true,"data":{},"msg":"更新成功"}'
-          schema:
-            type: string
-      security:
-      - ApiKeyAuth: []
-      summary: 更新数据类型
-      tags:
-      - MachineService
   /machineWarning/createMachineWarning:
     post:
       consumes:

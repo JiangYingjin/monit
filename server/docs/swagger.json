@@ -3225,8 +3225,14 @@
                         "required": true
                     },
                     {
+                        "type": "string",
+                        "description": "服务",
+                        "name": "service",
+                        "in": "query"
+                    },
+                    {
                         "type": "boolean",
-                        "description": "状态",
+                        "description": "在线状态",
                         "name": "status",
                         "in": "query"
                     },
@@ -3348,6 +3354,38 @@
                 }
             }
         },
+        "/machine/setMachineService": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Machine"
+                ],
+                "summary": "设置机器监控状态",
+                "parameters": [
+                    {
+                        "description": "MachineID",
+                        "name": "machineID",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "services",
+                        "name": "services",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Customize.SetMachineServiceReq"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/machine/updateMachine": {
             "put": {
                 "security": [
@@ -3373,280 +3411,6 @@
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/Customize.Machine"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{\"success\":true,\"data\":{},\"msg\":\"更新成功\"}",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/machineService/createMachineService": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "MachineService"
-                ],
-                "summary": "创建数据类型",
-                "parameters": [
-                    {
-                        "description": "创建数据类型",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/github_com_flipped-aurora_gin-vue-admin_server_model_Customize.MachineService"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{\"success\":true,\"data\":{},\"msg\":\"创建成功\"}",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/machineService/deleteMachineService": {
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "MachineService"
-                ],
-                "summary": "删除数据类型",
-                "parameters": [
-                    {
-                        "description": "删除数据类型",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/github_com_flipped-aurora_gin-vue-admin_server_model_Customize.MachineService"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{\"success\":true,\"data\":{},\"msg\":\"删除成功\"}",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/machineService/deleteMachineServiceByIds": {
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "MachineService"
-                ],
-                "summary": "批量删除数据类型",
-                "responses": {
-                    "200": {
-                        "description": "{\"success\":true,\"data\":{},\"msg\":\"批量删除成功\"}",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/machineService/findMachineService": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "MachineService"
-                ],
-                "summary": "用id查询数据类型",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "主键ID",
-                        "name": "ID",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "name": "createdBy",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "创建时间",
-                        "name": "created_at",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "name": "deletedBy",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "机器ID",
-                        "name": "machineID",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "当前机器支持的服务",
-                        "name": "services",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "name": "updatedBy",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "更新时间",
-                        "name": "updated_at",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{\"success\":true,\"data\":{},\"msg\":\"查询成功\"}",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/machineService/getMachineServiceList": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "MachineService"
-                ],
-                "summary": "分页获取数据类型列表",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "name": "endCreatedAt",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "关键字",
-                        "name": "keyword",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "页码",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "每页大小",
-                        "name": "pageSize",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "startCreatedAt",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{\"success\":true,\"data\":{},\"msg\":\"获取成功\"}",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/machineService/updateMachineService": {
-            "put": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "MachineService"
-                ],
-                "summary": "更新数据类型",
-                "parameters": [
-                    {
-                        "description": "更新数据类型",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/github_com_flipped-aurora_gin-vue-admin_server_model_Customize.MachineService"
                         }
                     }
                 ],
@@ -6922,8 +6686,12 @@
                     "description": "密钥",
                     "type": "string"
                 },
+                "service": {
+                    "description": "服务",
+                    "type": "string"
+                },
                 "status": {
-                    "description": "状态",
+                    "description": "在线状态",
                     "type": "boolean"
                 },
                 "updatedBy": {
@@ -6988,6 +6756,20 @@
                 }
             }
         },
+        "Customize.PropStatus": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
         "Customize.ServiceTemplate": {
             "type": "object",
             "required": [
@@ -7023,6 +6805,27 @@
                 "updated_at": {
                     "description": "更新时间",
                     "type": "string"
+                }
+            }
+        },
+        "Customize.SetMachineServiceReq": {
+            "type": "object",
+            "required": [
+                "machineID",
+                "services"
+            ],
+            "properties": {
+                "machineID": {
+                    "type": "integer"
+                },
+                "services": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/Customize.PropStatus"
+                        }
+                    }
                 }
             }
         },
@@ -8070,44 +7873,6 @@
                 },
                 "to": {
                     "description": "收件人:多个以英文逗号分隔 例：a@qq.com b@qq.com 正式开发中请把此项目作为参数使用",
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_flipped-aurora_gin-vue-admin_server_model_Customize.MachineService": {
-            "type": "object",
-            "required": [
-                "machineID",
-                "services"
-            ],
-            "properties": {
-                "ID": {
-                    "description": "主键ID",
-                    "type": "integer"
-                },
-                "createdBy": {
-                    "type": "integer"
-                },
-                "created_at": {
-                    "description": "创建时间",
-                    "type": "string"
-                },
-                "deletedBy": {
-                    "type": "integer"
-                },
-                "machineID": {
-                    "description": "机器ID",
-                    "type": "integer"
-                },
-                "services": {
-                    "description": "当前机器支持的服务",
-                    "type": "string"
-                },
-                "updatedBy": {
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "description": "更新时间",
                     "type": "string"
                 }
             }

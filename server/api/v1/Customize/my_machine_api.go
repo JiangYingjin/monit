@@ -1,6 +1,7 @@
 package Customize
 
 import (
+	"fmt"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/Customize"
 	CustomizeReq "github.com/flipped-aurora/gin-vue-admin/server/model/Customize/request"
@@ -131,10 +132,106 @@ func (m *MyMachineApi) GetData(c *gin.Context) {
 	response.OkWithData(result, c)
 }
 
+type PropStatus struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+	Type  string `json:"type"`
+}
+
+type SetMachineServiceReq struct {
+	MachineID uint                    `json:"machineID" binding:"required"`
+	Services  map[string][]PropStatus `json:"services" binding:"required"`
+}
+
+func (s *SetMachineServiceReq) ToParamString() {
+	var result []string
+	for name, propStatus := range s.Services {
+		for _, prop := range propStatus {
+			result = append(result, fmt.Sprintf("--%s-%s=%s", name, prop.Name, prop.Value))
+		}
+	}
+}
+
+// SetMachineService 开启/关闭某个进程的监听服务
+// @Tags Machine
+// @Summary 设置机器监控状态
+// @Produce  application/json
+// @Param machineID body uint true "MachineID"
+// @Param services body SetMachineServiceReq true "services"
+// @Router /machine/setMachineService [post]
+func (m *MyMachineApi) SetMachineService(c *gin.Context) {
+	//var newServiceReq SetMachineServiceReq
+	//err := c.ShouldBindJSON(&newServiceReq)
+	//if err != nil {
+	//	response.FailWithMessage(err.Error(), c)
+	//	return
+	//}
+	//
+	//err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+	//	var machine Customize.Machine
+	//	if err := tx.Model(&Customize.Machine{}).Where("id =", newServiceReq.MachineID).Find(&machine).Error; err != nil {
+	//		return err
+	//	}
+	//
+	//	var oldServices SetMachineServiceReq
+	//	err = json.Unmarshal([]byte(machine.Service), &oldServices)
+	//	if err != nil {
+	//		return err
+	//	}
+	//
+	//	for name, propStatus := range oldServices.Services {
+	//		var serviceInDB Customize.ServiceTemplate
+	//		if err := tx.Model(&Customize.ServiceTemplate{}).Where("service =", name).Find(&serviceInDB).Error; err != nil {
+	//			return err
+	//		}
+	//
+	//		newService, ok := newServiceReq.Services[name]
+	//		if !ok {
+	//			continue
+	//		}
+	//
+	//		for i, prop := range propStatus {
+	//			if prop.Name != newService[i].Name {
+	//				return errors.New("name not match")
+	//			}
+	//
+	//			switch prop.Type {
+	//			case "bool":
+	//				_, err = strconv.ParseBool(prop.Value)
+	//			case "int":
+	//				_, err = strconv.ParseInt(prop.Value, 10, 64)
+	//			case "str":
+	//				break
+	//			default:
+	//				return errors.New("unknown type")
+	//			}
+	//			if err != nil {
+	//				return err
+	//			}
+	//
+	//			oldServices.Services[name][i].Value = newService[i].Value
+	//		}
+	//	}
+	//
+	//	machine.Service = cast.ToString(oldServices)
+	//	err = tx.Save(&machine).Error
+	//	return nil
+	//})
+	//if err != nil {
+	//	response.FailWithMessage(err.Error(), c)
+	//	return
+	//} else {
+	//	response.OkWithMessage("更新成功", c)
+	//}
+}
+
 func (m *MyMachineApi) UpdateMachineService(c *gin.Context) {
 	var machine struct {
-		MachineID uint     `json:"machineID" binding:"required"`
-		Services  []string `json:"services" binding:"required"`
+		MachineID uint `json:"machineID" binding:"required"`
+		Services  []struct {
+			Service string `json:"service" binding:"required"`
+			Enable  bool   `json:"enable" binding:"required"`
+		} `json:"services" binding:"required"`
 	}
 	err := c.ShouldBindJSON(&machine)
 	if err != nil {

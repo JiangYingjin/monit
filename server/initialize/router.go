@@ -89,7 +89,7 @@ func Routers() *gin.Engine {
 		CustomizeRouter := router.RouterGroupApp.Customize
 
 		CustomizeRouter.InitMyMachineLoginRouter(PublicGroup)
-		CustomizeRouter.InitMyMachineRouter(PublicGroup)
+		CustomizeRouter.InitMyMachineRouter(MachineGroup)
 
 		CustomizeRouter.InitDataRouter(PrivateGroup)
 

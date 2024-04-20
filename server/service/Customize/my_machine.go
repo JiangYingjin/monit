@@ -6,7 +6,8 @@ import (
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/Customize"
 	"github.com/go-ping/ping"
-	"golang.org/x/crypto/ssh"
+	"os/exec"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -38,7 +39,7 @@ func ConvertTimestamp(timestamp string) string {
 	return timestamp
 }
 
-func (m *MyMachineService) AddMachineHook(machine Customize.Machine) {
+func (machineService *MyMachineService) AddMachineHook(machine Customize.Machine) {
 	MachinesMap.Store(machine.ID, machine.IPAddr)
 }
 
@@ -94,44 +95,60 @@ func (machineService *MyMachineService) SendEmail(to string, body string) (err e
 	return err
 }
 
-func (machineService *MyMachineService) ExecuteSSH(machine *Customize.Machine, cmds []string) (err error) {
-	sshHost := machine.IPAddr
-	sshUser := "root"
-	sshPassword := machine.Password
-	//sshType := "password"
-	sshPort := 22
-
-	//创建sshp登陆配置
-	config := &ssh.ClientConfig{
-		Timeout:         time.Second, //ssh 连接time out 时间一秒钟, 如果ssh验证错误 会在一秒内返回
-		User:            sshUser,
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(), //这个可以, 但是不够安全
-		//HostKeyCallback: hostKeyCallBackFunc(h.Host),
+func (machineService *MyMachineService) ExecuteCmd(params []string) (string, error) {
+	var terminalName string
+	if runtime.GOOS == "windows" {
+		terminalName = "cmd"
+	} else {
+		terminalName = "sh"
 	}
-	config.Auth = []ssh.AuthMethod{ssh.Password(sshPassword)}
-
-	//dial 获取ssh client
-	addr := fmt.Sprintf("%s:%d", sshHost, sshPort)
-	sshClient, err := ssh.Dial("tcp", addr, config)
+	cmdExec := exec.Command(terminalName, "-c", "python remote.py "+strings.Join(params, " "))
+	outputByte, err := cmdExec.CombinedOutput()
 	if err != nil {
-		global.GVA_LOG.Fatal("创建ssh client 失败" + err.Error())
+		global.GVA_LOG.Error("ExecuteSSH error: " + err.Error())
+		return "", err
+	} else {
+		output := string(outputByte)
+		return output, nil
 	}
-	defer sshClient.Close()
 
-	//创建ssh-session
-	session, err := sshClient.NewSession()
-	if err != nil {
-		global.GVA_LOG.Fatal("创建ssh session 失败" + err.Error())
-	}
-	defer session.Close()
-	//执行远程命令
-
-	combo, err := session.CombinedOutput(strings.Join(cmds, ";"))
-	if err != nil {
-		global.GVA_LOG.Fatal("远程执行cmd 失败" + err.Error())
-	}
-	global.GVA_LOG.Info("命令输出:" + string(combo))
-	return nil
+	//sshHost := machine.IPAddr
+	//sshUser := "root"
+	//sshPassword := machine.Password
+	////sshType := "password"
+	//sshPort := 22
+	//
+	////创建sshp登陆配置
+	//config := &ssh.ClientConfig{
+	//	Timeout:         time.Second, //ssh 连接time out 时间一秒钟, 如果ssh验证错误 会在一秒内返回
+	//	User:            sshUser,
+	//	HostKeyCallback: ssh.InsecureIgnoreHostKey(), //这个可以, 但是不够安全
+	//	//HostKeyCallback: hostKeyCallBackFunc(h.Host),
+	//}
+	//config.Auth = []ssh.AuthMethod{ssh.Password(sshPassword)}
+	//
+	////dial 获取ssh client
+	//addr := fmt.Sprintf("%s:%d", sshHost, sshPort)
+	//sshClient, err := ssh.Dial("tcp", addr, config)
+	//if err != nil {
+	//	global.GVA_LOG.Fatal("创建ssh client 失败" + err.Error())
+	//}
+	//defer sshClient.Close()
+	//
+	////创建ssh-session
+	//session, err := sshClient.NewSession()
+	//if err != nil {
+	//	global.GVA_LOG.Fatal("创建ssh session 失败" + err.Error())
+	//}
+	//defer session.Close()
+	////执行远程命令
+	//
+	//combo, err := session.CombinedOutput(strings.Join(cmds, ";"))
+	//if err != nil {
+	//	global.GVA_LOG.Fatal("远程执行cmd 失败" + err.Error())
+	//}
+	//global.GVA_LOG.Info("命令输出:" + string(combo))
+	//return nil
 }
 
 func (machineService *MyMachineService) PingMachine(machineIP string) (err error) {
