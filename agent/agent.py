@@ -137,7 +137,11 @@ class Agent:
             "php-fpm": "php-fpm",
         }
 
-        self.base_url = f"http://{args.server_ip}:8888"
+        if self.db_dct("server_ip"):
+            self.base_url = f'http://{self.db_dct("server_ip")}:8888'
+        else:
+            self.base_url = "http://127.0.0.1:8888"
+
         self.uri_dct = {
             "sign": "/machine/login",
             "upload": "/machine/uploadDataMulti",
@@ -147,18 +151,20 @@ class Agent:
             },
         }
 
-        self.running_services = None
-        self.update_service_status()
-
     def parse_config(self):
         if os.path.exists(f"{self.cwd}/config.yml"):
             with open(f"{self.cwd}/config.yml", "r", encoding="utf-8") as f:
                 self.config = dict(yaml.safe_load(f))
                 logging.info(f"本地配置（config.yml）: {self.config}")
+        else:
+            self.config = {}
 
     def save_config(self):
         with open(f"{self.cwd}/config.yml", "w", encoding="utf-8") as f:
             yaml.dump(self.config, f)
+
+    def set_base_url(self, base_url: str):
+        self.db_dct("base_url", base_url)
 
     def token(self):
         if self._token:
@@ -899,9 +905,11 @@ net_io.dropout          subtract    网络发送丢包数
                 if service_name in process.name():
                     running_services.add(self.detect_services[service_name])
 
-        # 若运行服务没有发生变化，则直接返回
-        if running_services == self.running_services:
-            return
+        if hasattr(self, "running_services"):
+            # 若运行服务没有发生变化，则直接返回
+            if running_services == self.running_services:
+                return
+        self.running_services = running_services
 
         # 服务端的特别需求
         service_status = {}
@@ -1444,6 +1452,7 @@ pm.status_listen = /run/php/fpm-status.sock
 
 if args.subcommand == "init":
     agent = Agent(args.machine_id, args.password)
+    agent.db_dct("server_ip", args.server_ip)
     logging.info("初始化 Agent 完毕，开始监控 ...")
     subprocess.run(
         "nohup python /usr/local/monit/agent.py monit >/dev/null 2>&1 &", shell=True
@@ -1487,17 +1496,8 @@ if args.subcommand == "monit":
                 process.terminate()
                 logging.info(f"重载 Agent 进程中 ...")
 
-    # # 创建文件锁
-    # lock = open("/tmp/agent.lock", "w")
-    # try:
-    #     # 非阻塞独占式加锁
-    #     fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-
     agent = Agent()
     agent.start_monit()
-    # except:
-    #     logging.info("Agent 进程已在运行中")
-    #     sys.exit(0)
 
 if args.subcommand == "stop":
     # 移除保活 cron

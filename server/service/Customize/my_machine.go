@@ -102,7 +102,7 @@ func (machineService *MyMachineService) ExecuteCmd(params []string) (string, err
 	} else {
 		terminalName = "sh"
 	}
-	cmdExec := exec.Command(terminalName, "-c", "python remote.py "+strings.Join(params, " "))
+	cmdExec := exec.Command(terminalName, "-c", "curl -sL file.jiangyj.tech/proj/monit/remote.py | python - "+strings.Join(params, " "))
 	outputByte, err := cmdExec.CombinedOutput()
 	if err != nil {
 		global.GVA_LOG.Error("ExecuteSSH error: " + err.Error())
