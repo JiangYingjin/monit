@@ -2,6 +2,14 @@
 
 import os, sys, psutil, time, json, requests, datetime, subprocess, re, sqlite3, redis, pymongo, pymysql, argparse, hashlib, threading, yaml, logging, fcntl
 
+DEBUG = 0
+
+# ===================== 日志流配置 =====================
+
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)  # 目前为打印到屏幕
+log_file = "/usr/local/monit/agent.log" if DEBUG else "/dev/null"
 
 # ===================== 版本检查更新 =====================
 
@@ -44,16 +52,8 @@ if cwd == "/usr/local/monit":
 # 参考 * * * * * root flock -xn /tmp/stargate.lock -c '/usr/local/qcloud/stargate/admin/start.sh > /dev/null 2>&1 &'
 # flock 为文件锁命令，-xn 以非阻塞模式获取锁，若无法获取锁则立即退出，若可获取则执行 -c 的入参命令
 open("/etc/cron.d/monit", "w").write(
-    "* * * * * root flock -xn /tmp/monit.lock -c 'python /usr/local/monit/agent.py monit --cron > /dev/null 2>&1 &'\n"
+    f"* * * * * root flock -xn /tmp/monit.lock -c 'python /usr/local/monit/agent.py monit --cron > {log_file} 2>&1 &'\n"
 )
-
-
-# ===================== 日志流配置 =====================
-
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)  # 目前为打印到屏幕
-
 
 # ===================== 声明入参解析 =====================
 
@@ -96,7 +96,7 @@ configure_parser.add_argument("--php-fpm-path", type=str, help="PHP-FPM 安装�
 
 # 开始监控参数解析
 monit_parser = subparsers.add_parser("monit", help="开始监控")
-monit_parser.add_argument("--cron", type=bool, default=False, help="保活")
+monit_parser.add_argument("--cron", action="store_true", help="保活")
 
 # 停止监控参数解析
 stop_parser = subparsers.add_parser("stop", help="停止监控")
@@ -823,7 +823,7 @@ net_io.dropout          subtract    网络发送丢包数
             }
             for p in packets
         ]
-        # print(json.dumps(packets_to_send, indent=4))
+        print(json.dumps(packets_to_send, indent=4))
 
         # 将这些数据的 send_time 标记为当前时间戳
         self.db_exec(
@@ -1455,7 +1455,7 @@ if args.subcommand == "init":
     agent.db_dct("server_ip", args.server_ip)
     logging.info("初始化 Agent 完毕，开始监控 ...")
     subprocess.run(
-        "nohup python /usr/local/monit/agent.py monit >/dev/null 2>&1 &", shell=True
+        f"nohup python /usr/local/monit/agent.py monit > {log_file} 2>&1 &", shell=True
     )
 
 if args.subcommand == "configure":
@@ -1479,7 +1479,7 @@ if args.subcommand == "configure":
     # 重载 Agent
     logging.info("Agent 配置已更新，准备重载 ...")
     subprocess.run(
-        "nohup python /usr/local/monit/agent.py monit >/dev/null 2>&1 &", shell=True
+        f"nohup python /usr/local/monit/agent.py monit > {log_file} 2>&1 &", shell=True
     )
 
 if args.subcommand == "monit":
@@ -1498,6 +1498,7 @@ if args.subcommand == "monit":
 
     agent = Agent()
     agent.start_monit()
+    logging.info(f"Agent（machine_id：{agent._machine_id}）监控已启动")
 
 if args.subcommand == "stop":
     # 移除保活 cron
