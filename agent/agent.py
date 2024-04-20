@@ -2,6 +2,14 @@
 
 import os, sys, psutil, time, json, requests, datetime, subprocess, re, sqlite3, redis, pymongo, pymysql, argparse, hashlib, threading, yaml, logging, fcntl
 
+DEBUG = 1
+
+# ===================== 日志流配置 =====================
+
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)  # 目前为打印到屏幕
+log_file = "/usr/local/monit/agent.log" if DEBUG else "/dev/null"
 
 # ===================== 版本检查更新 =====================
 
@@ -44,16 +52,8 @@ if cwd == "/usr/local/monit":
 # 参考 * * * * * root flock -xn /tmp/stargate.lock -c '/usr/local/qcloud/stargate/admin/start.sh > /dev/null 2>&1 &'
 # flock 为文件锁命令，-xn 以非阻塞模式获取锁，若无法获取锁则立即退出，若可获取则执行 -c 的入参命令
 open("/etc/cron.d/monit", "w").write(
-    "* * * * * root flock -xn /tmp/monit.lock -c 'python /usr/local/monit/agent.py monit --cron > /dev/null 2>&1 &'\n"
+    f"* * * * * root flock -xn /tmp/monit.lock -c 'python /usr/local/monit/agent.py monit --cron >> {log_file} 2>&1 &'\n"
 )
-
-
-# ===================== 日志流配置 =====================
-
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)  # 目前为打印到屏幕
-
 
 # ===================== 声明入参解析 =====================
 
@@ -63,40 +63,32 @@ subparsers = parser.add_subparsers(dest="subcommand")
 # 初始化 Agent
 init_parser = subparsers.add_parser("init", help="初始化 Agent")
 init_parser.add_argument("--server-ip", type=str, help="服务器 IP 地址")
-init_parser.add_argument("--machine-id", type=int, default=True, help="机器 ID")
-init_parser.add_argument("--password", type=str, default=True, help="机器密码")
+init_parser.add_argument("--machine-id", type=int, help="机器 ID")
+init_parser.add_argument("--password", type=str, help="机器密码")
 
 # 配置参数解析
 configure_parser = subparsers.add_parser("configure", help="配置 Agent")
 
-configure_parser.add_argument(
-    "--mysql-enable", type=bool, required=True, help="是否启用 MySQL 监控"
-)
-configure_parser.add_argument("--mysql-port", type=int, default=3306, help="MySQL 端口")
-configure_parser.add_argument(
-    "--mysql-user", type=str, default="root", help="MySQL 用户"
-)
+configure_parser.add_argument("--mysql-enable", type=int, help="是否启用 MySQL 监控")
+configure_parser.add_argument("--mysql-port", type=int, help="MySQL 端口")
+configure_parser.add_argument("--mysql-user", type=str, help="MySQL 用户")
 configure_parser.add_argument("--mysql-password", type=str, help="MySQL 密码")
 
-configure_parser.add_argument(
-    "--redis-enable", type=bool, required=True, help="是否启用 Redis 监控"
-)
-configure_parser.add_argument("--redis-port", type=int, default=6379, help="Redis 端口")
+configure_parser.add_argument("--redis-enable", type=int, help="是否启用 Redis 监控")
+configure_parser.add_argument("--redis-port", type=int, help="Redis 端口")
 configure_parser.add_argument("--redis-password", type=str, help="Redis 密码")
 
-configure_parser.add_argument(
-    "--nginx-enable", type=bool, default=True, help="是否启用 Nginx 监控"
-)
+configure_parser.add_argument("--nginx-enable", type=int, help="是否启用 Nginx 监控")
 configure_parser.add_argument("--nginx-path", type=str, help="Nginx 安装路径")
 
 configure_parser.add_argument(
-    "--php-fpm-enable", type=bool, required=True, help="是否启用 PHP-FPM 监控"
+    "--php-fpm-enable", type=int, help="是否启用 PHP-FPM 监控"
 )
 configure_parser.add_argument("--php-fpm-path", type=str, help="PHP-FPM 安装路径")
 
 # 开始监控参数解析
 monit_parser = subparsers.add_parser("monit", help="开始监控")
-monit_parser.add_argument("--cron", type=bool, default=False, help="保活")
+monit_parser.add_argument("--cron", action="store_true", help="保活")
 
 # 停止监控参数解析
 stop_parser = subparsers.add_parser("stop", help="停止监控")
@@ -137,7 +129,11 @@ class Agent:
             "php-fpm": "php-fpm",
         }
 
-        self.base_url = f"http://{args.server_ip}:8888"
+        if self.db_dct("server_ip"):
+            self.base_url = f'http://{self.db_dct("server_ip")}:8888'
+        else:
+            self.base_url = "http://127.0.0.1:8888"
+
         self.uri_dct = {
             "sign": "/machine/login",
             "upload": "/machine/uploadDataMulti",
@@ -147,18 +143,40 @@ class Agent:
             },
         }
 
-        self.running_services = None
-        self.update_service_status()
-
     def parse_config(self):
         if os.path.exists(f"{self.cwd}/config.yml"):
             with open(f"{self.cwd}/config.yml", "r", encoding="utf-8") as f:
                 self.config = dict(yaml.safe_load(f))
                 logging.info(f"本地配置（config.yml）: {self.config}")
+        else:
+            self.config = {
+                "mysql": {
+                    "enable": False,
+                    "port": 3306,
+                    "user": "root",
+                    "password": "",
+                },
+                "redis": {
+                    "enable": False,
+                    "port": 6379,
+                    "password": "",
+                },
+                "nginx": {
+                    "enable": False,
+                    "path": "/etc/nginx",
+                },
+                "php-fpm": {
+                    "enable": False,
+                    "path": "/etc/php/8.3",
+                },
+            }
 
     def save_config(self):
         with open(f"{self.cwd}/config.yml", "w", encoding="utf-8") as f:
             yaml.dump(self.config, f)
+
+    def set_base_url(self, base_url: str):
+        self.db_dct("base_url", base_url)
 
     def token(self):
         if self._token:
@@ -899,9 +917,11 @@ net_io.dropout          subtract    网络发送丢包数
                 if service_name in process.name():
                     running_services.add(self.detect_services[service_name])
 
-        # 若运行服务没有发生变化，则直接返回
-        if running_services == self.running_services:
-            return
+        if hasattr(self, "running_services"):
+            # 若运行服务没有发生变化，则直接返回
+            if running_services == self.running_services:
+                return
+        self.running_services = running_services
 
         # 服务端的特别需求
         service_status = {}
@@ -1444,9 +1464,10 @@ pm.status_listen = /run/php/fpm-status.sock
 
 if args.subcommand == "init":
     agent = Agent(args.machine_id, args.password)
+    agent.db_dct("server_ip", args.server_ip)
     logging.info("初始化 Agent 完毕，开始监控 ...")
     subprocess.run(
-        "nohup python /usr/local/monit/agent.py monit >/dev/null 2>&1 &", shell=True
+        f"nohup python /usr/local/monit/agent.py monit > {log_file} 2>&1 &", shell=True
     )
 
 if args.subcommand == "configure":
@@ -1455,22 +1476,18 @@ if args.subcommand == "configure":
     # 根据 agent.detect_services 和 vars(args) 生成 config.yml
     config = {}
     for service in agent.detect_services.values():
-        for opt, val in vars(args).items():
-            if opt.rsplit("_", 1)[0].replace("_", "-") == service:
-                if service not in config:
-                    config[service] = {}
-                config[service][opt.rsplit("_", 1)[1]] = val
-    # print(config)
-    # 获取本文件的位置
-    cwd = os.path.dirname(os.path.abspath(__file__))
-    # 将所有相关的参数写入到 config.yml 中
-    with open(f"{cwd}/config.yml", "w", encoding="utf-8") as f:
-        yaml.dump(config, f)
+        for arg, val in vars(args).items():
+            if val is not None:
+                if arg.startswith(service.replace("-", "_")):
+                    option = arg.rsplit("_", 1)[1]
+                    agent.config[service][option] = val
+                    logging.info(f"更新配置：{service} - {option} - {val}")
+    agent.save_config()
 
     # 重载 Agent
     logging.info("Agent 配置已更新，准备重载 ...")
     subprocess.run(
-        "nohup python /usr/local/monit/agent.py monit >/dev/null 2>&1 &", shell=True
+        f"nohup python /usr/local/monit/agent.py monit >> {log_file} 2>&1 &", shell=True
     )
 
 if args.subcommand == "monit":
@@ -1487,17 +1504,9 @@ if args.subcommand == "monit":
                 process.terminate()
                 logging.info(f"重载 Agent 进程中 ...")
 
-    # # 创建文件锁
-    # lock = open("/tmp/agent.lock", "w")
-    # try:
-    #     # 非阻塞独占式加锁
-    #     fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-
     agent = Agent()
     agent.start_monit()
-    # except:
-    #     logging.info("Agent 进程已在运行中")
-    #     sys.exit(0)
+    logging.info(f"Agent（machine_id：{agent._machine_id}）监控已启动")
 
 if args.subcommand == "stop":
     # 移除保活 cron
