@@ -62,6 +62,7 @@ subparsers = parser.add_subparsers(dest="subcommand")
 
 # 初始化 Agent
 init_parser = subparsers.add_parser("init", help="初始化 Agent")
+init_parser.add_argument("--server-ip", type=str, help="服务器 IP 地址")
 init_parser.add_argument("--machine-id", type=int, default=True, help="机器 ID")
 init_parser.add_argument("--password", type=str, default=True, help="机器密码")
 
@@ -136,8 +137,7 @@ class Agent:
             "php-fpm": "php-fpm",
         }
 
-        # self.base_url = "http://zhandj.top:8888"
-        self.base_url = "https://monit-server.jiangyj.tech"
+        self.base_url = f"http://{args.server_ip}:8888"
         self.uri_dct = {
             "sign": "/machine/login",
             "upload": "/machine/uploadDataMulti",
@@ -147,6 +147,7 @@ class Agent:
             },
         }
 
+        self.running_services = None
         self.update_service_status()
 
     def parse_config(self):
@@ -898,7 +899,20 @@ net_io.dropout          subtract    网络发送丢包数
                 if service_name in process.name():
                     running_services.add(self.detect_services[service_name])
 
-        logging.info(f"正在运行的服务：{running_services}")
+        # 若运行服务没有发生变化，则直接返回
+        if running_services == self.running_services:
+            return
+
+        # 服务端的特别需求
+        service_status = {}
+        for service in running_services:
+            # 读入配置获取是否启用
+            if self.config.get(service):
+                service_status[service] = int(self.config[service].get("enable", False))
+            else:
+                service_status[service] = 0
+
+        logging.info(f"更新正在运行的服务：{service_status}")
 
         # 向服务器端发送正在运行的服务
         r = requests.post(
@@ -906,10 +920,10 @@ net_io.dropout          subtract    网络发送丢包数
             headers={"x-token": self.token()},
             json={
                 "MachineID": self._machine_id,
-                "Services": json.dumps(list(running_services)),
+                "Services": json.dumps(service_status),
             },
         )
-        logging.info(f"更新服务：{running_services}")
+        logging.info(f"更新服务：{service_status}")
 
         if r.json()["code"] == 7 and r.json()["msg"] == "该数据不存在":
             # 为该机器创建 services 项
