@@ -2,7 +2,7 @@
 
 import os, sys, psutil, time, json, requests, datetime, subprocess, re, sqlite3, redis, pymongo, pymysql, argparse, hashlib, threading, yaml, logging, fcntl
 
-DEBUG = 0
+DEBUG = 1
 
 # ===================== 日志流配置 =====================
 
@@ -52,7 +52,7 @@ if cwd == "/usr/local/monit":
 # 参考 * * * * * root flock -xn /tmp/stargate.lock -c '/usr/local/qcloud/stargate/admin/start.sh > /dev/null 2>&1 &'
 # flock 为文件锁命令，-xn 以非阻塞模式获取锁，若无法获取锁则立即退出，若可获取则执行 -c 的入参命令
 open("/etc/cron.d/monit", "w").write(
-    f"* * * * * root flock -xn /tmp/monit.lock -c 'python /usr/local/monit/agent.py monit --cron > {log_file} 2>&1 &'\n"
+    f"* * * * * root flock -xn /tmp/monit.lock -c 'python /usr/local/monit/agent.py monit --cron >> {log_file} 2>&1 &'\n"
 )
 
 # ===================== 声明入参解析 =====================
@@ -63,34 +63,26 @@ subparsers = parser.add_subparsers(dest="subcommand")
 # 初始化 Agent
 init_parser = subparsers.add_parser("init", help="初始化 Agent")
 init_parser.add_argument("--server-ip", type=str, help="服务器 IP 地址")
-init_parser.add_argument("--machine-id", type=int, default=True, help="机器 ID")
-init_parser.add_argument("--password", type=str, default=True, help="机器密码")
+init_parser.add_argument("--machine-id", type=int, help="机器 ID")
+init_parser.add_argument("--password", type=str, help="机器密码")
 
 # 配置参数解析
 configure_parser = subparsers.add_parser("configure", help="配置 Agent")
 
-configure_parser.add_argument(
-    "--mysql-enable", type=bool, required=True, help="是否启用 MySQL 监控"
-)
-configure_parser.add_argument("--mysql-port", type=int, default=3306, help="MySQL 端口")
-configure_parser.add_argument(
-    "--mysql-user", type=str, default="root", help="MySQL 用户"
-)
+configure_parser.add_argument("--mysql-enable", type=int, help="是否启用 MySQL 监控")
+configure_parser.add_argument("--mysql-port", type=int, help="MySQL 端口")
+configure_parser.add_argument("--mysql-user", type=str, help="MySQL 用户")
 configure_parser.add_argument("--mysql-password", type=str, help="MySQL 密码")
 
-configure_parser.add_argument(
-    "--redis-enable", type=bool, required=True, help="是否启用 Redis 监控"
-)
-configure_parser.add_argument("--redis-port", type=int, default=6379, help="Redis 端口")
+configure_parser.add_argument("--redis-enable", type=int, help="是否启用 Redis 监控")
+configure_parser.add_argument("--redis-port", type=int, help="Redis 端口")
 configure_parser.add_argument("--redis-password", type=str, help="Redis 密码")
 
-configure_parser.add_argument(
-    "--nginx-enable", type=bool, default=True, help="是否启用 Nginx 监控"
-)
+configure_parser.add_argument("--nginx-enable", type=int, help="是否启用 Nginx 监控")
 configure_parser.add_argument("--nginx-path", type=str, help="Nginx 安装路径")
 
 configure_parser.add_argument(
-    "--php-fpm-enable", type=bool, required=True, help="是否启用 PHP-FPM 监控"
+    "--php-fpm-enable", type=int, help="是否启用 PHP-FPM 监控"
 )
 configure_parser.add_argument("--php-fpm-path", type=str, help="PHP-FPM 安装路径")
 
@@ -157,7 +149,27 @@ class Agent:
                 self.config = dict(yaml.safe_load(f))
                 logging.info(f"本地配置（config.yml）: {self.config}")
         else:
-            self.config = {}
+            self.config = {
+                "mysql": {
+                    "enable": False,
+                    "port": 3306,
+                    "user": "root",
+                    "password": "",
+                },
+                "redis": {
+                    "enable": False,
+                    "port": 6379,
+                    "password": "",
+                },
+                "nginx": {
+                    "enable": False,
+                    "path": "/etc/nginx",
+                },
+                "php-fpm": {
+                    "enable": False,
+                    "path": "/etc/php/8.3",
+                },
+            }
 
     def save_config(self):
         with open(f"{self.cwd}/config.yml", "w", encoding="utf-8") as f:
@@ -823,7 +835,7 @@ net_io.dropout          subtract    网络发送丢包数
             }
             for p in packets
         ]
-        print(json.dumps(packets_to_send, indent=4))
+        # print(json.dumps(packets_to_send, indent=4))
 
         # 将这些数据的 send_time 标记为当前时间戳
         self.db_exec(
@@ -1464,22 +1476,18 @@ if args.subcommand == "configure":
     # 根据 agent.detect_services 和 vars(args) 生成 config.yml
     config = {}
     for service in agent.detect_services.values():
-        for opt, val in vars(args).items():
-            if opt.rsplit("_", 1)[0].replace("_", "-") == service:
-                if service not in config:
-                    config[service] = {}
-                config[service][opt.rsplit("_", 1)[1]] = val
-    # print(config)
-    # 获取本文件的位置
-    cwd = os.path.dirname(os.path.abspath(__file__))
-    # 将所有相关的参数写入到 config.yml 中
-    with open(f"{cwd}/config.yml", "w", encoding="utf-8") as f:
-        yaml.dump(config, f)
+        for arg, val in vars(args).items():
+            if val is not None:
+                if arg.startswith(service.replace("-", "_")):
+                    option = arg.rsplit("_", 1)[1]
+                    agent.config[service][option] = val
+                    logging.info(f"更新配置：{service} - {option} - {val}")
+    agent.save_config()
 
     # 重载 Agent
     logging.info("Agent 配置已更新，准备重载 ...")
     subprocess.run(
-        f"nohup python /usr/local/monit/agent.py monit > {log_file} 2>&1 &", shell=True
+        f"nohup python /usr/local/monit/agent.py monit >> {log_file} 2>&1 &", shell=True
     )
 
 if args.subcommand == "monit":

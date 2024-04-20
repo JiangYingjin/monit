@@ -32,34 +32,26 @@ install_parser.add_argument("--machine-id", type=int, required=True, help="machi
 # 配置参数解析
 configure_parser = subparsers.add_parser("configure", help="配置 Agent")
 
-configure_parser.add_argument(
-    "--mysql-enable", type=bool, required=True, help="是否启用 MySQL 监控"
-)
-configure_parser.add_argument("--mysql-port", type=int, default=3306, help="MySQL 端口")
-configure_parser.add_argument(
-    "--mysql-user", type=str, default="root", help="MySQL 用户"
-)
+configure_parser.add_argument("--mysql-enable", type=int, help="是否启用 MySQL 监控")
+configure_parser.add_argument("--mysql-port", type=int, help="MySQL 端口")
+configure_parser.add_argument("--mysql-user", type=str, help="MySQL 用户")
 configure_parser.add_argument("--mysql-password", type=str, help="MySQL 密码")
 
-configure_parser.add_argument(
-    "--redis-enable", type=bool, required=True, help="是否启用 Redis 监控"
-)
-configure_parser.add_argument("--redis-port", type=int, default=6379, help="Redis 端口")
+configure_parser.add_argument("--redis-enable", type=int, help="是否启用 Redis 监控")
+configure_parser.add_argument("--redis-port", type=int, help="Redis 端口")
 configure_parser.add_argument("--redis-password", type=str, help="Redis 密码")
 
-configure_parser.add_argument(
-    "--nginx-enable", type=bool, default=True, help="是否启用 Nginx 监控"
-)
+configure_parser.add_argument("--nginx-enable", type=int, help="是否启用 Nginx 监控")
 configure_parser.add_argument("--nginx-path", type=str, help="Nginx 安装路径")
 
 configure_parser.add_argument(
-    "--php-fpm-enable", type=bool, required=True, help="是否启用 PHP-FPM 监控"
+    "--php-fpm-enable", type=int, help="是否启用 PHP-FPM 监控"
 )
 configure_parser.add_argument("--php-fpm-path", type=str, help="PHP-FPM 安装路径")
 
 # 运行命令参数解析
 run_parser = subparsers.add_parser("run", help="在远程主机上执行命令")
-run_parser.add_argument("--command", type=str, required=True, help="执行的命令")
+run_parser.add_argument("--command", type=str, help="执行的命令")
 
 # 停止监控命令参数解析
 stop_parser = subparsers.add_parser("stop", help="在远程主机上停止 Agent 监控")
@@ -163,9 +155,19 @@ if args.subcommand == "install":
 
 if args.subcommand == "configure":
     print("正在配置 Agent ...\n")
-    remote_exec(
-        f"python /usr/local/monit/agent.py configure --mysql-enable {args.mysql_enable} --mysql-port {args.mysql_port} --mysql-user {args.mysql_user} --mysql-password {args.mysql_password} --redis-enable {args.redis_enable} --redis-port {args.redis_port} --redis-password {args.redis_password} --nginx-enable {args.nginx_enable} --nginx-path {args.nginx_path} --php-fpm-enable {args.php_fpm_enable} --php-fpm-path {args.php_fpm_path}"
-    )
+    services = {"mysql", "redis", "nginx", "php-fpm"}
+    params = ""
+    for arg, val in vars(args).items():
+        for service in services:
+            # service: php-fpm
+            # arg: php_fpm_enable
+            if arg.startswith(f"{service.replace('-', '_')}"):
+                if val is not None:
+                    option = arg.rsplit("_", 1)[1]
+                    print(f"{service}：{option}={val}")
+                    params += f" --{service}-{option} {val}"
+    # print(f"执行命令：python /usr/local/monit/agent.py configure {params}")
+    remote_exec(f"python /usr/local/monit/agent.py configure {params}")
 
 if args.subcommand == "run":
     print(f"在远程主机 {args.host} 上执行命令: {args.command}")
