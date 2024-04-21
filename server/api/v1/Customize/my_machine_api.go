@@ -15,6 +15,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/spf13/cast"
 	"go.uber.org/zap"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"strconv"
 	"time"
@@ -80,13 +81,23 @@ func (m *MyMachineApi) MachineLogin(c *gin.Context) {
 	}
 
 	machine, err := machineService.GetMachine(l.MachineID)
-	if err != nil || machine.Password != l.Password || strconv.FormatUint(uint64(machine.ID), 10) != l.MachineID {
-		global.GVA_LOG.Error("登陆失败! 机器ID不存在或者密码错误!", zap.Error(err))
+	if err != nil {
+		global.GVA_LOG.Error("登陆失败! 机器ID不存在!", zap.Error(err))
 		// 验证码次数+1
 		global.BlackCache.Increment(key, 1)
-		response.FailWithMessage("机器ID不存在或者密码错误", c)
+		response.FailWithMessage("机器ID不存在", c)
 		return
 	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(l.Password), []byte(machine.Password))
+	if err != nil {
+		global.GVA_LOG.Error("登陆失败! 密码错误!", zap.Error(err))
+		// 验证码次数+1
+		global.BlackCache.Increment(key, 1)
+		response.FailWithMessage("密码错误", c)
+		return
+	}
+
 	m.TokenNext(c, machine)
 	return
 }
