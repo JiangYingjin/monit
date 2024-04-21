@@ -39,7 +39,7 @@ func (machineService *MachineService) DeleteMachineByIds(IDs []string, deleted_b
 		if err := tx.Model(&Customize.Machine{}).Where("id in ?", IDs).Update("deleted_by", deleted_by).Error; err != nil {
 			return err
 		}
-		if err := tx.Where("id in ?", IDs).Delete(&Customize.Machine{}).Error; err != nil {
+		if err := tx.Unscoped().Where("id in ?", IDs).Delete(&Customize.Machine{}).Error; err != nil {
 			return err
 		}
 		return nil

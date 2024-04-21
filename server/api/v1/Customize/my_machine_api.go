@@ -191,7 +191,7 @@ func (m *MyMachineApi) SetMachineService(c *gin.Context) {
 		var myMachineService Customize2.MyMachineService
 		agentParam = myMachineService.FormCmdParams(
 			machine.IPAddr,
-			"--password="+machine.Password,
+			"--username=root",
 			"configure")
 
 		var machineServiceStatus map[string]bool
