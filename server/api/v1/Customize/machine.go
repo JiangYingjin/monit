@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
 	"go.uber.org/zap"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -38,6 +39,10 @@ func (machineApi *MachineApi) CreateMachine(c *gin.Context) {
 	machine.CreatedBy = utils.GetUserID(c)
 	machine.Service = "[]"
 
+	machineSshPassword := machine.Password
+	machinePasswordBytes, _ := bcrypt.GenerateFromPassword([]byte(machine.Password), bcrypt.DefaultCost)
+	machine.Password = string(machinePasswordBytes)
+
 	if err = machineService.CreateMachine(&machine); err != nil {
 		global.GVA_LOG.Error("创建失败!", zap.Error(err))
 		response.FailWithMessage("创建失败: "+err.Error(), c)
@@ -48,7 +53,7 @@ func (machineApi *MachineApi) CreateMachine(c *gin.Context) {
 	myMachineService := Customize2.MyMachineService{}
 	output, err := myMachineService.ExecuteCmd(myMachineService.FormCmdParams(
 		machine.IPAddr,
-		"--password="+machine.Password,
+		"--password="+machineSshPassword,
 		"install",
 		"--machine-id="+cast.ToString(machine.ID)))
 	if err != nil {
@@ -85,7 +90,6 @@ func (machineApi *MachineApi) DeleteMachine(c *gin.Context) {
 		myMachineService := Customize2.MyMachineService{}
 		_, err = myMachineService.ExecuteCmd(myMachineService.FormCmdParams(
 			machine.IPAddr,
-			"--password="+machine.Password,
 			"uninstall",
 		))
 
