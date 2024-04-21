@@ -23,32 +23,32 @@ import (
 type MyMachineApi struct {
 }
 
+func UploadTestData(dataTypeID int, machineID int, minValue float64, maxValue float64) {
+	for {
+		value := (float64(utils.RandomInt(1, 10000))/10000)*(maxValue-minValue) + minValue
+		data := Customize.Data{
+			DataTypeID: &dataTypeID,
+			Value:      &value,
+			MachineID:  &machineID,
+			CreatedBy:  0,
+			UpdatedBy:  0,
+			DeletedBy:  0,
+		}
+
+		var dataService Customize2.DataService
+		if err := dataService.CreateData(&data); err != nil {
+			break
+		}
+		time.Sleep(1 * time.Second)
+	}
+}
+
 func init() {
-	//go func() {
-	//	time.Sleep(5 * time.Second)
-	//	for {
-	//		time.Sleep(1 * time.Second)
-	//
-	//		dataTypeID := 1
-	//		value := (float64(utils.RandomInt(1, 1000))) / 200.0
-	//		machineID := 1
-	//		data := Customize.Data{
-	//			DataTypeID: &dataTypeID,
-	//			Value:      &value,
-	//			MachineID:  &machineID,
-	//			CreatedBy:  0,
-	//			UpdatedBy:  0,
-	//			DeletedBy:  0,
-	//		}
-	//
-	//		var dataService Customize2.DataService
-	//		if err := dataService.CreateData(&data); err != nil {
-	//		} else {
-	//			var myMachineApi MyMachineApi
-	//			myMachineApi.UploadDataHook(data)
-	//		}
-	//	}
-	//}()
+	go func() {
+		time.Sleep(10 * time.Second)
+
+		//UploadTestData(104741653, 1, 0, 100)
+	}()
 }
 
 // MachineLogin
@@ -153,8 +153,12 @@ type SetMachineServiceReq struct {
 func (s *SetMachineServiceReq) ToParamString() []string {
 	var result []string
 	for name, propStatus := range s.Services {
-		for _, prop := range propStatus {
-			result = append(result, fmt.Sprintf("--%v-%v=%v", name, prop.Name, prop.Value))
+		if propStatus[0].Value == "0" {
+			result = append(result, fmt.Sprintf("--%v-%v=%v", name, propStatus[0].Name, propStatus[0].Value))
+		} else {
+			for _, prop := range propStatus {
+				result = append(result, fmt.Sprintf("--%v-%v=%v", name, prop.Name, prop.Value))
+			}
 		}
 	}
 	return result
