@@ -1,6 +1,6 @@
 #!python
 
-import os, sys, psutil, time, json, requests, datetime, subprocess, re, sqlite3, redis, pymongo, pymysql, argparse, hashlib, threading, yaml, logging, fcntl
+import os, sys, psutil, time, json, requests, datetime, subprocess, re, sqlite3, redis, pymongo, pymysql, argparse, hashlib, threading, yaml, logging, bcrypt
 
 DEBUG = 1
 
@@ -191,9 +191,12 @@ class Agent:
             self.base_url + self.uri_dct["sign"],
             json={
                 "machine_id": str(self._machine_id),
-                "password": self.db_dct("password"),
+                "password": bcrypt.hashpw(
+                    self.db_dct("password").encode(), bcrypt.gensalt()
+                ),
             },
         )
+        print(r.text)
 
         """
         {"code":0,"data":{"ExpiresAt":1713674791000,"Machine":{"ID":3,"CreatedAt":"2024-04-14T11:08:00.813+08:00","UpdatedAt":"2024-04-14T11:08:00.813+08:00","name":"041411","description":"1","ip_addr":"111.230.30.196","password":"admin","status":true,"CreatedBy":1,"UpdatedBy":0,"DeletedBy":0},"Token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNYWNoaW5lSUQiOiIzIiwiQnVmZmVyVGltZSI6ODY0MDAsImlzcyI6InFtUGx1cyIsImF1ZCI6WyJHVkEiXSwiZXhwIjoxNzEzNjc0NzkxLCJuYmYiOjE3MTMwNjk5OTF9.a1jVZ52Y-BnAbj0ZGLzioA-CsjNhxybsngIGAC8NczU"},"msg":"登录成功"}"""
@@ -1487,7 +1490,8 @@ if args.subcommand == "configure":
     # 重载 Agent
     logging.info("Agent 配置已更新，准备重载 ...")
     subprocess.run(
-        f"nohup python3 /usr/local/monit/agent.py monit >> {log_file} 2>&1 &", shell=True
+        f"nohup python3 /usr/local/monit/agent.py monit >> {log_file} 2>&1 &",
+        shell=True,
     )
 
 if args.subcommand == "monit":

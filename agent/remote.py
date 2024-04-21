@@ -152,7 +152,15 @@ if args.subcommand == "install":
     # 安装 agent.py 所需依赖
     print("初始化 Agent ...\n")
     # os, sys, psutil, time, json, requests, datetime, subprocess, re, sqlite3, redis, pymongo, pymysql, argparse, hashlib, threading, yaml, logging
-    agent_modules = {"psutil", "requests", "redis", "pymongo", "PyMySQL", "PyYAML"}
+    agent_modules = {
+        "psutil",
+        "requests",
+        "redis",
+        "pymongo",
+        "PyMySQL",
+        "PyYAML",
+        "bcrypt",
+    }
     # 检查 Agent 所需依赖 module 是否已安装，若未安装则安装
     out, _ = remote_exec("pip list", silent=True)
     installed_modules = set(out.strip().split()[2:])
