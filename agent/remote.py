@@ -1,6 +1,6 @@
 #!python
 
-import subprocess, argparse, importlib, sys, os, requests
+import subprocess, argparse, importlib, sys, os
 
 
 def install_module(module_name: str):
@@ -63,16 +63,27 @@ args = parser.parse_args()
 print(args)
 
 install_module("paramiko")
-import paramiko
+install_module("requests")
+import paramiko, requests
 
 ssh_client = paramiko.SSHClient()
 ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-ssh_client.connect(
-    hostname=args.host,
-    port=args.port,
-    username=args.username,
-    password=args.password,
-)
+try:
+    ssh_client.connect(
+        hostname=args.host,
+        port=args.port,
+        username=args.username,
+        password=args.password,
+    )
+except:
+    ssh_client.connect(
+        hostname=args.host,
+        port=args.port,
+        username=args.username,
+        password=args.password,
+        allow_agent=False,
+        look_for_keys=False,
+    )
 
 
 def remote_exec(command: str, silent=False):
@@ -156,6 +167,7 @@ if args.subcommand == "install":
     # 获取本机的公网地址
     ip_api = "https://searchplugin.csdn.net/api/v1/ip/get"
     server_ip = requests.get(ip_api).json()["data"]["ip"]
+    server_ip = "dev.zhandj.com"
     print("服务端 IP 地址为:", server_ip)
     print(f"后续监控数据将发送至 {server_ip}:8888")
     print("请注意开启服务端的公网 8888 端口，否则 Agent 发送数据将失败")
@@ -164,7 +176,7 @@ if args.subcommand == "install":
     print("machine_id:", args.machine_id)
     print("password:", args.password)
     remote_exec(
-        f"python /usr/local/monit/agent.py init --server-ip {server_ip} --machine-id {args.machine_id} --password {args.password}"
+        f"python3 /usr/local/monit/agent.py init --server-ip {server_ip} --machine-id {args.machine_id} --password {args.password}"
     )
 
 if args.subcommand == "configure":
@@ -180,8 +192,8 @@ if args.subcommand == "configure":
                     option = arg.rsplit("_", 1)[1]
                     print(f"{service}：{option}={val}")
                     params += f" --{service}-{option} {val}"
-    # print(f"执行命令：python /usr/local/monit/agent.py configure {params}")
-    remote_exec(f"python /usr/local/monit/agent.py configure {params}")
+    # print(f"执行命令：python3 /usr/local/monit/agent.py configure {params}")
+    remote_exec(f"python3 /usr/local/monit/agent.py configure {params}")
 
 if args.subcommand == "run":
     print(f"在远程主机 {args.host} 上执行命令: {args.command}")
@@ -190,12 +202,12 @@ if args.subcommand == "run":
 
 if args.subcommand == "stop":
     print("正在停止 Agent ...")
-    remote_exec("python /usr/local/monit/agent.py stop")
+    remote_exec("python3 /usr/local/monit/agent.py stop")
     print("Agent 已停止")
 
 if args.subcommand == "uninstall":
     print("正在卸载 Agent ...")
-    remote_exec("python /usr/local/monit/agent.py uninstall")
+    remote_exec("python3 /usr/local/monit/agent.py uninstall")
     print("Agent 已卸载")
 
 ssh_client.close()

@@ -36,7 +36,7 @@ if cwd == "/usr/local/monit":
         # 从 https://file.jiangyj.tech/proj/monit/agent.py 下载最新版本的 agent.py 替换本文件
         # 原封不动地保留本文件的所有入参并重新执行
         subprocess.run(
-            f"wget -L https://file.jiangyj.tech/proj/monit/agent.py -O /usr/local/monit/agent.py && chmod +x /usr/local/monit/agent.py && python /usr/local/monit/agent.py {' '.join(sys.argv[1:])}",
+            f"wget -L https://file.jiangyj.tech/proj/monit/agent.py -O /usr/local/monit/agent.py && chmod +x /usr/local/monit/agent.py && python3 /usr/local/monit/agent.py {' '.join(sys.argv[1:])}",
             shell=True,
             # stdout=subprocess.DEVNULL,
             # stderr=subprocess.DEVNULL,
@@ -52,7 +52,7 @@ if cwd == "/usr/local/monit":
 # 参考 * * * * * root flock -xn /tmp/stargate.lock -c '/usr/local/qcloud/stargate/admin/start.sh > /dev/null 2>&1 &'
 # flock 为文件锁命令，-xn 以非阻塞模式获取锁，若无法获取锁则立即退出，若可获取则执行 -c 的入参命令
 open("/etc/cron.d/monit", "w").write(
-    f"* * * * * root flock -xn /tmp/monit.lock -c 'python /usr/local/monit/agent.py monit --cron >> {log_file} 2>&1 &'\n"
+    f"* * * * * root flock -xn /tmp/monit.lock -c 'python3 /usr/local/monit/agent.py monit --cron >> {log_file} 2>&1 &'\n"
 )
 
 # ===================== 声明入参解析 =====================
@@ -828,14 +828,14 @@ net_io.dropout          subtract    网络发送丢包数
         # 转为列表字典的形式
         packets_to_send = [
             {
-                "created_at": p[0],
+                "CreatedAt": p[0],
                 "DataTypeID": self._uri_to_id(p[1]),
                 "value": p[2],
                 "MachineID": self._machine_id,
             }
             for p in packets
         ]
-        # print(json.dumps(packets_to_send, indent=4))
+        print(json.dumps(packets_to_send, indent=4))
 
         # 将这些数据的 send_time 标记为当前时间戳
         self.db_exec(
@@ -1223,7 +1223,7 @@ pm.status_listen = /run/php/fpm-status.sock
             return json.JSONEncoder.default(self, obj)
 
     def _db_rotate(self):
-        # 清空设定时间之前的数据（sqlite3 无法很好地处理时区差异，还是使用 Python 的）
+        # 清空设定时间之前的数据（sqlite3 无法很好地处理时区差异，还是使用 python3 的）
         # now = datetime.datetime.now()
         # interval = datetime.timedelta(minutes=3)
         # expire = (now - interval).strftime("%Y-%m-%d %H:%M:%S")
@@ -1467,7 +1467,7 @@ if args.subcommand == "init":
     agent.db_dct("server_ip", args.server_ip)
     logging.info("初始化 Agent 完毕，开始监控 ...")
     subprocess.run(
-        f"nohup python /usr/local/monit/agent.py monit > {log_file} 2>&1 &", shell=True
+        f"nohup python3 /usr/local/monit/agent.py monit > {log_file} 2>&1 &", shell=True
     )
 
 if args.subcommand == "configure":
@@ -1487,7 +1487,7 @@ if args.subcommand == "configure":
     # 重载 Agent
     logging.info("Agent 配置已更新，准备重载 ...")
     subprocess.run(
-        f"nohup python /usr/local/monit/agent.py monit >> {log_file} 2>&1 &", shell=True
+        f"nohup python3 /usr/local/monit/agent.py monit >> {log_file} 2>&1 &", shell=True
     )
 
 if args.subcommand == "monit":
