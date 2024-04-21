@@ -13,6 +13,7 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
+	"time"
 )
 
 type MachineApi struct {
@@ -147,6 +148,13 @@ func (machineApi *MachineApi) UpdateMachine(c *gin.Context) {
 		return
 	}
 	machine.UpdatedBy = utils.GetUserID(c)
+	machine.UpdatedAt = time.Now()
+	machine.CreatedAt = time.Now()
+
+	if len(machine.Password) != 60 {
+		machinePasswordBytes, _ := bcrypt.GenerateFromPassword([]byte(machine.Password), bcrypt.DefaultCost)
+		machine.Password = string(machinePasswordBytes)
+	}
 
 	if err := machineService.UpdateMachine(machine); err != nil {
 		global.GVA_LOG.Error("更新失败!", zap.Error(err))
