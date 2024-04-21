@@ -89,7 +89,7 @@ func (m *MyMachineApi) MachineLogin(c *gin.Context) {
 		return
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(l.Password), []byte(machine.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(machine.Password), []byte(l.Password))
 	if err != nil {
 		global.GVA_LOG.Error("登陆失败! 密码错误!", zap.Error(err))
 		// 验证码次数+1
