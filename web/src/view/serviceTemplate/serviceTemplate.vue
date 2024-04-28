@@ -116,6 +116,7 @@ function resetForm() {
 function submitForm() {
   console.log("submit成功");
   console.log(templates);
+  ElMessage.success("提交成功");
 }
 
 import { getMachineList } from "@/api/machine";
