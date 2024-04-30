@@ -404,12 +404,33 @@
         </el-form-item>
       </el-form>
     </div>
-        <div
-          v-for="config in chartConfigs"
-          :id="config.id"
+<!--        <div-->
+<!--          v-for="config in chartConfigs"-->
+<!--          :id="config.id"-->
+<!--          :key="config.id"-->
+<!--          style="width: 1200px; height: 500px;"-->
+<!--        />-->
+    <!-- 布局选择器 -->
+    <el-select v-model="selectedLayout" placeholder="选择布局" style="width: 200px;" >
+      <el-option label="一行两个" value="double" />
+      <el-option label="一行一个" value="single" />
+    </el-select>
+
+
+
+    <!-- 根据选择的布局调整列 -->
+    <el-row :gutter="20">
+      <el-col
+          v-for="(config, index) in chartConfigs"
           :key="config.id"
-          style="width: 1200px; height: 500px;"
+          :span="selectedLayout === 'double' ? 12 : 24"
+      >
+        <div
+            :id="config.id"
+            style="width: 100%; height: 500px;"
         />
+      </el-col>
+    </el-row>
 <!--    <div class="chart-container">-->
 <!--      <div class="chart-row" v-for="(row, index) in Math.ceil(chartConfigs.length / 2)" :key="index">-->
 <!--        <div v-for="(config, innerIndex) in chartConfigs.slice(index * 2, (index + 1) * 2)" :id="config.id" :key="innerIndex" class="chart-item" style="width: calc(50% - 10px); height: 500px; margin-right: 20px;">-->
@@ -493,6 +514,14 @@ onMounted(() => {
 const startColor = '#75BFA5' // 起始颜色
 const endColor = '#FFA500' // 结束颜色
 const colorCount = 0 // 需要的颜色数量
+
+
+const selectedLayout = ref(); // 默认值
+
+// 计算属性，用于显示当前布局的描述文本
+const currentLayoutText = computed(() => {
+  return selectedLayout.value === 'double' ? '一行两个' : '一行一个';
+});
 
 function interpolateColor(startColor, endColor, colorCount) {
   const colorInterpolator = d3.interpolate(startColor, endColor)
