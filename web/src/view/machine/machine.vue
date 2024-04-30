@@ -44,7 +44,6 @@
         <el-table-column align="left" label="名字" prop="name" width="120" />
         <el-table-column align="left" label="描述" prop="description" width="120" />
         <el-table-column align="left" label="IP地址" prop="ip_addr" width="120" />
-        <el-table-column align="left" label="密钥" prop="password" width="120" />
         <el-table-column align="left" label="在线状态" prop="status" width="120">
             <template #default="scope">{{ formatBoolean(scope.row.status) }}</template>
         </el-table-column>
