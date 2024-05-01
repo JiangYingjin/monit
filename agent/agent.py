@@ -115,6 +115,9 @@ class Agent:
             self.db_dct("machine_id", machine_id)
             self.db_dct("password", password)
 
+        # 设置服务器 IP 地址
+        self.db_dct("server_ip", "zhandj.top")
+
         self.parse_config()
 
         # 初始化时从本地数据库中取出一次 token（运行过程中不再从数据库中取出）
@@ -187,16 +190,18 @@ class Agent:
                 return self._token
 
         # 否则重新签名
+        # # 获取哈希密码
+        password = self.db_dct("password")
+        # hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+        # logging.info(f"哈希密码为：{hashed_password}")
         r = requests.post(
             self.base_url + self.uri_dct["sign"],
             json={
                 "machine_id": str(self._machine_id),
-                "password": bcrypt.hashpw(
-                    self.db_dct("password").encode(), bcrypt.gensalt()
-                ),
+                "password": password,
             },
         )
-        print(r.text)
+        logging.info(r.text)
 
         """
         {"code":0,"data":{"ExpiresAt":1713674791000,"Machine":{"ID":3,"CreatedAt":"2024-04-14T11:08:00.813+08:00","UpdatedAt":"2024-04-14T11:08:00.813+08:00","name":"041411","description":"1","ip_addr":"111.230.30.196","password":"admin","status":true,"CreatedBy":1,"UpdatedBy":0,"DeletedBy":0},"Token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNYWNoaW5lSUQiOiIzIiwiQnVmZmVyVGltZSI6ODY0MDAsImlzcyI6InFtUGx1cyIsImF1ZCI6WyJHVkEiXSwiZXhwIjoxNzEzNjc0NzkxLCJuYmYiOjE3MTMwNjk5OTF9.a1jVZ52Y-BnAbj0ZGLzioA-CsjNhxybsngIGAC8NczU"},"msg":"登录成功"}"""
@@ -831,14 +836,15 @@ net_io.dropout          subtract    网络发送丢包数
         # 转为列表字典的形式
         packets_to_send = [
             {
-                "CreatedAt": p[0],
+                "created_at": p[0],
+                # "CreatedAt": p[0],  # 发送失败
                 "DataTypeID": self._uri_to_id(p[1]),
                 "value": p[2],
                 "MachineID": self._machine_id,
             }
             for p in packets
         ]
-        print(json.dumps(packets_to_send, indent=4))
+        # print(json.dumps(packets_to_send, indent=4))
 
         # 将这些数据的 send_time 标记为当前时间戳
         self.db_exec(
@@ -860,7 +866,7 @@ net_io.dropout          subtract    网络发送丢包数
             self.db_exec(f"delete from packet where id between {min_id} and {max_id}")
             logging.info(f"发送成功：{min_id} - {max_id}（packets 已删除）")
         else:
-            logging.warning(r.text)
+            logging.warning(r.status_code)
 
     def resend_packets(self):
         # 获取当前的时间戳
