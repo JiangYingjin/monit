@@ -1,242 +1,331 @@
 <template>
+
   <div>
-    <div class="gva-search-box">
-      <el-form
-        ref="elSearchFormRef"
-        :inline="true"
-        :model="searchInfo"
-        class="demo-form-inline"
-        :rules="searchRule"
-        @keyup.enter="onSubmit"
-      >
-        <el-form-item
-          label="创建日期"
-          prop="createdAt"
-        >
-          <template #label>
-            <span>
-              创建日期
-              <el-tooltip content="搜索范围是开始日期（包含）至结束日期（不包含）">
-                <el-icon><QuestionFilled /></el-icon>
-              </el-tooltip>
-            </span>
-          </template>
-          <el-date-picker
-            v-model="searchInfo.startCreatedAt"
-            type="datetime"
-            placeholder="开始日期"
-            :disabled-date="time=> searchInfo.endCreatedAt ? time.getTime() > searchInfo.endCreatedAt.getTime() : false"
+    <div class="data-center-box">
+      <CenterCard title="设备在线情况">
+        <template #action>
+          <span
+            class="gvaIcon-prompt"
+            style="color: #999"
           />
-          —
-          <el-date-picker
-            v-model="searchInfo.endCreatedAt"
-            type="datetime"
-            placeholder="结束日期"
-            :disabled-date="time=> searchInfo.startCreatedAt ? time.getTime() < searchInfo.startCreatedAt.getTime() : false"
+        </template>
+        <template #body>
+          <ChainRatio />
+        </template>
+      </CenterCard>
+      <CenterCard title="内存使用率"
+                  style="grid-column-start: span 3;">
+        <template #action>
+          <span
+              class="gvaIcon-prompt"
+              style="color: #999"
           />
-        </el-form-item>
+        </template>
+        <template #body>
+<!--          <Order />-->
+          <div
+              id="chart1"
+              style="width: 100%; height: 200px;"
+          />
+        </template>
+      </CenterCard>
+<!--      <CenterCard title="回收里程(Km)">-->
+<!--        <template #action>-->
+<!--          <span-->
+<!--            class="gvaIcon-prompt"-->
+<!--            style="color: #999"-->
+<!--          />-->
+<!--        </template>-->
+<!--        <template #body>-->
+<!--          <ReclaimMileage />-->
+<!--        </template>-->
+<!--      </CenterCard>-->
+<!--      <CenterCard title="设备回收率">-->
+<!--        <template #action>-->
+<!--          <span-->
+<!--            class="gvaIcon-prompt"-->
+<!--            style="color: #999"-->
+<!--          />-->
+<!--        </template>-->
+<!--        <template #body>-->
+<!--          <RecoveryRate />-->
+<!--        </template>-->
+<!--      </CenterCard>-->
 
-        <el-form-item>
-          <el-button
-            type="primary"
-            icon="search"
-            @click="onSubmit"
-          >查询</el-button>
-          <el-button
-            icon="refresh"
-            @click="onReset"
-          >重置</el-button>
-        </el-form-item>
-      </el-form>
+      <CenterCard
+        title="CPU占用率"
+        style="grid-column-start: span 4;"
+      >
+        <template #action>
+          <span class="gvaIcon-prompt" style="color: #999" />
+        </template>
+        <template #body>
+          <!-- 循环渲染 initialCharts -->
+          <!--    <div-->
+          <!--      id="chart"-->
+          <!--      style="width: 800px; height: 300px;"-->
+          <!--    />-->
+          <div
+              id="chart"
+              style="width: 100%; height: 360px;"
+          />
+        </template>
+      </CenterCard>
+<!--      <CenterCard-->
+<!--        title="源接入台数占比"-->
+<!--        style="grid-auto-columns: 1.5fr"-->
+<!--      >-->
+<!--        <template #action>-->
+<!--          <span class="gvaIcon-prompt" style="color: #999" />-->
+<!--        </template>-->
+<!--        <template #body>-->
+<!--          &lt;!&ndash; 循环渲染 initialCharts &ndash;&gt;-->
+<!--          &lt;!&ndash;    <div&ndash;&gt;-->
+<!--          &lt;!&ndash;      id="chart"&ndash;&gt;-->
+<!--          &lt;!&ndash;      style="width: 800px; height: 300px;"&ndash;&gt;-->
+<!--          &lt;!&ndash;    />&ndash;&gt;-->
+<!--        </template>-->
+<!--      </CenterCard>-->
     </div>
-    <div class="gva-table-box">
-      <div class="gva-btn-list">
-        <el-button
-          type="primary"
-          icon="plus"
-          @click="openDialog"
-        >新增</el-button>
-        <el-button
-          icon="delete"
-          style="margin-left: 10px;"
-          :disabled="!multipleSelection.length"
-          @click="onDelete"
-        >删除</el-button>
-      </div>
-      <el-table
-        ref="multipleTable"
-        style="width: 100%"
-        tooltip-effect="dark"
-        :data="tableData"
-        row-key="ID"
-        @selection-change="handleSelectionChange"
-      >
-        <el-table-column
-          type="selection"
-          width="55"
-        />
-
-        <el-table-column
-          align="left"
-          label="日期"
-          width="180"
-        >
-          <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
-        </el-table-column>
-
-        <el-table-column
-          align="left"
-          label="数据类型"
-          width="120"
-        >
-          <template #default="scope">
-            {{ dataTypeMap[scope.row.dataTypeID.toString()] }}
-          </template>
-        </el-table-column>
-        <el-table-column
-          align="left"
-          label="值"
-          prop="value"
-          width="120"
-        />
-        <el-table-column
-          align="left"
-          label="机器ID"
-          prop="machineID"
-          width="120"
-        />
-        <el-table-column
-          align="left"
-          label="操作"
-          fixed="right"
-          min-width="240"
-        >
-          <template #default="scope">
-            <el-button
-              type="primary"
-              link
-              class="table-button"
-              @click="getDetails(scope.row)"
-            >
-              <el-icon style="margin-right: 5px"><InfoFilled /></el-icon>
-              查看详情
-            </el-button>
-            <el-button
-              type="primary"
-              link
-              icon="edit"
-              class="table-button"
-              @click="updateDataFunc(scope.row)"
-            >变更</el-button>
-            <el-button
-              type="primary"
-              link
-              icon="delete"
-              @click="deleteRow(scope.row)"
-            >删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      <div class="gva-pagination">
-        <el-pagination
-          layout="total, sizes, prev, pager, next, jumper"
-          :current-page="page"
-          :page-size="pageSize"
-          :page-sizes="[10, 30, 50, 100]"
-          :total="total"
-          @current-change="handleCurrentChange"
-          @size-change="handleSizeChange"
-        />
-      </div>
-    </div>
-    <el-drawer
-      v-model="dialogFormVisible"
-      size="800"
-      :show-close="false"
-      :before-close="closeDialog"
-    >
-      <template #title>
-        <div class="flex justify-between items-center">
-          <span class="text-lg">{{ type==='create'?'添加':'修改' }}</span>
-          <div>
-            <el-button
-              type="primary"
-              @click="enterDialog"
-            >确 定</el-button>
-            <el-button @click="closeDialog">取 消</el-button>
-          </div>
-        </div>
-      </template>
-
-      <el-form
-        ref="elFormRef"
-        :model="formData"
-        label-position="top"
-        :rules="rule"
-        label-width="80px"
-      >
-        <el-form-item
-          label="数据类型:"
-          prop="dataTypeID"
-        >
-          <el-input
-            v-model.number="formData.dataTypeID"
-            :clearable="true"
-            placeholder="请输入数据类型"
-          />
-        </el-form-item>
-        <el-form-item
-          label="值:"
-          prop="value"
-        >
-          <el-input-number
-            v-model="formData.value"
-            style="width:100%"
-            :precision="2"
-            :clearable="true"
-          />
-        </el-form-item>
-        <el-form-item
-          label="机器ID:"
-          prop="machineID"
-        >
-          <el-input
-            v-model.number="formData.machineID"
-            :clearable="true"
-            placeholder="请输入机器ID"
-          />
-        </el-form-item>
-      </el-form>
-    </el-drawer>
-
-    <el-drawer
-      v-model="detailShow"
-      size="800"
-      :before-close="closeDetailShow"
-      title="查看详情"
-      destroy-on-close
-    >
-      <template #title>
-        <div class="flex justify-between items-center">
-          <span class="text-lg">查看详情</span>
-        </div>
-      </template>
-      <el-descriptions
-        :column="1"
-        border
-      >
-        <el-descriptions-item label="数据类型">
-          {{ formData.dataTypeID }}
-        </el-descriptions-item>
-        <el-descriptions-item label="值">
-          {{ formData.value }}
-        </el-descriptions-item>
-        <el-descriptions-item label="机器ID">
-          {{ formData.machineID }}
-        </el-descriptions-item>
-      </el-descriptions>
-    </el-drawer>
     <br>
+    <br>
+    <!--    <div class="gva-search-box">-->
+    <!--      <el-form-->
+    <!--        ref="elSearchFormRef"-->
+    <!--        :inline="true"-->
+    <!--        :model="searchInfo"-->
+    <!--        class="demo-form-inline"-->
+    <!--        :rules="searchRule"-->
+    <!--        @keyup.enter="onSubmit"-->
+    <!--      >-->
+    <!--        <el-form-item-->
+    <!--          label="创建日期"-->
+    <!--          prop="createdAt"-->
+    <!--        >-->
+    <!--          <template #label>-->
+    <!--            <span>-->
+    <!--              创建日期-->
+    <!--              <el-tooltip content="搜索范围是开始日期（包含）至结束日期（不包含）">-->
+    <!--                <el-icon><QuestionFilled /></el-icon>-->
+    <!--              </el-tooltip>-->
+    <!--            </span>-->
+    <!--          </template>-->
+    <!--          <el-date-picker-->
+    <!--            v-model="searchInfo.startCreatedAt"-->
+    <!--            type="datetime"-->
+    <!--            placeholder="开始日期"-->
+    <!--            :disabled-date="time=> searchInfo.endCreatedAt ? time.getTime() > searchInfo.endCreatedAt.getTime() : false"-->
+    <!--          />-->
+    <!--          —-->
+    <!--          <el-date-picker-->
+    <!--            v-model="searchInfo.endCreatedAt"-->
+    <!--            type="datetime"-->
+    <!--            placeholder="结束日期"-->
+    <!--            :disabled-date="time=> searchInfo.startCreatedAt ? time.getTime() < searchInfo.startCreatedAt.getTime() : false"-->
+    <!--          />-->
+    <!--        </el-form-item>-->
+
+    <!--        <el-form-item>-->
+    <!--          <el-button-->
+    <!--            type="primary"-->
+    <!--            icon="search"-->
+    <!--            @click="onSubmit"-->
+    <!--          >查询</el-button>-->
+    <!--          <el-button-->
+    <!--            icon="refresh"-->
+    <!--            @click="onReset"-->
+    <!--          >重置</el-button>-->
+    <!--        </el-form-item>-->
+    <!--      </el-form>-->
+    <!--    </div>-->
+    <!--    <div class="gva-table-box">-->
+    <!--      <div class="gva-btn-list">-->
+    <!--        <el-button-->
+    <!--          type="primary"-->
+    <!--          icon="plus"-->
+    <!--          @click="openDialog"-->
+    <!--        >新增</el-button>-->
+    <!--        <el-button-->
+    <!--          icon="delete"-->
+    <!--          style="margin-left: 10px;"-->
+    <!--          :disabled="!multipleSelection.length"-->
+    <!--          @click="onDelete"-->
+    <!--        >删除</el-button>-->
+    <!--      </div>-->
+    <!--      <el-table-->
+    <!--        ref="multipleTable"-->
+    <!--        style="width: 100%"-->
+    <!--        tooltip-effect="dark"-->
+    <!--        :data="tableData"-->
+    <!--        row-key="ID"-->
+    <!--        @selection-change="handleSelectionChange"-->
+    <!--      >-->
+    <!--        <el-table-column-->
+    <!--          type="selection"-->
+    <!--          width="55"-->
+    <!--        />-->
+
+    <!--        <el-table-column-->
+    <!--          align="left"-->
+    <!--          label="日期"-->
+    <!--          width="180"-->
+    <!--        >-->
+    <!--          <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>-->
+    <!--        </el-table-column>-->
+
+    <!--        <el-table-column-->
+    <!--          align="left"-->
+    <!--          label="数据类型"-->
+    <!--          width="120"-->
+    <!--        >-->
+    <!--          <template #default="scope">-->
+    <!--            {{ dataTypeMap[scope.row.dataTypeID.toString()] }}-->
+    <!--          </template>-->
+    <!--        </el-table-column>-->
+    <!--        <el-table-column-->
+    <!--          align="left"-->
+    <!--          label="值"-->
+    <!--          prop="value"-->
+    <!--          width="120"-->
+    <!--        />-->
+    <!--        <el-table-column-->
+    <!--          align="left"-->
+    <!--          label="机器ID"-->
+    <!--          prop="machineID"-->
+    <!--          width="120"-->
+    <!--        />-->
+    <!--        <el-table-column-->
+    <!--          align="left"-->
+    <!--          label="操作"-->
+    <!--          fixed="right"-->
+    <!--          min-width="240"-->
+    <!--        >-->
+    <!--          <template #default="scope">-->
+    <!--            <el-button-->
+    <!--              type="primary"-->
+    <!--              link-->
+    <!--              class="table-button"-->
+    <!--              @click="getDetails(scope.row)"-->
+    <!--            >-->
+    <!--              <el-icon style="margin-right: 5px"><InfoFilled /></el-icon>-->
+    <!--              查看详情-->
+    <!--            </el-button>-->
+    <!--            <el-button-->
+    <!--              type="primary"-->
+    <!--              link-->
+    <!--              icon="edit"-->
+    <!--              class="table-button"-->
+    <!--              @click="updateDataFunc(scope.row)"-->
+    <!--            >变更</el-button>-->
+    <!--            <el-button-->
+    <!--              type="primary"-->
+    <!--              link-->
+    <!--              icon="delete"-->
+    <!--              @click="deleteRow(scope.row)"-->
+    <!--            >删除</el-button>-->
+    <!--          </template>-->
+    <!--        </el-table-column>-->
+    <!--      </el-table>-->
+    <!--      <div class="gva-pagination">-->
+    <!--        <el-pagination-->
+    <!--          layout="total, sizes, prev, pager, next, jumper"-->
+    <!--          :current-page="page"-->
+    <!--          :page-size="pageSize"-->
+    <!--          :page-sizes="[10, 30, 50, 100]"-->
+    <!--          :total="total"-->
+    <!--          @current-change="handleCurrentChange"-->
+    <!--          @size-change="handleSizeChange"-->
+    <!--        />-->
+    <!--      </div>-->
+    <!--    </div>-->
+    <!--    <el-drawer-->
+    <!--      v-model="dialogFormVisible"-->
+    <!--      size="800"-->
+    <!--      :show-close="false"-->
+    <!--      :before-close="closeDialog"-->
+    <!--    >-->
+    <!--      <template #title>-->
+    <!--        <div class="flex justify-between items-center">-->
+    <!--          <span class="text-lg">{{ type==='create'?'添加':'修改' }}</span>-->
+    <!--          <div>-->
+    <!--            <el-button-->
+    <!--              type="primary"-->
+    <!--              @click="enterDialog"-->
+    <!--            >确 定</el-button>-->
+    <!--            <el-button @click="closeDialog">取 消</el-button>-->
+    <!--          </div>-->
+    <!--        </div>-->
+    <!--      </template>-->
+
+    <!--      <el-form-->
+    <!--        ref="elFormRef"-->
+    <!--        :model="formData"-->
+    <!--        label-position="top"-->
+    <!--        :rules="rule"-->
+    <!--        label-width="80px"-->
+    <!--      >-->
+    <!--        <el-form-item-->
+    <!--          label="数据类型:"-->
+    <!--          prop="dataTypeID"-->
+    <!--        >-->
+    <!--          <el-input-->
+    <!--            v-model.number="formData.dataTypeID"-->
+    <!--            :clearable="true"-->
+    <!--            placeholder="请输入数据类型"-->
+    <!--          />-->
+    <!--        </el-form-item>-->
+    <!--        <el-form-item-->
+    <!--          label="值:"-->
+    <!--          prop="value"-->
+    <!--        >-->
+    <!--          <el-input-number-->
+    <!--            v-model="formData.value"-->
+    <!--            style="width:100%"-->
+    <!--            :precision="2"-->
+    <!--            :clearable="true"-->
+    <!--          />-->
+    <!--        </el-form-item>-->
+    <!--        <el-form-item-->
+    <!--          label="机器ID:"-->
+    <!--          prop="machineID"-->
+    <!--        >-->
+    <!--          <el-input-->
+    <!--            v-model.number="formData.machineID"-->
+    <!--            :clearable="true"-->
+    <!--            placeholder="请输入机器ID"-->
+    <!--          />-->
+    <!--        </el-form-item>-->
+    <!--      </el-form>-->
+    <!--    </el-drawer>-->
+
+    <!--    <el-drawer-->
+    <!--      v-model="detailShow"-->
+    <!--      size="800"-->
+    <!--      :before-close="closeDetailShow"-->
+    <!--      title="查看详情"-->
+    <!--      destroy-on-close-->
+    <!--    >-->
+    <!--      <template #title>-->
+    <!--        <div class="flex justify-between items-center">-->
+    <!--          <span class="text-lg">查看详情</span>-->
+    <!--        </div>-->
+    <!--      </template>-->
+    <!--      <el-descriptions-->
+    <!--        :column="1"-->
+    <!--        border-->
+    <!--      >-->
+    <!--        <el-descriptions-item label="数据类型">-->
+    <!--          {{ formData.dataTypeID }}-->
+    <!--        </el-descriptions-item>-->
+    <!--        <el-descriptions-item label="值">-->
+    <!--          {{ formData.value }}-->
+    <!--        </el-descriptions-item>-->
+    <!--        <el-descriptions-item label="机器ID">-->
+    <!--          {{ formData.machineID }}-->
+    <!--        </el-descriptions-item>-->
+    <!--      </el-descriptions>-->
+    <!--    </el-drawer>-->
+    <!--    <br>-->
 
     <div class="filter-box">
       <el-form
@@ -296,7 +385,7 @@
             filterable
             collapse-tags
             placeholder="选择机器"
-            style="width: 200px;"
+            style="width: 150px;"
             @change="handleMachinesChange"
           >
             <el-option
@@ -315,18 +404,69 @@
         </el-form-item>
       </el-form>
     </div>
+<!--        <div-->
+<!--          v-for="config in chartConfigs"-->
+<!--          :id="config.id"-->
+<!--          :key="config.id"-->
+<!--          style="width: 1200px; height: 500px;"-->
+<!--        />-->
+    <!-- 布局选择器 -->
+    <el-select v-model="selectedLayout" placeholder="选择布局" style="width: 200px;" >
+      <el-option label="一行两个" value="double" />
+      <el-option label="一行一个" value="single" />
+    </el-select>
+
+
+
+    <!-- 根据选择的布局调整列 -->
+    <el-row :gutter="20">
+      <el-col
+          v-for="(config, index) in chartConfigs"
+          :key="config.id"
+          :span="selectedLayout === 'double' ? 12 : 24"
+      >
+        <div
+            :id="config.id"
+            style="width: 100%; height: 500px;"
+        />
+      </el-col>
+    </el-row>
+<!--    <div class="chart-container">-->
+<!--      <div class="chart-row" v-for="(row, index) in Math.ceil(chartConfigs.length / 2)" :key="index">-->
+<!--        <div v-for="(config, innerIndex) in chartConfigs.slice(index * 2, (index + 1) * 2)" :id="config.id" :key="innerIndex" class="chart-item" style="width: calc(50% - 10px); height: 500px; margin-right: 20px;">-->
+<!--          &lt;!&ndash; 这里放置你的曲线图表 &ndash;&gt;-->
+<!--          &lt;!&ndash; 每个图表的宽度是50%，减去margin-right的值 &ndash;&gt;-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+
     <!--    <div-->
-    <!--      id="chart"-->
-    <!--      style="width: 800px; height: 300px;"-->
-    <!--    />-->
-    <div
-      v-for="config in chartConfigs"
-      :id="config.id"
-      :key="config.id"
-      style="width: 800px; height: 500px;"
-    />
+<!--      v-for="config in chartConfigs"-->
+<!--      :id="config.id"-->
+<!--      :key="config.id"-->
+<!--      style="width: 700px;height: 500px"-->
+<!--    />-->
+    <br>
+<!--    <el-radio-group v-model="layout" size="small">-->
+<!--      <el-radio label="single">一行一个图表</el-radio>-->
+<!--      <el-radio label="double">一行两个图表</el-radio>-->
+<!--    </el-radio-group>-->
     <br>
     <br>
+<!--    <div class="chart-container">-->
+<!--      <el-space>-->
+<!--        <div-->
+<!--          v-for="(config, index) in chartConfigs"-->
+<!--          :key="config.id"-->
+<!--          :id="config.id"-->
+<!--          class="chart-item"-->
+<!--          :style="{ width: getChartWidth() + '%', height: '150px' }"-->
+<!--        >-->
+<!--          &lt;!&ndash; 这里放置您的曲线图表 &ndash;&gt;-->
+<!--        </div>-->
+<!--      </el-space>-->
+<!--    </div>-->
+
   </div>
 
 </template>
@@ -342,6 +482,7 @@ import {
   getData,
 } from '@/api/data'
 import { getMachineList } from '@/api/machine'
+import lineCharts from './dataCenterComponents/lineCharts.vue'
 
 // 全量引入格式化工具 请按需保留
 import { getDictFunc, formatDate, formatBoolean, filterDict, ReturnArrImg, onDownloadFile } from '@/utils/format'
@@ -352,51 +493,487 @@ import { nextTick } from 'vue'
 defineOptions({
   name: 'Data'
 })
-
+import * as d3 from 'd3' // 使用ES模块导入方式
 import { onMounted } from 'vue' // 使用Vue 3提供的onMounted函数
 import * as echarts from 'echarts'
 import { getDataTypeList } from '@/api/dataType'
-import {timestamp} from "@vueuse/core"; // 导入echarts库
-
+import { timestamp } from '@vueuse/core'
+import CenterCard from '@/view/dataCenter/dataCenterComponents/centerCard.vue'
+import ReclaimMileage from '@/view/dataCenter/dataCenterComponents/ReclaimMileage.vue'
+import Order from '@/view/dataCenter/dataCenterComponents/order.vue'
+import RecoveryRate from '@/view/dataCenter/dataCenterComponents/RecoveryRate.vue'
+import ChainRatio from '@/view/dataCenter/dataCenterComponents/chainRatio.vue'
+import part from '../dataCenter/dataCenterComponents/part.vue'
+import { FALSE } from 'sass'
+import colors from 'tailwindcss/colors' // 导入echarts库
+import { computed } from 'vue';
 onMounted(() => {
   // getData123()
   // renderChart()
 })
+const startColor = '#75BFA5' // 起始颜色
+const endColor = '#FFA500' // 结束颜色
+const colorCount = 0 // 需要的颜色数量
+
+
+const selectedLayout = ref(); // 默认值
+
+// 计算属性，用于显示当前布局的描述文本
+const currentLayoutText = computed(() => {
+  return selectedLayout.value === 'double' ? '一行两个' : '一行一个';
+});
+
+function interpolateColor(startColor, endColor, colorCount) {
+  const colorInterpolator = d3.interpolate(startColor, endColor)
+  const colorScale = d3.scaleLinear().domain([0, colorCount - 1]).range([0, 1])
+
+  const colors = []
+  for (let i = 0; i < colorCount; i++) {
+    const t = colorScale(i)
+    const interpolatedColor = colorInterpolator(t)
+    colors.push(interpolatedColor)
+  }
+
+  return colors
+}
+
+
+const getChartsPerRow = computed(() => {
+  return layout.value === 'single' ? 1 : 2; // 如果是单行，返回1；如果是两行，返回2
+});
+
+// 根据布局类型获取图表容器的宽度
+const getChartWidth = computed(() => {
+  return 800 / getChartsPerRow.value; // 计算每个图表容器的宽度
+});
 
 function renderCharts() {
   chartConfigs.value.forEach(config => {
     // echarts.dispose(document.getElementById(config.id))
-    const chart = echarts.init(document.getElementById(config.id), 'light', { width: 600, height: 400 })
+    const chart = echarts.init(document.getElementById(config.id), 'light')
+    const colors = interpolateColor(startColor, endColor, config.data.length)
+    console.log(config.data)
     chart.setOption({
       title: {
         text: config.title,
         left: 'center',
         top: '10px'
       },
-      legend: {
-        data: config.data.map(series => series),
-        right: 20, // 调整图例到右边的距离
-        top: 20, // 调整图例到顶部的距离// 根据配置的数据动态生成 legend 数据
+      backgroundColor: 'transparent',
+      tooltip: {
+        trigger: 'axis',
+        backgroundColor: 'transparent',
       },
+      legend: {
+        align: 'left',
+        right: '5%',
+        top: '0%',
+        type: 'plain',
+        itemGap: 25,
+        itemWidth: 20,
+        // icon: 'path://M0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z',
+        data: config.data.map((series, index) => ({
+          name: series.name,
+          textStyle: {
+            color: colors[index], // 使用相应的颜色
+          },
+        })),
+      },
+      // legend: {
+      //   data: config.data.map(series => series),
+      //   right: 20, // 调整图例到右边的距离
+      //   top: 20, // 调整图例到顶部的距离// 根据配置的数据动态生成 legend 数据
+      // },
       xAxis: {
         type: 'time',
         // data: globalTimeList,
+        boundaryGap: false,
+        axisLine: {
+          // 坐标轴轴线相关设置。数学上的x轴
+          show: false,
+          lineStyle: {
+            color: '#e1e1e1',
+          },
+        },
+        axisLabel: {
+          // 坐标轴刻度标签的相关设置
+          textStyle: {
+            color: '#92969E',
+          },
+          // formatter: function(data) {
+          //   return data
+          // },
+        },
+        splitLine: {
+          show: false,
+          lineStyle: {
+            color: '#192a44',
+          },
+        },
+        axisTick: {
+          show: false,
+        },
       },
       yAxis: {
         type: 'value',
+        nameTextStyle: {
+          color: '#777',
+        },
+        min: 0,
+        splitLine: {
+          show: true,
+          lineStyle: {
+            color: '#e1e1e1',
+          },
+        },
+        axisLine: {
+          show: false,
+        },
+        axisLabel: {
+          show: true,
+          textStyle: {
+            color: '#92969E',
+          },
+        },
+        axisTick: {
+          show: false,
+        },
         // max: 10 // 设置y轴最大值为100
       },
       // 其他配置项
     })
     // 渲染图表数据
     chart.setOption({
-      series: config.data.map(series => ({
+      series: config.data.map((series, index) => ({
         type: 'line',
         name: series.name,
         data: series.data.map(item => [item.time, item.value]),
+        symbol: 'circle', // 默认是空心圆（中间是白色的），改成实心圆
+        showAllSymbol: true,
+        symbolSize: 0,
+        smooth: true,
+        lineStyle: {
+          normal: {
+            width: 2,
+            color: colors[index], // 线条颜色
+          },
+        },
+        itemStyle: {
+          color: colors[index], // 使用相应的颜色
+        },
+        // areaStyle: {
+        //   // 区域填充样式
+        //   normal: {
+        //     color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+        //       {
+        //         offset: 0,
+        //         color: 'rgba(50, 216, 205, .8)'
+        //       },
+        //       {
+        //         offset: 1,
+        //         color: 'rgba(255, 255, 255, 0.2)'
+        //       }
+        //     ], false),
+        //     shadowColor: 'rgba(117,191,165,0.52)', // 阴影颜色
+        //     shadowBlur: 3,
+        //   },
+        // },
+        areaStyle: {
+          normal: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              {
+                offset: 0,
+                color: colors[index], // 使用相应的颜色
+              },
+              {
+                offset: 1,
+                color: 'rgba(255, 255, 255, 0.2)',
+              }
+            ], false),
+            shadowColor: 'rgba(117,191,165,0.52)',
+            shadowBlur: 3,
+          },
+        },
         // 其他配置...
       }))
     })
+  })
+}
+
+function init_charts() {
+  const config = initialCharts.value[0]
+  // echarts.dispose(document.getElementById(config.id))
+  echarts.dispose(document.getElementById('chart'))
+  const chart = echarts.init(document.getElementById('chart'), 'light')
+  const colors = interpolateColor(startColor, endColor, config.data.length)
+  chart.setOption({
+    title: {
+      text: config.title,
+      left: 'center',
+      top: '10px'
+    },
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: 'transparent',
+    },
+    legend: {
+      align: 'left',
+      right: '5%',
+      top: '0%',
+      type: 'plain',
+      itemGap: 25,
+      itemWidth: 20,
+      // icon: 'path://M0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z',
+      data: config.data.map((series, index) => ({
+        name: series.name,
+        textStyle: {
+          color: colors[index], // 使用相应的颜色
+        },
+      })),
+    },
+    // legend: {
+    //   data: config.data.map(series => series),
+    //   right: 20, // 调整图例到右边的距离
+    //   top: 20, // 调整图例到顶部的距离// 根据配置的数据动态生成 legend 数据
+    // },
+    xAxis: {
+      type: 'time',
+      // data: globalTimeList,
+      boundaryGap: false,
+      axisLine: {
+        // 坐标轴轴线相关设置。数学上的x轴
+        show: false,
+        lineStyle: {
+          color: '#e1e1e1',
+        },
+      },
+      axisLabel: {
+        // 坐标轴刻度标签的相关设置
+        textStyle: {
+          color: '#92969E',
+        },
+        // formatter: function(data) {
+        //   return data
+        // },
+      },
+      splitLine: {
+        show: false,
+        lineStyle: {
+          color: '#192a44',
+        },
+      },
+      axisTick: {
+        show: false,
+      },
+    },
+    yAxis: {
+      type: 'value',
+      nameTextStyle: {
+        color: '#777',
+      },
+      min: 0,
+      splitLine: {
+        show: true,
+        lineStyle: {
+          color: '#e1e1e1',
+        },
+      },
+      axisLine: {
+        show: false,
+      },
+      axisLabel: {
+        show: true,
+        textStyle: {
+          color: '#92969E',
+        },
+      },
+      axisTick: {
+        show: false,
+      },
+      // max: 10 // 设置y轴最大值为100
+    },
+    // 其他配置项
+  })
+  // 渲染图表数据
+  chart.setOption({
+    series: config.data.map((series, index) => ({
+      type: 'line',
+      name: series.name,
+      data: series.data.map(item => [item.time, item.value]),
+      symbol: 'circle', // 默认是空心圆（中间是白色的），改成实心圆
+      showAllSymbol: true,
+      symbolSize: 0,
+      smooth: true,
+      lineStyle: {
+        normal: {
+          width: 2,
+          color: colors[index], // 线条颜色
+        },
+      },
+      itemStyle: {
+        color: colors[index], // 使用相应的颜色
+      },
+      areaStyle: {
+        normal: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            {
+              offset: 0,
+              color: colors[index], // 使用相应的颜色
+            },
+            {
+              offset: 1,
+              color: 'rgba(255, 255, 255, 0.2)',
+            }
+          ], false),
+          shadowColor: 'rgba(117,191,165,0.52)',
+          shadowBlur: 3,
+        },
+      },
+      // 其他配置...
+    }))
+  })
+}
+
+
+
+function init_chart_of_memory() {
+  const config = initialChartsOfMemory.value[0]
+  console.log(initialCharts.value)
+  console.log(initialCharts.value.length)
+  console.log(123123)
+  // echarts.dispose(document.getElementById(config.id))
+  echarts.dispose(document.getElementById('chart1'))
+  const chart = echarts.init(document.getElementById('chart1'), 'light', {
+    height: '240px'
+  })
+  const colors = interpolateColor(startColor, endColor, config.data.length)
+  chart.setOption({
+    title: {
+      text: config.title,
+      left: 'center',
+      top: '10px'
+    },
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: 'transparent',
+    },
+    legend: {
+      align: 'left',
+      right: '5%',
+      top: '0%',
+      type: 'plain',
+      itemGap: 25,
+      itemWidth: 20,
+      // icon: 'path://M0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z',
+      data: config.data.map((series, index) => ({
+        name: series.name,
+        textStyle: {
+          color: colors[index], // 使用相应的颜色
+        },
+      })),
+    },
+    // legend: {
+    //   data: config.data.map(series => series),
+    //   right: 20, // 调整图例到右边的距离
+    //   top: 20, // 调整图例到顶部的距离// 根据配置的数据动态生成 legend 数据
+    // },
+    xAxis: {
+      type: 'time',
+      // data: globalTimeList,
+      boundaryGap: false,
+      axisLine: {
+        // 坐标轴轴线相关设置。数学上的x轴
+        show: false,
+        lineStyle: {
+          color: '#e1e1e1',
+        },
+      },
+      axisLabel: {
+        // 坐标轴刻度标签的相关设置
+        textStyle: {
+          color: '#92969E',
+        },
+        // formatter: function(data) {
+        //   return data
+        // },
+      },
+      splitLine: {
+        show: false,
+        lineStyle: {
+          color: '#192a44',
+        },
+      },
+      axisTick: {
+        show: false,
+      },
+    },
+    yAxis: {
+      type: 'value',
+      nameTextStyle: {
+        color: '#777',
+      },
+      min: 0,
+      splitLine: {
+        show: true,
+        lineStyle: {
+          color: '#e1e1e1',
+        },
+      },
+      axisLine: {
+        show: false,
+      },
+      axisLabel: {
+        show: true,
+        textStyle: {
+          color: '#92969E',
+        },
+      },
+      axisTick: {
+        show: false,
+      },
+      // max: 10 // 设置y轴最大值为100
+    },
+    // 其他配置项
+  })
+  // 渲染图表数据
+  chart.setOption({
+    series: config.data.map((series, index) => ({
+      type: 'line',
+      name: series.name,
+      data: series.data.map(item => [item.time, item.value]),
+      symbol: 'circle', // 默认是空心圆（中间是白色的），改成实心圆
+      showAllSymbol: true,
+      symbolSize: 0,
+      smooth: true,
+      lineStyle: {
+        normal: {
+          width: 2,
+          color: colors[index], // 线条颜色
+        },
+      },
+      itemStyle: {
+        color: colors[index], // 使用相应的颜色
+      },
+      areaStyle: {
+        normal: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            {
+              offset: 0,
+              color: colors[index], // 使用相应的颜色
+            },
+            {
+              offset: 1,
+              color: 'rgba(255, 255, 255, 0.2)',
+            }
+          ], false),
+          shadowColor: 'rgba(117,191,165,0.52)',
+          shadowBlur: 3,
+        },
+      },
+      // 其他配置...
+    }))
   })
 }
 
@@ -854,29 +1431,42 @@ const handleSubmit = () => {
   // 根据筛选条件请求数据并更新图表
   // fetchDataAndRenderChart(startTime, endTime, dataType, machines)
 }
+const initialDataTypes = ref( ['2857619455','301978823']) //cpu-percent,memory-percent,disk-percent //,'3019788237','2963749463'
 const data2 = ref({
-  machine_ids: ['1'],
-  data_type_id: '1',
-  start_time: '2024-04-16 02:00:33', // 使用格式化的开始时间间
-  end_time: '2024-04-16 02:02:33', // 使用格式化的当前时间作为结束时
+  machine_ids: [],
+  data_type_id: '2857619455',
+  start_time: '2024-04-28 00:00:33', // 使用格式化的开始时间间
+  end_time: '2024-04-29 00:00:33', // 使用格式化的当前时间作为结束时
   // start_time: '',
   // end_time: '',
 
 })
+
+const data3 = ref({
+  machine_ids: [],
+  data_type_id: '2857619455',
+  start_time: '2024-04-28 00:00:33', // 使用格式化的开始时间间
+  end_time: '2024-04-29 00:00:33', // 使用格式化的当前时间作为结束时
+  // start_time: '',
+  // end_time: '',
+})
+const datalist = ref ([])
 const data1 = ref({
   machine_ids: ['1'],
   data_type_id: '1',
-  start_time: '2024-04-16 02:00:33', // 使用格式化的开始时间间
-  end_time: '2024-04-16 02:00:43', // 使用格式化的当前时间作为结束时
+  start_time: '2024-04-28 02:00:33', // 使用格式化的开始时间间
+  end_time: '2024-04-30 02:00:43', // 使用格式化的当前时间作为结束时
   // start_time: '',
   // end_time: '',
 
 })
-
 
 const globalTimeList = []
 const globalValuesList = []
 const chartConfigs = ref([])
+const initialCharts = ref([])
+const initialChartsOfMemory = ref([])
+const flag1 = ref(false)
 const getData123 = async() => {
   // 获取当前时间的Date对象
   // const endTime = new Date()
@@ -889,19 +1479,92 @@ const getData123 = async() => {
   // console.log(data1.value.end_time)
   // 打开弹窗
   chartConfigs.value.length = 0
-  for (const i in filterForm.value.dataType) {
+    for (const i in filterForm.value.dataType) {
+      console.log(1111)
+      console.log(filterForm.value.dataType)
+      data1.value.data_type_id = filterForm.value.dataType[i].toString()
+      const res = await getData(data1.value)
+      if (res.code === 0) {
+        // ElMessage({
+        //   type: 'success',
+        //   message: '成功'
+        // })
+        responseData.value = res.data
+        const time_dic = {}
+        const seriesData = []
+        for (const key in responseData.value) {
+          time_dic[key] = []
+          // val_dic[key] = []
+          console.log(responseData.value)
+          console.log(key)
+          responseData.value[key].forEach(item => {
+            time_dic[key].push({ time: formatDate(item.CreatedAt), value: item.value })
+          })
+          console.log(time_dic[key])
+          console.log(key)
+          seriesData.push({ name: machineMap[key], data: time_dic[key] })
+          console.log(seriesData)
+          console.log(time_dic[key])
+        }
+        chartConfigs.value.push({
+          id: filterForm.value.dataType[i].toString(),
+          title: dataTypeMap[filterForm.value.dataType[i]],
+          data: seriesData
+        })
+        // globalTimeList.length = 0 // 清空时间列表数组
+        // globalValuesList.length = 0 // 清空数值列表数组
+        // globalTimeList.push(...time)
+        // globalValuesList.push(...values)
+      }
+    }
+
+  console.log(chartConfigs.value)
+  nextTick(() => {
+    // 在 DOM 更新完成后执行绘制图表的操作
+    console.log(initialDataTypes)
+    renderCharts()
+  })
+}
+
+const getInitialData = async() => {
+  // 获取当前时间的Date对象
+  // const endTime = new Date()
+  //
+  // console.log(formatDate(searchInfo.value.startCreatedAt))
+  // if (searchInfo.value.startCreatedAt && searchInfo.value.endCreatedAt) {
+  //   data1.value.start_time = formatDate(searchInfo.value.startCreatedAt)
+  //   data1.value.end_time = formatDate(searchInfo.value.endCreatedAt)
+  // }
+  // console.log(data1.value.end_time)
+  // 打开弹窗
+  initialCharts.value.length = 0
+
+  const endTime = new Date().toISOString()
+  // 设置 startTime 为 endTime 的前一个小时
+  const startTime = new Date(new Date(endTime).getTime() - 10 * 60 * 1000)
+  const startTimeISOString = startTime.toISOString()
+  data2.value.end_time = formatDate(endTime)
+  data2.value.start_time = formatDate(startTimeISOString)
+  //machine
+  const machineIDs = []
+  machines.value.forEach(item => {
+    machineIDs.push(item.id.toString())
+  })
+  data2.value.machine_ids = machineIDs
+  //time
+  // request
+  for (const i in initialDataTypes.value) {
     console.log(1111)
-    console.log(filterForm.value.dataType[i])
-    data1.value.data_type_id = filterForm.value.dataType[i].toString()
-    const res = await getData(data1.value)
+    console.log(initialDataTypes.value.dataType)
+    data2.value.data_type_id = initialDataTypes.value[i]
+    const res = await getData(data2.value)
     if (res.code === 0) {
       // ElMessage({
       //   type: 'success',
       //   message: '成功'
       // })
       responseData.value = res.data
-      const time_dic = {
-      }
+      const time_dic = {}
       const seriesData = []
       for (const key in responseData.value) {
         time_dic[key] = []
@@ -917,21 +1580,192 @@ const getData123 = async() => {
         console.log(seriesData)
         console.log(time_dic[key])
       }
-      chartConfigs.value.push({ id: filterForm.value.dataType[i].toString(), title: dataTypeMap[filterForm.value.dataType[i]], data: seriesData })
+      initialCharts.value.push({
+        id: initialDataTypes.value[i],
+        title: dataTypeMap[initialDataTypes.value[i]],
+        data: seriesData
+      })
       // globalTimeList.length = 0 // 清空时间列表数组
       // globalValuesList.length = 0 // 清空数值列表数组
       // globalTimeList.push(...time)
       // globalValuesList.push(...values)
     }
   }
+
   console.log(chartConfigs.value)
   nextTick(() => {
     // 在 DOM 更新完成后执行绘制图表的操作
-    renderCharts()
+    console.log(initialDataTypes)
+    // init_charts()
   })
 }
-const machineMap = []
 
+
+// const getData1234 = async() => {
+//   initialCharts.value.length = 0
+//   if (!flag1.value) {
+//     const machineIDs = []
+//     machines.value.forEach(item => {
+//       machineIDs.push(item.id.toString())
+//     })
+//     data2.value.data_type_id = '2857619455'
+//     data2.value.machine_ids = machineIDs
+//     const endTime = new Date().toISOString()
+//     // 设置 startTime 为 endTime 的前一个小时
+//     const startTime = new Date(new Date(endTime).getTime() - 10 * 60 * 1000)
+//     const startTimeISOString = startTime.toISOString()
+//     data2.value.end_time = formatDate(endTime)
+//     data2.value.start_time = formatDate(startTimeISOString)
+//     console.log(data2.value.start_time)
+//     data3.value.end_time = formatDate(endTime)
+//     data3.value.start_time = formatDate(startTimeISOString)
+//     console.log(machineIDs)
+//     // data2.value.machine_ids =
+//     console.log(initialDataTypes)
+//     const res = await getData(data2.value)
+//     if (res.code === 0) {
+//       // ElMessage({
+//       //   type: 'success',
+//       //   message: '成功'
+//       // })
+//       responseData.value = res.data
+//       const time_dic = {
+//       }
+//       const seriesData = []
+//       for (const key in responseData.value) {
+//         time_dic[key] = []
+//         // val_dic[key] = []
+//         responseData.value[key].forEach(item => {
+//           time_dic[key].push({ time: formatDate(item.CreatedAt), value: item.value })
+//         })
+//         seriesData.push({ name: machineMap[key], data: time_dic[key] })
+//       }
+//       initialCharts.value.push({ id: data2.value.data_type_id.toString(), title: dataTypeMap[data2.value.data_type_id], data: seriesData })
+//     //   // globalTimeList.length = 0 // 清空时间列表数组
+//     //   // globalValuesList.length = 0 // 清空数值列表数组
+//     //   // globalTimeList.push(...time)
+//     //   // globalValuesList.push(...values)
+//     }
+//     flag1.value = true
+//   }
+//   console.log(initialCharts.value)
+//   nextTick(() => {
+//     // 在 DOM 更新完成后执行绘制图表的操作
+//     console.log(1111)
+//     init_charts()
+//   })
+// }
+
+async function getData1234() {
+  initialCharts.value.length = 0;
+  const machineIDs = machines.value.map(item => item.id.toString());
+  data2.value.data_type_id = '2857619455';
+  data2.value.machine_ids = machineIDs;
+  const endTime = new Date().toISOString();
+  // 设置 startTime 为 endTime 的前十分钟
+  const startTime = new Date(new Date(endTime).getTime() - 10 * 60 * 1000);
+  data2.value.end_time = formatDate(endTime);
+  data2.value.start_time = formatDate(startTime.toISOString());
+  data3.value.end_time = formatDate(endTime);
+  data3.value.start_time = formatDate(startTime.toISOString());
+
+  try {
+    const res = await getData(data2.value);
+    if (res.code === 0) {
+      responseData.value = res.data;
+      const time_dic = {};
+      const seriesData = [];
+      for (const key in responseData.value) {
+        time_dic[key] = [];
+        responseData.value[key].forEach(item => {
+          time_dic[key].push({ time: formatDate(item.CreatedAt), value: item.value });
+        });
+        seriesData.push({ name: machineMap[key], data: time_dic[key] });
+      }
+      initialCharts.value.push({ id: data2.value.data_type_id.toString(), title: dataTypeMap[data2.value.data_type_id], data: seriesData });
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+  nextTick(() => {
+    // 在 DOM 更新完成后执行绘制图表的操作
+    console.log(1111)
+    init_charts()
+  })
+}
+
+let flag2 = { value: false }; // 初始设置 flag1 为 false
+let refreshIntervalId; // 存储 setInterval 返回的 ID
+
+async function startRefresh() {
+  await getData1234(); // 执行一次获取数据和绘制图表的操作
+  flag2.value = true; // 将 flag1 设置为 true
+  refreshIntervalId = setInterval(getData1234, 15000); // 每隔十秒执行一次 getData1234
+}
+
+startRefresh(); // 开始执行定时刷新
+
+// 当需要停止定时刷新时，可以调用 clearInterval(refreshIntervalId);
+
+const getData12345 = async() => {
+  initialChartsOfMemory.value.length = 0
+  if (true) {
+    const machineIDs = []
+    machines.value.forEach(item => {
+      machineIDs.push(item.id.toString())
+    })
+    data3.value.data_type_id = '3019788237'
+    data3.value.machine_ids = machineIDs
+    const endTime = new Date().toISOString();
+    // 设置 startTime 为 endTime 的前十分钟
+    const startTime = new Date(new Date(endTime).getTime() - 10 * 60 * 1000);
+    data3.value.start_time=formatDate(startTime)
+    data3.value.end_time=formatDate(endTime)
+    console.log(machineIDs)
+    // data2.value.machine_ids =
+    console.log(initialDataTypes)
+    try {
+      const res = await getData(data3.value)
+      if (res.code === 0) {
+        // ElMessage({
+        //   type: 'success',
+        //   message: '成功'
+        // })
+        responseData.value = res.data
+        const time_dic = {}
+        const seriesData = []
+        for (const key in responseData.value) {
+          time_dic[key] = []
+          // val_dic[key] = []
+          responseData.value[key].forEach(item => {
+            time_dic[key].push({time: formatDate(item.CreatedAt), value: item.value})
+          })
+          seriesData.push({name: machineMap[key], data: time_dic[key]})
+        }
+        initialChartsOfMemory.value.push({
+          id: data3.value.data_type_id.toString(),
+          title: dataTypeMap[data3.value.data_type_id],
+          data: seriesData
+        })
+        //   // globalTimeList.length = 0 // 清空时间列表数组
+        //   // globalValuesList.length = 0 // 清空数值列表数组
+        //   // globalTimeList.push(...time)
+        //   // globalValuesList.push(...values)
+      }
+      flag1.value = true
+      console.log(initialCharts.value)
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+    nextTick(() => {
+      // 在 DOM 更新完成后执行绘制图表的操作
+      console.log(1111)
+      init_chart_of_memory()
+    })
+  }
+}
+setInterval(getData12345, 15000); // 每隔10秒刷新一次数据
+const machineMap = []
 const getCurrentMachines = async() => {
   const table = await getMachineList({ page: 0, pageSize: 10000 })
   if (table.code === 0) {
@@ -940,12 +1774,19 @@ const getCurrentMachines = async() => {
       id: item.ID.toString(),
       name: item.name
     }))
+    console.log(machines.value)
   }
+  // machineIDs.value.length = 0
   machines.value.forEach(item => {
     machineMap[item.id] = item.name
   })
+  // getInitialData()
+  getData1234()
+  getData12345()
 }
-
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
 getCurrentMachines()
 const dataTypeMap = {}
 const getCurrentDataTypes = async() => {
@@ -961,18 +1802,47 @@ const getCurrentDataTypes = async() => {
   dataTypes.value.forEach(item => {
     dataTypeMap[item.id] = item.name
   })
+
 }
 
 getCurrentDataTypes()
 
+
+
+// renderChart()
+</script>
+
+<script>
+export default {
+  name: 'DataCenter',
+  data() {
+    return {
+      val: [] // 假设 dataArray 是你要传递的数组变量
+    };
+  }
+}
 </script>
 
 <style>
-
-  /* 样式可根据需要自定义 */
-.chart-container {
+.data-center-box{
   width: 100%;
-  height: 400px; /* 图表容器高度 */
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 2fr 1.5fr;
+  column-gap: 10px;
+}
+  /* 样式可根据需要自定义 */
+
+.chart-container {
+  display: flex;
+}
+
+.chart-item {
+  margin-right: 10px; /* 设置曲线之间的间距 */
+}
+
+.chart-content {
+  width: 100%;
+  height: 100%;
 }
 
 </style>
