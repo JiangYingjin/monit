@@ -117,8 +117,9 @@ if args.subcommand == "install":
         print("本机不存在 ~/.ssh/id_rsa.pub 文件，先生成密钥对")
         # 生成密钥对并设置权限
         if system == "Linux":
+            # 如果 {home}/.ssh 目录不存在则创建
             subprocess.check_call(
-                f"mkdir {home}/.ssh && chmod 700 {home}/.ssh && ssh-keygen -t rsa -f {home}/.ssh/id_rsa -N '' && chmod 600 {home}/.ssh/id_rsa",
+                f"mkdir -p {home}/.ssh && chmod 700 {home}/.ssh && ssh-keygen -t rsa -f {home}/.ssh/id_rsa -N '' && chmod 600 {home}/.ssh/id_rsa",
                 shell=True,
             )
         elif system == "Windows":
