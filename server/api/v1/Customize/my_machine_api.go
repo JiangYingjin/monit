@@ -52,7 +52,7 @@ func init() {
 		go UploadTestData(3019788237, 2, 0, 100)
 		go UploadTestData(3019788237, 64, 0, 100)
 		go UploadTestData(3019788237, 3, 0, 100)
-		
+
 		go UploadTestData(2857619455, 1, 0, 100)
 		go UploadTestData(2857619455, 2, 0, 100)
 		go UploadTestData(2857619455, 64, 0, 100)
@@ -260,23 +260,23 @@ func (m *MyMachineApi) SetMachineService(c *gin.Context) {
 
 func (m *MyMachineApi) UpdateMachineService(c *gin.Context) {
 	var machine struct {
-		MachineID uint `json:"machineID" binding:"required"`
-		Services  []struct {
-			Service string `json:"service" binding:"required"`
-			Enable  bool   `json:"enable" binding:"required"`
-		} `json:"services" binding:"required"`
+		MachineID uint           `json:"machineID" binding:"required"`
+		Services  map[string]int `json:"services" binding:"required"`
 	}
 	err := c.ShouldBindJSON(&machine)
 	if err != nil {
+		global.GVA_LOG.Error("接口传入参数错误：", zap.Error(err))
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
 
-	err = global.GVA_DB.Model(&Customize.Machine{}).Where("id = ?", machine.MachineID).Update("service", machine.Services).Error
+	serviceStr, _ := json.Marshal(machine.Services)
+	err = global.GVA_DB.Model(&Customize.Machine{}).Where("id = ?", machine.MachineID).Update("service", string(serviceStr)).Error
 	if err != nil {
 		global.GVA_LOG.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败: "+err.Error(), c)
 	} else {
+		global.GVA_LOG.Error("更新失败")
 		response.OkWithMessage("更新成功", c)
 	}
 }
