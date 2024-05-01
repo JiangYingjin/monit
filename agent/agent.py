@@ -1024,7 +1024,7 @@ net_io.dropout          subtract    网络发送丢包数
 
         # 开始添加的标记
         nginx_conf_reg = r"\n\s*http\s*{"
-        nginx_conf_reg_sub = """
+        nginx_conf_reg_sub = r"""
 http {
 # monit - DO NOT EDIT
 server {

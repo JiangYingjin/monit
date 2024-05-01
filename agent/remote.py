@@ -68,14 +68,7 @@ import paramiko, requests
 
 ssh_client = paramiko.SSHClient()
 ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-try:
-    ssh_client.connect(
-        hostname=args.host,
-        port=args.port,
-        username=args.username,
-        password=args.password,
-    )
-except:
+if args.password:
     ssh_client.connect(
         hostname=args.host,
         port=args.port,
@@ -83,6 +76,18 @@ except:
         password=args.password,
         allow_agent=False,
         look_for_keys=False,
+    )
+
+else:
+    print("尝试无密码登录远程客户端主机 ...")
+    ssh_client.connect(
+        hostname=args.host,
+        port=args.port,
+        username=args.username,
+        # SSH 代理可以使用本地密钥对进行身份验证
+        allow_agent=True,
+        look_for_keys=True,
+        key_filename="/root/.ssh/id_rsa",
     )
 
 
@@ -139,7 +144,7 @@ if args.subcommand == "install":
         print("本机公钥未添加到远程主机，正尝试添加")
         # 安装本机公钥到远程主机
         remote_exec(
-            f'mkdir -p ~/.ssh && chmod 700 ~/.ssh && echo "{pubkey}" >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys'
+            f'mkdir -p ~/.ssh && chmod 700 ~/.ssh && echo "ssh-rsa {pubkey}" >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys'
         )
         print("本机公钥已成功添加到远程主机")
 
