@@ -949,9 +949,10 @@ net_io.dropout          subtract    网络发送丢包数
             headers={"x-token": self.token()},
             json={
                 "MachineID": self._machine_id,
-                "Services": json.dumps(service_status),
+                "Services": service_status,
             },
         )
+        logging.info(r.content.decode())
         logging.info(f"更新服务：{service_status}")
 
         if r.json()["code"] == 7 and r.json()["msg"] == "该数据不存在":
