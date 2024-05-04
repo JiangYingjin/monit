@@ -78,8 +78,6 @@ const formData = ref({
 
 const selectOptions = ref([]);
 
-const templates = ref([]);
-
 const selectProps = {
   multiple: false,
 };
