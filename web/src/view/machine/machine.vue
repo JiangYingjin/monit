@@ -131,6 +131,15 @@
             <el-button
               type="primary"
               link
+              class="table-button"
+              @click="getServiceList(scope.row)"
+            >
+              <el-icon style="margin-right: 5px"><Menu /></el-icon>
+              状态监控
+            </el-button>
+            <el-button
+              type="primary"
+              link
               icon="edit"
               class="table-button"
               @click="updateMachineFunc(scope.row)"
@@ -262,6 +271,66 @@
         </el-descriptions-item>
       </el-descriptions>
     </el-drawer>
+
+    <el-drawer
+      v-model="drawerVisible"
+      title="状态监控"
+      size="800"
+      @close="handleDrawerClose"
+      destroy-on-close
+    >
+      <div class="flex justify-between items-center">
+        <el-select
+          v-model="selectedService"
+          placeholder="请选择服务"
+          :disabled="isSelectDisabled"
+          clearable
+        >
+          <el-option
+            v-for="service in serviceList"
+            :key="service.name"
+            :label="service.name"
+            :value="service.name"
+          >
+            <div class="flex items-center">
+              <span
+                :style="{ backgroundColor: service.isActive ? 'green' : 'red' }"
+                class="dot"
+              ></span>
+              {{ service.name }}
+            </div>
+          </el-option>
+        </el-select>
+        <el-button
+          type="primary"
+          @click="confirmForm"
+          :disabled="isConfirmDisabled"
+        >
+          确定
+        </el-button>
+        <el-button @click="resetForm" :disabled="isResetDisabled">
+          重置
+        </el-button>
+      </div>
+      <el-form v-if="isSelectDisabled" label-position="left">
+        <el-row :gutter="5">
+          <el-col :span="24" v-for="item in templates" :key="item.name">
+            <el-form-item :label="item.repr">
+              <template v-if="item.type === 'bool'">
+                <el-switch v-model="item.value"></el-switch>
+              </template>
+              <template v-else-if="item.type === 'str'">
+                <el-input style="width: 300px" v-model="item.value"></el-input>
+              </template>
+              <template v-else-if="item.type === 'int'">
+                <el-input-number v-model="item.value"></el-input-number>
+              </template>
+            </el-form-item>
+          </el-col>
+          <el-button type="primary" @click="submitForm">确定</el-button>
+        </el-row>
+      </el-form>
+    </el-drawer>
   </div>
 </template>
 
@@ -273,6 +342,7 @@ import {
   updateMachine,
   findMachine,
   getMachineList,
+  setMachineService,
 } from "@/api/machine";
 
 // 全量引入格式化工具 请按需保留
@@ -300,6 +370,128 @@ const formData = ref({
   status: false,
   service: "",
 });
+
+const drawerVisible = ref(false);
+const isSelectDisabled = ref(false);
+const isConfirmDisabled = ref(false);
+const isResetDisabled = ref(true);
+const selectedService = ref(null);
+const serviceList = ref([]);
+const currentMachineID = ref(null);
+
+const getServiceList = async (row) => {
+  currentMachineID.value = row.ID;
+  const res = await findMachine({ ID: row.ID });
+  if (res.code === 0) {
+    serviceList.value = Object.entries(
+      JSON.parse(res.data.remachine.service)
+    ).map(([name, status]) => ({
+      name,
+      isActive: status === 1,
+    }));
+    if (serviceList.value.length == 0)
+      ElMessage.error("您选择的机器当前不支持任何服务，请重新选择！");
+    else {
+      // console.log(serviceList.value);
+      drawerVisible.value = true;
+    }
+  }
+};
+
+function confirmForm() {
+  if (typeof selectedService.value !== "string") {
+    ElMessage.error("请选择服务！");
+  } else {
+    // console.log("confirm成功");
+    isSelectDisabled.value = true;
+    isConfirmDisabled.value = true;
+    isResetDisabled.value = false;
+    getServiceTemplate(selectedService.value);
+  }
+}
+
+import { getServiceTemplateList } from "@/api/serviceTemplate";
+
+const templates = ref([]);
+
+const getServiceTemplate = async (serviceName) => {
+  const res = await getServiceTemplateList({});
+  if (res.code === 0) {
+    const serviceTemplateInfo = res.data.list;
+    generateTemplates(serviceTemplateInfo, serviceName);
+  }
+};
+
+function generateTemplates(serviceTemplateInfo, targetService) {
+  serviceTemplateInfo.forEach((item) => {
+    const { service, template } = item;
+    if (service === targetService) {
+      templates.value = JSON.parse(template).map((option) => {
+        const { default: defaultValue, ...rest } = option;
+        let value = defaultValue;
+
+        if (rest.type === "bool") {
+          value = Boolean(defaultValue);
+        }
+
+        return { ...rest, value };
+      });
+      // console.log(templates.value);
+    }
+  });
+}
+
+function resetForm() {
+  // console.log("reset成功");
+  isSelectDisabled.value = false;
+  isConfirmDisabled.value = false;
+  isResetDisabled.value = true;
+  selectedService.value = null;
+  templates.value = [];
+}
+
+function submitForm() {
+  // console.log("submit成功");
+  ElMessage.success("提交成功");
+  const result = {
+    machineID: currentMachineID.value,
+    services: {
+      [selectedService.value]: Object.keys(templates.value).map((index) => ({
+        name: templates.value[index].name,
+        type: templates.value[index].type,
+        value:
+          templates.value[index].type === "bool"
+            ? templates.value[index].value
+              ? "1"
+              : "0"
+            : templates.value[index].value.toString(),
+      })),
+    },
+  };
+  console.log(result);
+  updateMachineServiceFunc(result);
+}
+
+const updateMachineServiceFunc = async (data) => {
+  const res = await setMachineService({ data });
+  console.log(res);
+  if (res.code === 0) {
+    ElMessage.success("更新成功");
+  } else {
+    ElMessage.error("更新失败");
+  }
+};
+
+const handleDrawerClose = () => {
+  drawerVisible.value = false;
+  isSelectDisabled.value = false;
+  isConfirmDisabled.value = false;
+  isResetDisabled.value = true;
+  selectedService.value = null;
+  currentMachineID.value = null;
+  templates.value = [];
+  serviceList.value = [];
+};
 
 // 验证规则
 const rule = reactive({
@@ -435,7 +627,6 @@ const getTableData = async () => {
     total.value = table.data.total;
     page.value = table.data.page;
     pageSize.value = table.data.pageSize;
-    console.log(tableData.value);
   }
 };
 
@@ -608,4 +799,12 @@ const enterDialog = async () => {
 };
 </script>
 
-<style></style>
+<style>
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+</style>
