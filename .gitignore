@@ -2,6 +2,10 @@
 /web/node_modules
 /web/dist
 
+/server/___1linux_linux
+/server/___linux_linux
+/server/___2linux_linux
+
 .DS_Store
 
 # local env files

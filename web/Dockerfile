@@ -3,13 +3,17 @@ FROM node:16
 WORKDIR /gva_web/
 COPY . .
 
-RUN yarn && yarn build
+ENV NODE_ENV=dev
+RUN npm config set registry http://mirrors.cloud.tencent.com/npm/
+RUN npm install
+#RUN npm install \
+#    && npm install -g serve \
+#    && npm run build \
+#    && rm -fr node_modules
 
-FROM nginx:alpine
-LABEL MAINTAINER="SliverHorn@sliver_horn@qq.com"
+EXPOSE 8080
 
-COPY .docker-compose/nginx/conf.d/my.conf /etc/nginx/conf.d/my.conf
-COPY --from=0 /gva_web/dist /usr/share/nginx/html
-RUN cat /etc/nginx/nginx.conf
-RUN cat /etc/nginx/conf.d/my.conf
-RUN ls -al /usr/share/nginx/html
+#CMD [ "serve", "-s", "build" ]
+#CMD [ "npm", "run", "serve" ]
+CMD npm run serve -- --host 0.0.0.0
+

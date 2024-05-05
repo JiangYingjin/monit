@@ -97,7 +97,7 @@ func Routers() *gin.Engine {
 		CustomizeRouter.InitDataTypeRouter(PrivateGroup)
 
 		CustomizeRouter.InitServiceTemplateRouter(PrivateGroup)
-		CustomizeRouter.InitMachineRouter(PrivateGroup)
+		CustomizeRouter.InitMachineRouter(PublicGroup)
 
 	}
 

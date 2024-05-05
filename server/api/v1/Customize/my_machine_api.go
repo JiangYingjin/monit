@@ -48,20 +48,20 @@ func init() {
 	go func() {
 		time.Sleep(10 * time.Second)
 
-		go UploadTestData(3019788237, 1, 0, 100)
-		go UploadTestData(3019788237, 2, 0, 100)
-		go UploadTestData(3019788237, 64, 0, 100)
-		go UploadTestData(3019788237, 3, 0, 100)
-
-		go UploadTestData(2857619455, 1, 0, 100)
-		go UploadTestData(2857619455, 2, 0, 100)
-		go UploadTestData(2857619455, 64, 0, 100)
-		go UploadTestData(2857619455, 3, 0, 100)
-
-		go UploadTestData(2963749463, 1, 0, 40)
-		go UploadTestData(2963749463, 2, 0, 40)
-		go UploadTestData(2963749463, 64, 0, 40)
-		go UploadTestData(2963749463, 3, 0, 40)
+		//go UploadTestData(3019788237, 1, 0, 100)
+		//go UploadTestData(3019788237, 2, 0, 100)
+		//go UploadTestData(3019788237, 64, 0, 100)
+		//go UploadTestData(3019788237, 3, 0, 100)
+		//
+		//go UploadTestData(2857619455, 1, 0, 100)
+		//go UploadTestData(2857619455, 2, 0, 100)
+		//go UploadTestData(2857619455, 64, 0, 100)
+		//go UploadTestData(2857619455, 3, 0, 100)
+		//
+		//go UploadTestData(2963749463, 1, 0, 40)
+		//go UploadTestData(2963749463, 2, 0, 40)
+		//go UploadTestData(2963749463, 64, 0, 40)
+		//go UploadTestData(2963749463, 3, 0, 40)
 
 	}()
 }
@@ -219,7 +219,7 @@ func (m *MyMachineApi) SetMachineService(c *gin.Context) {
 			"--username=root",
 			"configure")
 
-		var machineServiceStatus map[string]bool
+		var machineServiceStatus map[string]int
 		err = json.Unmarshal([]byte(machine.Service), &machineServiceStatus)
 		if err != nil {
 			return err
@@ -235,7 +235,7 @@ func (m *MyMachineApi) SetMachineService(c *gin.Context) {
 			if props[0].Name != "enable" {
 				return fmt.Errorf("props does not start with enable")
 			}
-			machineServiceStatus[name] = cast.ToBool(props[0].Value)
+			machineServiceStatus[name] = cast.ToInt(props[0].Value)
 		}
 
 		machineServiceByte, _ := json.Marshal(machineServiceStatus)
