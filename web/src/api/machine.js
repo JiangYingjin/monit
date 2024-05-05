@@ -95,3 +95,11 @@ export const getMachineList = (params) => {
     params
   })
 }
+
+export const setMachineService = (params) => {
+  return service({
+    url: '/machine/setMachineService',
+    method: 'post',
+    params
+  })
+}

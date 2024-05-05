@@ -135,7 +135,7 @@
               @click="getServiceList(scope.row)"
             >
               <el-icon style="margin-right: 5px"><Menu /></el-icon>
-              命令模板
+              状态监控
             </el-button>
             <el-button
               type="primary"
@@ -274,7 +274,7 @@
 
     <el-drawer
       v-model="drawerVisible"
-      title="命令模板"
+      title="状态监控"
       size="800"
       @close="handleDrawerClose"
       destroy-on-close
@@ -342,7 +342,7 @@ import {
   updateMachine,
   findMachine,
   getMachineList,
-  //setMachineService,
+  setMachineService,
 } from "@/api/machine";
 
 // 全量引入格式化工具 请按需保留
@@ -392,7 +392,7 @@ const getServiceList = async (row) => {
     if (serviceList.value.length == 0)
       ElMessage.error("您选择的机器当前不支持任何服务，请重新选择！");
     else {
-      console.log(serviceList.value);
+      // console.log(serviceList.value);
       drawerVisible.value = true;
     }
   }
@@ -402,7 +402,7 @@ function confirmForm() {
   if (typeof selectedService.value !== "string") {
     ElMessage.error("请选择服务！");
   } else {
-    console.log("confirm成功");
+    // console.log("confirm成功");
     isSelectDisabled.value = true;
     isConfirmDisabled.value = true;
     isResetDisabled.value = false;
@@ -436,30 +436,51 @@ function generateTemplates(serviceTemplateInfo, targetService) {
 
         return { ...rest, value };
       });
-      console.log(templates.value);
+      // console.log(templates.value);
     }
   });
 }
 
 function resetForm() {
-  console.log("reset成功");
-  isSelectDisabled.value = false;
-  isConfirmDisabled.value = false;
-  isResetDisabled.value = true;
-  templates.value = [];
-  serviceList.value = [];
-}
-
-function submitForm() {
-  console.log("submit成功");
-  ElMessage.success("提交成功");
+  // console.log("reset成功");
   isSelectDisabled.value = false;
   isConfirmDisabled.value = false;
   isResetDisabled.value = true;
   selectedService.value = null;
-  currentMachineID.value = null;
   templates.value = [];
 }
+
+function submitForm() {
+  // console.log("submit成功");
+  ElMessage.success("提交成功");
+  const result = {
+    machineID: currentMachineID.value,
+    services: {
+      [selectedService.value]: Object.keys(templates.value).map((index) => ({
+        name: templates.value[index].name,
+        type: templates.value[index].type,
+        value:
+          templates.value[index].type === "bool"
+            ? templates.value[index].value
+              ? "1"
+              : "0"
+            : templates.value[index].value.toString(),
+      })),
+    },
+  };
+  console.log(result);
+  updateMachineServiceFunc(result);
+}
+
+const updateMachineServiceFunc = async (data) => {
+  const res = await setMachineService({ data });
+  console.log(res);
+  if (res.code === 0) {
+    ElMessage.success("更新成功");
+  } else {
+    ElMessage.error("更新失败");
+  }
+};
 
 const handleDrawerClose = () => {
   drawerVisible.value = false;
@@ -469,6 +490,7 @@ const handleDrawerClose = () => {
   selectedService.value = null;
   currentMachineID.value = null;
   templates.value = [];
+  serviceList.value = [];
 };
 
 // 验证规则
