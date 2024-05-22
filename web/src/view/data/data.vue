@@ -372,8 +372,8 @@
               :value="type.id"
             />
           </el-select>
-
         </el-form-item>
+        <br>
         <el-form-item label="机器">
           <el-checkbox
             v-model="allMachinesChecked"
@@ -385,7 +385,7 @@
             filterable
             collapse-tags
             placeholder="选择机器"
-            style="width: 150px;"
+            style="width: 200px;"
             @change="handleMachinesChange"
           >
             <el-option
@@ -396,10 +396,17 @@
             />
           </el-select>
         </el-form-item>
+
+        <el-form-item>
+          <el-select v-model="selectedLayout" placeholder="选择布局" style="width: 200px;" >
+            <el-option label="一行两个" value="double" />
+            <el-option label="一行一个" value="single" />
+          </el-select>
+        </el-form-item>
         <el-form-item>
           <el-button
-            type="primary"
-            native-type="submit"
+              type="primary"
+              native-type="submit"
           >筛选</el-button>
         </el-form-item>
       </el-form>
@@ -411,10 +418,7 @@
 <!--          style="width: 1200px; height: 500px;"-->
 <!--        />-->
     <!-- 布局选择器 -->
-    <el-select v-model="selectedLayout" placeholder="选择布局" style="width: 200px;" >
-      <el-option label="一行两个" value="double" />
-      <el-option label="一行一个" value="single" />
-    </el-select>
+
 
 
 
