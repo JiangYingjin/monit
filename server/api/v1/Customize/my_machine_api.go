@@ -26,6 +26,9 @@ type MyMachineApi struct {
 
 func UploadTestData(dataTypeID int, machineID int, minValue float64, maxValue float64) {
 	for {
+
+		fmt.Println("upload data")
+
 		value := (float64(utils.RandomInt(1, 10000))/10000)*(maxValue-minValue) + minValue
 		data := Customize.Data{
 			DataTypeID: &dataTypeID,
@@ -40,28 +43,31 @@ func UploadTestData(dataTypeID int, machineID int, minValue float64, maxValue fl
 		if err := dataService.CreateData(&data); err != nil {
 			break
 		}
-		time.Sleep(10 * time.Second)
+		time.Sleep(5 * time.Second)
 	}
 }
 
 func init() {
+
+	fmt.Println("init")
+
 	go func() {
 		time.Sleep(10 * time.Second)
 
-		//go UploadTestData(3019788237, 1, 0, 100)
-		//go UploadTestData(3019788237, 2, 0, 100)
-		//go UploadTestData(3019788237, 64, 0, 100)
-		//go UploadTestData(3019788237, 3, 0, 100)
-		//
-		//go UploadTestData(2857619455, 1, 0, 100)
-		//go UploadTestData(2857619455, 2, 0, 100)
-		//go UploadTestData(2857619455, 64, 0, 100)
-		//go UploadTestData(2857619455, 3, 0, 100)
-		//
-		//go UploadTestData(2963749463, 1, 0, 40)
-		//go UploadTestData(2963749463, 2, 0, 40)
-		//go UploadTestData(2963749463, 64, 0, 40)
-		//go UploadTestData(2963749463, 3, 0, 40)
+		go UploadTestData(3019788237, 1, 0, 100)
+		go UploadTestData(3019788237, 2, 0, 100)
+		go UploadTestData(3019788237, 64, 0, 100)
+		go UploadTestData(3019788237, 3, 0, 100)
+		
+		go UploadTestData(2857619455, 1, 0, 100)
+		go UploadTestData(2857619455, 2, 0, 100)
+		go UploadTestData(2857619455, 64, 0, 100)
+		go UploadTestData(2857619455, 3, 0, 100)
+		
+		go UploadTestData(2963749463, 1, 0, 40)
+		go UploadTestData(2963749463, 2, 0, 40)
+		go UploadTestData(2963749463, 64, 0, 40)
+		go UploadTestData(2963749463, 3, 0, 40)
 
 	}()
 }
