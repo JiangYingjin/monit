@@ -58,8 +58,8 @@ func (machineApi *MachineApi) CreateMachine(c *gin.Context) {
 		"install",
 		"--machine-id="+cast.ToString(machine.ID)))
 	if err != nil {
-		global.GVA_LOG.Error("创建失败（InstallAgent error）: " + err.Error())
-		response.FailWithMessage("创建失败（InstallAgent error）:"+err.Error(), c)
+		global.GVA_LOG.Error("创建失败（InstallAgent error）: " + err.Error() + "\noutput: " + output)
+		response.FailWithMessage("创建失败（InstallAgent error）:"+err.Error()+"\noutput: "+output, c)
 		_ = machineService.DeleteMachine(cast.ToString(machine.ID), utils.GetUserID(c))
 		return
 	} else {

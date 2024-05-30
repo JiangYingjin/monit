@@ -100,6 +100,6 @@ export const setMachineService = (params) => {
   return service({
     url: '/machine/setMachineService',
     method: 'post',
-    params
+    data: params
   })
 }

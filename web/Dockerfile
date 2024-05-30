@@ -14,6 +14,6 @@ RUN npm install
 EXPOSE 8080
 
 #CMD [ "serve", "-s", "build" ]
-#CMD [ "npm", "run", "serve" ]
-CMD npm run serve -- --host 0.0.0.0
+#CMD [ "npm", "run", "serve", "--", "--host", "0.0.0.0" ]
+CMD npm run serve
 

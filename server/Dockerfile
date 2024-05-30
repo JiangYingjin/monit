@@ -40,7 +40,7 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
 # Copy the source code into the container.
-COPY ./___1linux_linux /app/server
+COPY ./___5linux_linux /app/server
 COPY ./config.yaml /app/config.yaml
 
 # Expose the port that the application listens on.
