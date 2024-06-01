@@ -100,6 +100,7 @@
           label="密钥"
           prop="password"
           width="120"
+          show-overflow-tooltip
         />
         <!-- <el-table-column
           align="left"
@@ -796,6 +797,7 @@ const enterDialog = async () => {
         break;
     }
     if (res.code === 0) {
+      location.reload();
       ElMessage({
         type: "success",
         message: "创建/更改成功",
