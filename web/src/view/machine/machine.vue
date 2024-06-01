@@ -101,7 +101,7 @@
           prop="password"
           width="120"
         />
-        <el-table-column
+        <!-- <el-table-column
           align="left"
           label="在线状态"
           prop="status"
@@ -111,7 +111,7 @@
             formatBoolean(scope.row.status)
           }}</template>
         </el-table-column>
-        <el-table-column align="left" label="服务" prop="service" width="120" />
+        <el-table-column align="left" label="服务" prop="service" width="120" /> -->
         <el-table-column
           align="left"
           label="操作"
@@ -218,7 +218,7 @@
             placeholder="请输入密钥"
           />
         </el-form-item>
-        <el-form-item label="在线状态:" prop="status">
+        <!-- <el-form-item label="在线状态:" prop="status">
           <el-switch
             v-model="formData.status"
             active-color="#13ce66"
@@ -226,6 +226,7 @@
             active-text="是"
             inactive-text="否"
             clearable
+            :disabled="true"
           ></el-switch>
         </el-form-item>
         <el-form-item label="服务:" prop="service">
@@ -233,8 +234,9 @@
             v-model="formData.service"
             :clearable="true"
             placeholder="请输入服务"
+            :disabled="true"
           />
-        </el-form-item>
+        </el-form-item> -->
       </el-form>
     </el-drawer>
 
@@ -283,8 +285,9 @@
         <el-select
           v-model="selectedService"
           placeholder="请选择服务"
-          :disabled="isSelectDisabled"
           clearable
+          @change="confirmForm"
+          @clear="resetForm"
         >
           <el-option
             v-for="service in serviceList"
@@ -301,28 +304,24 @@
             </div>
           </el-option>
         </el-select>
-        <el-button
-          type="primary"
-          @click="confirmForm"
-          :disabled="isConfirmDisabled"
-        >
-          确定
-        </el-button>
-        <el-button @click="resetForm" :disabled="isResetDisabled">
-          重置
-        </el-button>
       </div>
       <el-form v-if="isSelectDisabled" label-position="left">
         <el-row :gutter="5">
           <el-col :span="24" v-for="item in templates" :key="item.name">
-            <el-form-item :label="item.repr">
+            <el-form-item
+              v-if="item.type === 'bool' || isComponentVisible"
+              :label="item.repr"
+            >
               <template v-if="item.type === 'bool'">
-                <el-switch v-model="item.value"></el-switch>
+                <el-switch
+                  v-model="item.value"
+                  @change="handleSwitchChange(item.name, item.value)"
+                ></el-switch>
               </template>
-              <template v-else-if="item.type === 'str'">
+              <template v-else-if="item.type === 'str' && isComponentVisible">
                 <el-input style="width: 300px" v-model="item.value"></el-input>
               </template>
-              <template v-else-if="item.type === 'int'">
+              <template v-else-if="item.type === 'int' && isComponentVisible">
                 <el-input-number v-model="item.value"></el-input-number>
               </template>
             </el-form-item>
@@ -373,8 +372,7 @@ const formData = ref({
 
 const drawerVisible = ref(false);
 const isSelectDisabled = ref(false);
-const isConfirmDisabled = ref(false);
-const isResetDisabled = ref(true);
+const isComponentVisible = ref(true);
 const selectedService = ref(null);
 const serviceList = ref([]);
 const currentMachineID = ref(null);
@@ -399,13 +397,10 @@ const getServiceList = async (row) => {
 };
 
 function confirmForm() {
-  if (typeof selectedService.value !== "string") {
-    ElMessage.error("请选择服务！");
-  } else {
+  if (typeof selectedService.value == "string") {
     // console.log("confirm成功");
     isSelectDisabled.value = true;
-    isConfirmDisabled.value = true;
-    isResetDisabled.value = false;
+    isComponentVisible.value = true;
     getServiceTemplate(selectedService.value);
   }
 }
@@ -444,8 +439,7 @@ function generateTemplates(serviceTemplateInfo, targetService) {
 function resetForm() {
   // console.log("reset成功");
   isSelectDisabled.value = false;
-  isConfirmDisabled.value = false;
-  isResetDisabled.value = true;
+  isComponentVisible.value = true;
   selectedService.value = null;
   templates.value = [];
 }
@@ -473,7 +467,7 @@ function submitForm() {
 }
 
 const updateMachineServiceFunc = async (data) => {
-  const res = await setMachineService(data);
+  const res = await setMachineService({ data });
   console.log(res);
   if (res.code === 0) {
     ElMessage.success("更新成功");
@@ -485,13 +479,24 @@ const updateMachineServiceFunc = async (data) => {
 const handleDrawerClose = () => {
   drawerVisible.value = false;
   isSelectDisabled.value = false;
-  isConfirmDisabled.value = false;
-  isResetDisabled.value = true;
+  isComponentVisible.value = true;
   selectedService.value = null;
   currentMachineID.value = null;
   templates.value = [];
   serviceList.value = [];
 };
+
+function handleSwitchChange(name, value) {
+  // 当 item.value 变为 false 时,隐藏其他表单项
+  if (!value && name === "enable") {
+    isComponentVisible.value = false;
+    console.log(isComponentVisible.value);
+  } else if (value && name === "enable") {
+    // 当 item.value 变为 true 时,根据 item.type 显示对应的表单项
+    isComponentVisible.value = true;
+    console.log(isComponentVisible.value);
+  }
+}
 
 // 验证规则
 const rule = reactive({
@@ -771,6 +776,7 @@ const closeDialog = () => {
     service: "",
   };
 };
+
 // 弹窗确定
 const enterDialog = async () => {
   elFormRef.value?.validate(async (valid) => {
@@ -779,6 +785,8 @@ const enterDialog = async () => {
     switch (type.value) {
       case "create":
         res = await createMachine(formData.value);
+        console.log(formData.value);
+        console.log(res);
         break;
       case "update":
         res = await updateMachine(formData.value);
