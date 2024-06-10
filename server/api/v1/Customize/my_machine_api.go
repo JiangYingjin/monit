@@ -330,7 +330,7 @@ func (m *MyMachineApi) UploadDataHook(data Customize.Data) {
 	oneHourAgo := time.Now().Add(-1 * time.Hour)
 	err = global.GVA_DB.Model(&Customize.MachineWarningLog{}).
 		Where("user_id = ? and warning_id = ? and send_time >= ?", warning.ReporterID, warning.ID, oneHourAgo).
-		Order("created_at desc").
+		Order("send_time desc").
 		First(&warningLog).Error
 
 	if *warning.Type == 0 && *data.Value > *warning.Limit {
