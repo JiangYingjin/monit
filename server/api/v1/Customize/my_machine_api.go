@@ -26,9 +26,6 @@ type MyMachineApi struct {
 
 func UploadTestData(dataTypeID int, machineID int, minValue float64, maxValue float64) {
 	for {
-
-		fmt.Println("upload data")
-
 		value := (float64(utils.RandomInt(1, 10000))/10000)*(maxValue-minValue) + minValue
 		data := Customize.Data{
 			DataTypeID: &dataTypeID,
@@ -54,20 +51,20 @@ func init() {
 	go func() {
 		time.Sleep(10 * time.Second)
 
-		go UploadTestData(3019788237, 1, 0, 100)
-		go UploadTestData(3019788237, 2, 0, 100)
-		go UploadTestData(3019788237, 64, 0, 100)
-		go UploadTestData(3019788237, 3, 0, 100)
-		
-		go UploadTestData(2857619455, 1, 0, 100)
-		go UploadTestData(2857619455, 2, 0, 100)
-		go UploadTestData(2857619455, 64, 0, 100)
-		go UploadTestData(2857619455, 3, 0, 100)
-		
-		go UploadTestData(2963749463, 1, 0, 40)
-		go UploadTestData(2963749463, 2, 0, 40)
-		go UploadTestData(2963749463, 64, 0, 40)
-		go UploadTestData(2963749463, 3, 0, 40)
+		//go UploadTestData(3019788237, 1, 0, 100)
+		//go UploadTestData(3019788237, 2, 0, 100)
+		//go UploadTestData(3019788237, 64, 0, 100)
+		//go UploadTestData(3019788237, 3, 0, 100)
+		//
+		//go UploadTestData(2857619455, 1, 0, 100)
+		//go UploadTestData(2857619455, 2, 0, 100)
+		//go UploadTestData(2857619455, 64, 0, 100)
+		//go UploadTestData(2857619455, 3, 0, 100)
+		//
+		//go UploadTestData(2963749463, 1, 0, 40)
+		//go UploadTestData(2963749463, 2, 0, 40)
+		//go UploadTestData(2963749463, 64, 0, 40)
+		//go UploadTestData(2963749463, 3, 0, 40)
 
 	}()
 }
@@ -322,10 +319,26 @@ func (dataApi *DataApi) CreateDataMulti(c *gin.Context) {
 func (m *MyMachineApi) UploadDataHook(data Customize.Data) {
 
 	var warning Customize.MachineWarning
-	global.GVA_DB.Model(&Customize.MachineWarning{}).
+	err := global.GVA_DB.Model(&Customize.MachineWarning{}).
 		Where("machine_i_d = ? and data_type_i_d = ?", data.MachineID, data.DataTypeID).
-		Find(&warning)
-	if warning != (Customize.MachineWarning{}) && *warning.Limit > *data.Value {
+		Find(&warning).Error
+	if err != nil || warning == (Customize.MachineWarning{}) {
+		return
+	}
+
+	var warningLog Customize.MachineWarningLog
+	oneHourAgo := time.Now().Add(-1 * time.Hour)
+	err = global.GVA_DB.Model(&Customize.MachineWarningLog{}).
+		Where("user_id = ? and warning_id = ? and send_time >= ?", warning.ReporterID, warning.ID, oneHourAgo).
+		Order("send_time desc").
+		First(&warningLog).Error
+
+	if *warning.Type == 0 && *data.Value > *warning.Limit {
+		if err != nil {
+			global.GVA_LOG.Info("该时段内已经发送过告警")
+			return
+		}
+
 		userService := system.UserService{}
 		userID, err := strconv.ParseInt(warning.ReporterID, 10, 64)
 		user, err := userService.FindUserById(int(userID))
@@ -340,7 +353,38 @@ func (m *MyMachineApi) UploadDataHook(data Customize.Data) {
 			global.GVA_LOG.Error("发送邮件失败", zap.Error(err))
 			return
 		}
+	} else if *warning.Type == 1 && *data.Value < *warning.Limit {
+		if err != nil {
+			global.GVA_LOG.Info("该时段内已经发送过告警")
+			return
+		}
+
+		userService := system.UserService{}
+		userID, err := strconv.ParseInt(warning.ReporterID, 10, 64)
+		user, err := userService.FindUserById(int(userID))
+		if err != nil {
+			global.GVA_LOG.Error("获取用户信息失败", zap.Error(err))
+			return
+		}
+		warningMessage := "机器ID: " + strconv.FormatUint(uint64(*data.MachineID), 10) + " 数据类型ID: " + strconv.FormatUint(uint64(*data.DataTypeID), 10) + " 数据异常"
+		myMachineService := Customize2.MyMachineService{}
+		err = myMachineService.SendEmail(user.Email, warningMessage)
+		if err != nil {
+			global.GVA_LOG.Error("发送邮件失败", zap.Error(err))
+			return
+		}
+	} else {
+		return
 	}
+
+	tmpUserID := cast.ToInt(warning.ReporterID)
+	tmpWarningID := int(warning.ID)
+	tmpCurrentTime := time.Now()
+	machineWarningLogService.CreateMachineWarningLog(&Customize.MachineWarningLog{
+		UserId:    &tmpUserID,
+		WarningId: &tmpWarningID,
+		SendTime:  &tmpCurrentTime,
+	})
 }
 
 type MachineClaim struct {

@@ -4,7 +4,8 @@ type ApiGroup struct {
 	MyMachineApi
 	DataTypeApi
 	DataApi
-	MachineWarningApi
 	ServiceTemplateApi
 	MachineApi
+	MachineWarningLogApi
+	MachineWarningApi
 }
