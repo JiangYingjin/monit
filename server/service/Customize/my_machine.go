@@ -1,6 +1,7 @@
 package Customize
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
@@ -95,16 +96,17 @@ func (machineService *MyMachineService) FormCmdParams(host string, params ...str
 }
 
 func (machineService *MyMachineService) ExecuteCmd(params []string) (string, error) {
-	//curlCmd := exec.Command("curl", "-sL", "file.jiangyj.tech/proj/monit/remote.py")
-	//pythonScript, _ := curlCmd.CombinedOutput()
-	//
-	//pythonCmd := exec.Command("python", params...)
-	//pythonCmd.Stdin = bytes.NewReader(pythonScript)
+	curlCmd := exec.Command("curl", "-sL", "file.jiangyj.tech/proj/monit/remote.py")
+	pythonScript, _ := curlCmd.CombinedOutput()
 
-	if params[0] == "-" {
-		params[0] = "../agent/remote.py"
-	}
-	pythonCmd := exec.Command("C:\\Users\\24761\\AppData\\Local\\Programs\\Python\\Python311\\python.exe", params...)
+	pythonCmd := exec.Command("python", params...)
+	pythonCmd.Stdin = bytes.NewReader(pythonScript)
+
+	//if params[0] == "-" {
+	//	params[0] = "../agent/remote.py"
+	//}
+	//pythonCmd := exec.Command("python", params...)
+	//pythonCmd := exec.Command("C:\\Users\\24761\\AppData\\Local\\Programs\\Python\\Python311\\python.exe", params...)
 
 	// 执行python命令并等待结果
 	outputByte, err := pythonCmd.CombinedOutput()
