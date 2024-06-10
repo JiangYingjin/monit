@@ -17,9 +17,6 @@
         <el-form-item label="告警机器ID:" prop="machineID">
           <el-input v-model.number="formData.machineID" :clearable="true" placeholder="请输入" />
        </el-form-item>
-        <el-form-item label="比较类型:" prop="type">
-          <el-input v-model.number="formData.type" :clearable="true" placeholder="请输入" />
-       </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="save">保存</el-button>
           <el-button type="primary" @click="back">返回</el-button>
@@ -56,7 +53,6 @@ const formData = ref({
             dataTypeID: 0,
             limit: 0,
             machineID: 0,
-            type: 0,
         })
 // 验证规则
 const rule = reactive({

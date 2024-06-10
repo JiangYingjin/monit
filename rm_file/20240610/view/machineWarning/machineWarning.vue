@@ -46,7 +46,6 @@
         <el-table-column align="left" label="告警数据类型" prop="dataTypeID" width="120" />
         <el-table-column align="left" label="告警阈值" prop="limit" width="120" />
         <el-table-column align="left" label="告警机器ID" prop="machineID" width="120" />
-        <el-table-column align="left" label="比较类型" prop="type" width="120" />
         <el-table-column align="left" label="操作" fixed="right" min-width="240">
             <template #default="scope">
             <el-button type="primary" link class="table-button" @click="getDetails(scope.row)">
@@ -97,9 +96,6 @@
             <el-form-item label="告警机器ID:"  prop="machineID" >
               <el-input v-model.number="formData.machineID" :clearable="true" placeholder="请输入告警机器ID" />
             </el-form-item>
-            <el-form-item label="比较类型:"  prop="type" >
-              <el-input v-model.number="formData.type" :clearable="true" placeholder="请输入比较类型" />
-            </el-form-item>
           </el-form>
     </el-drawer>
 
@@ -124,9 +120,6 @@
                 </el-descriptions-item>
                 <el-descriptions-item label="告警机器ID">
                         {{ formData.machineID }}
-                </el-descriptions-item>
-                <el-descriptions-item label="比较类型">
-                        {{ formData.type }}
                 </el-descriptions-item>
         </el-descriptions>
     </el-drawer>
@@ -159,7 +152,6 @@ const formData = ref({
         dataTypeID: 0,
         limit: 0,
         machineID: 0,
-        type: 0,
         })
 
 
@@ -398,7 +390,6 @@ const closeDetailShow = () => {
           dataTypeID: 0,
           limit: 0,
           machineID: 0,
-          type: 0,
           }
 }
 
@@ -418,7 +409,6 @@ const closeDialog = () => {
         dataTypeID: 0,
         limit: 0,
         machineID: 0,
-        type: 0,
         }
 }
 // 弹窗确定
