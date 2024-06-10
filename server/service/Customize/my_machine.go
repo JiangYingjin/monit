@@ -1,7 +1,6 @@
 package Customize
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
@@ -20,17 +19,11 @@ type MyMachineService struct {
 var MachinesMap sync.Map // id->ip_addr
 
 func init() {
-	//tmpMachines := make([]struct {
-	//	ID     uint
-	//	IPAddr string
-	//}, 0)
-	//global.GVA_DB.Model(&Customize.Machine{}).Select("id", "ip_addr").Find(&tmpMachines)
-	//for _, machine := range tmpMachines {
-	//	MachinesMap.Store(machine.ID, machine.IPAddr)
-	//}
-	//
-	//myMachineService := MyMachineService{}
-	//myMachineService.MachineHeartBeat()
+	go func() {
+		time.Sleep(10 * time.Second) // wait for db init
+		myMachineService := MyMachineService{}
+		myMachineService.MachineHeartBeat()
+	}()
 }
 
 func ConvertTimestamp(timestamp string) string {
@@ -102,26 +95,25 @@ func (machineService *MyMachineService) FormCmdParams(host string, params ...str
 }
 
 func (machineService *MyMachineService) ExecuteCmd(params []string) (string, error) {
-	curlCmd := exec.Command("curl", "-sL", "file.jiangyj.tech/proj/monit/remote.py")
-	pythonScript, _ := curlCmd.CombinedOutput()
-
-	pythonCmd := exec.Command("python", params...)
-	pythonCmd.Stdin = bytes.NewReader(pythonScript)
-
-	//if params[0] == "-" {
-	//	params[0] = "../agent/remote.py"
-	//}
+	//curlCmd := exec.Command("curl", "-sL", "file.jiangyj.tech/proj/monit/remote.py")
+	//pythonScript, _ := curlCmd.CombinedOutput()
+	//
 	//pythonCmd := exec.Command("python", params...)
+	//pythonCmd.Stdin = bytes.NewReader(pythonScript)
+
+	if params[0] == "-" {
+		params[0] = "../agent/remote.py"
+	}
+	pythonCmd := exec.Command("C:\\Users\\24761\\AppData\\Local\\Programs\\Python\\Python311\\python.exe", params...)
 
 	// 执行python命令并等待结果
 	outputByte, err := pythonCmd.CombinedOutput()
 
 	if err != nil {
-		global.GVA_LOG.Error("execute cmd error: " + err.Error())
-		return "", err
+		global.GVA_LOG.Error("execute cmd error: " + err.Error() + ", output: " + string(outputByte))
+		return string(outputByte), err
 	} else {
-		output := string(outputByte)
-		return output, nil
+		return string(outputByte), nil
 	}
 
 	//sshHost := machine.IPAddr
@@ -190,17 +182,25 @@ func (machineService *MyMachineService) PingMachine(machineIP string) (err error
 
 func (machineService *MyMachineService) MachineHeartBeat() {
 	for {
-		MachinesMap.Range(func(machineID, MachineAddr interface{}) bool {
-			machine := Customize.Machine{}
-			global.GVA_DB.Where("id = ?", machineID).First(&machine)
-			err := machineService.PingMachine(MachineAddr.(string))
+		if global.GVA_DB == nil {
+			time.Sleep(10 * time.Second)
+			continue
+		}
+
+		tmpMachines := make([]struct {
+			ID     uint   `gorm:"primarykey" json:"ID"`
+			IPAddr string `json:"ip_addr" form:"ip_addr" gorm:"column:ip_addr;comment:;" binding:"required"`
+			Status bool   `json:"status" form:"status" gorm:"column:status;comment:机器是否在线;"`
+		}, 0)
+		global.GVA_DB.Model(&Customize.Machine{}).Select("id", "ip_addr", "status").Find(&tmpMachines)
+		for _, machine := range tmpMachines {
+			err := machineService.PingMachine(machine.IPAddr)
 			newStatus := err == nil
-			if newStatus != *machine.Status {
-				machine.Status = &newStatus
-				global.GVA_DB.Model(&Customize.Machine{}).Save(&machine)
+			if newStatus != machine.Status {
+				global.GVA_DB.Model(&Customize.Machine{}).Where("id = ?", machine.ID).Updates(map[string]interface{}{"status": newStatus})
 			}
-			return true
-		})
+		}
+
 		time.Sleep(10 * time.Second) // ping duration
 	}
 }

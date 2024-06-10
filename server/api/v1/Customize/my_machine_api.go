@@ -319,10 +319,26 @@ func (dataApi *DataApi) CreateDataMulti(c *gin.Context) {
 func (m *MyMachineApi) UploadDataHook(data Customize.Data) {
 
 	var warning Customize.MachineWarning
-	global.GVA_DB.Model(&Customize.MachineWarning{}).
+	err := global.GVA_DB.Model(&Customize.MachineWarning{}).
 		Where("machine_i_d = ? and data_type_i_d = ?", data.MachineID, data.DataTypeID).
-		Find(&warning)
-	if warning != (Customize.MachineWarning{}) && *warning.Limit > *data.Value {
+		Find(&warning).Error
+	if err != nil || warning == (Customize.MachineWarning{}) {
+		return
+	}
+
+	var warningLog Customize.MachineWarningLog
+	oneHourAgo := time.Now().Add(-1 * time.Hour)
+	err = global.GVA_DB.Model(&Customize.MachineWarningLog{}).
+		Where("user_id = ? and warning_id = ? and send_time >= ?", warning.ReporterID, warning.ID, oneHourAgo).
+		Order("created_at desc").
+		First(&warningLog).Error
+
+	if *warning.Type == 0 && *data.Value > *warning.Limit {
+		if err != nil {
+			global.GVA_LOG.Info("该时段内已经发送过告警")
+			return
+		}
+
 		userService := system.UserService{}
 		userID, err := strconv.ParseInt(warning.ReporterID, 10, 64)
 		user, err := userService.FindUserById(int(userID))
@@ -337,7 +353,38 @@ func (m *MyMachineApi) UploadDataHook(data Customize.Data) {
 			global.GVA_LOG.Error("发送邮件失败", zap.Error(err))
 			return
 		}
+	} else if *warning.Type == 1 && *data.Value < *warning.Limit {
+		if err != nil {
+			global.GVA_LOG.Info("该时段内已经发送过告警")
+			return
+		}
+
+		userService := system.UserService{}
+		userID, err := strconv.ParseInt(warning.ReporterID, 10, 64)
+		user, err := userService.FindUserById(int(userID))
+		if err != nil {
+			global.GVA_LOG.Error("获取用户信息失败", zap.Error(err))
+			return
+		}
+		warningMessage := "机器ID: " + strconv.FormatUint(uint64(*data.MachineID), 10) + " 数据类型ID: " + strconv.FormatUint(uint64(*data.DataTypeID), 10) + " 数据异常"
+		myMachineService := Customize2.MyMachineService{}
+		err = myMachineService.SendEmail(user.Email, warningMessage)
+		if err != nil {
+			global.GVA_LOG.Error("发送邮件失败", zap.Error(err))
+			return
+		}
+	} else {
+		return
 	}
+
+	tmpUserID := cast.ToInt(warning.ReporterID)
+	tmpWarningID := int(warning.ID)
+	tmpCurrentTime := time.Now()
+	machineWarningLogService.CreateMachineWarningLog(&Customize.MachineWarningLog{
+		UserId:    &tmpUserID,
+		WarningId: &tmpWarningID,
+		SendTime:  &tmpCurrentTime,
+	})
 }
 
 type MachineClaim struct {
