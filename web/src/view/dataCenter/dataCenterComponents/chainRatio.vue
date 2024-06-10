@@ -6,14 +6,18 @@
       style="height: 120px"
     />
     <div class="chainRatio-box-values">
-      <div class="chainRatio-box-values-item in-line">在线<span>3</span></div>
-      <div class="chainRatio-box-values-item out-line">离线<span>1</span></div>
+      <div class="chainRatio-box-values-item in-line">在线<span>{{ onlineMachines }}</span></div>
+      <div class="chainRatio-box-values-item out-line">离线<span>{{ offlineMachines }}</span></div>
     </div>
   </div>
 </template>
 <script setup>
 import * as echarts from 'echarts'
 import { nextTick, onMounted, onUnmounted, ref, shallowRef, watchEffect } from 'vue'
+import {
+  getMachineList,
+} from "@/api/machine";
+
 
 const chart = shallowRef(null)
 const echart = ref(null)
@@ -25,7 +29,7 @@ const setOptions = () => {
   chart.value.setOption({
     backgroundColor: '#fbfbfb',
     title: {
-      text: '4',
+      text: totalMachines.value,
       textStyle: {
         color: '#1d1d1f',
         fontSize: 14
@@ -128,6 +132,35 @@ onUnmounted(() => {
   chart.value.dispose()
   chart.value = null
 })
+
+
+const machineTypesLoaded = ref(false)
+const machines = ref([])
+const totalMachines = ref(0)
+const onlineMachines = ref(0)
+const offlineMachines = ref(0)
+
+const getCurrentMachines = async () => {
+  const table = await getMachineList({ page: 0, pageSize: 10000 })
+  if (table.code === 0) {
+    const machineList = table.data.list
+    machines.value = machineList.map(item => ({
+      id: item.ID.toString(),
+      name: item.name,
+      status: item.status // 假设status字段存在
+    }))
+
+    totalMachines.value = machines.value.length
+    onlineMachines.value = machines.value.filter(machine => machine.status === 'true').length
+    offlineMachines.value = totalMachines.value - onlineMachines.value
+
+    console.log(totalMachines.value)
+  }
+
+  machineTypesLoaded.value = true
+}
+getCurrentMachines()
+
 </script>
 <style lang="scss" scoped>
 

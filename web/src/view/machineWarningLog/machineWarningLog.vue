@@ -8,7 +8,8 @@
         </el-form-item>
       </el-form>
     </div>
-    <div class="gva-table-box">
+    <div v-if="warningTypesLoaded && usersLoaded"
+        class="gva-table-box" >
         <div class="gva-btn-list">
             <el-button type="primary" icon="plus" @click="openDialog">新增</el-button>
             <el-button icon="delete" style="margin-left: 10px;" :disabled="!multipleSelection.length" @click="onDelete">删除</el-button>
@@ -22,10 +23,28 @@
         @selection-change="handleSelectionChange"
         >
         <el-table-column type="selection" width="55" />
-        
-        <el-table-column align="left" label="userId字段" prop="userId" width="120" />
-        <el-table-column align="left" label="warningId字段" prop="warningId" width="120" />
-         <el-table-column align="left" label="sendTime字段" width="180">
+
+          <el-table-column
+              align="left"
+              label="上传用户"
+              prop="userId"
+              width="120"
+          >
+            <template v-slot:="scope" >
+              {{ userMap[scope.row.userId] }}
+            </template>
+          </el-table-column>
+          <el-table-column
+              align="left"
+              label="描述信息"
+              prop="warningId"
+              width="180"
+          >
+            <template v-slot:="scope" >
+              {{ warningMap[scope.row.warningId] }}
+            </template>
+          </el-table-column>
+         <el-table-column align="left" label="sendTime" width="220">
             <template #default="scope">{{ formatDate(scope.row.sendTime) }}</template>
          </el-table-column>
         <el-table-column align="left" label="操作" fixed="right" min-width="240">
@@ -110,6 +129,10 @@ import {
 import { getDictFunc, formatDate, formatBoolean, filterDict, ReturnArrImg, onDownloadFile } from '@/utils/format'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ref, reactive } from 'vue'
+import {getDataTypeList} from "@/api/dataType";
+import {getMachineList} from "@/api/machine";
+import {getUserList} from "@/api/user";
+import {getMachineWarningList} from "@/api/machineWarning";
 
 defineOptions({
     name: 'MachineWarningLog'
@@ -361,6 +384,55 @@ const enterDialog = async () => {
               }
       })
 }
+const users = ref([])
+const userList = ref([])
+
+const warningList = ref([])
+const warnings = ref([])
+
+const userMap = {}
+const usersLoaded = ref(false)
+const warningTypesLoaded = ref(false)
+const getCurrentUsers = async() => {
+  const table = await getUserList({ page: 1, pageSize: 10000 })
+  if (table.code === 0) {
+    userList.value = table.data.list
+    users.value = userList.value.map(item => ({
+      id: item.ID.toString(),
+      name: item.nickName
+    }))
+  }
+
+  users.value.forEach(item => {
+    userMap[item.id] = item.name
+  })
+  usersLoaded.value = true
+}
+
+getCurrentUsers()
+console.log(userMap)
+
+const warningMap = []
+const getCurrentWarnings = async() => {
+  const table = await getMachineWarningList({ page: 0, pageSize: 10000 })
+  if (table.code === 0) {
+    warningList.value = table.data.list
+    warnings.value = warningList.value.map(item => ({
+      id: item.ID.toString(),
+      name: item.description
+    }))
+    console.log(warnings.value)
+  }
+  // warningIDs.value.length = 0
+  warnings.value.forEach(item => {
+    warningMap[item.id] = item.name
+  })
+  warningTypesLoaded.value = true
+  // getInitialData()
+}
+getCurrentWarnings()
+
+
 
 </script>
 

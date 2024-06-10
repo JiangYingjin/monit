@@ -637,6 +637,7 @@ const getCurrentMachines = async() => {
   // getInitialData()
 }
 getCurrentMachines()
+
 </script>
 
 <style>
