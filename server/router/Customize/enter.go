@@ -6,4 +6,5 @@ type RouterGroup struct {
 	MachineWarningRouter
 	ServiceTemplateRouter
 	MachineRouter
+	MachineWarningLogRouter
 }

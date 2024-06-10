@@ -52,7 +52,7 @@ func RegisterTables() {
 		example.ExaFile{},
 		example.ExaCustomer{},
 		example.ExaFileChunk{},
-		example.ExaFileUploadAndDownload{}, Customize.Data{}, Customize.MachineWarning{}, Customize.DataType{}, Customize.ServiceTemplate{}, Customize.Machine{},
+		example.ExaFileUploadAndDownload{}, Customize.Data{}, Customize.MachineWarning{}, Customize.DataType{}, Customize.ServiceTemplate{}, Customize.Machine{}, Customize.MachineWarningLog{},
 	)
 	if err != nil {
 		global.GVA_LOG.Error("register table failed", zap.Error(err))

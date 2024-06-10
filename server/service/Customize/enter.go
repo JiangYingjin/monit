@@ -6,4 +6,5 @@ type ServiceGroup struct {
 	MachineWarningService
 	ServiceTemplateService
 	MachineService
+	MachineWarningLogService
 }

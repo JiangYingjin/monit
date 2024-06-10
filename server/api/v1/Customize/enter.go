@@ -7,4 +7,5 @@ type ApiGroup struct {
 	MachineWarningApi
 	ServiceTemplateApi
 	MachineApi
+	MachineWarningLogApi
 }

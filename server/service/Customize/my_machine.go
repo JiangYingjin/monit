@@ -1,11 +1,13 @@
 package Customize
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/Customize"
 	"github.com/go-ping/ping"
+	"net/smtp"
 	"os/exec"
 	"strings"
 	"sync"
@@ -44,16 +46,12 @@ func (machineService *MyMachineService) AddMachineHook(machine Customize.Machine
 
 // to: xxxx@qq.com
 func (machineService *MyMachineService) SendEmail(to string, body string) (err error) {
-	fmt.Println("package sendFunc sendMailSimple")
-	// logrus.Info("Panic info is: %v", err)
-	global.GVA_LOG.Info("SendMailSimple func start ")
-
-	//auth := smtp.PlainAuth(
-	//	"",                  //传空值即可，用不上
-	//	"2476100824@qq.com", // **发送邮件的邮箱地址
-	//	"zclhprbppvlgdjhf",  //POP3/IMAP/SMTP/Exchange/CardDAV/CalDAV服务的授权码，需要在QQ邮箱设置中开启
-	//	"smtp.qq.com",       // qq邮箱SMTP 服务器地址
-	//)
+	auth := smtp.PlainAuth(
+		"",                  //传空值即可，用不上
+		"2476100824@qq.com", // **发送邮件的邮箱地址
+		"zclhprbppvlgdjhf",  //POP3/IMAP/SMTP/Exchange/CardDAV/CalDAV服务的授权码，需要在QQ邮箱设置中开启
+		"smtp.qq.com",       // qq邮箱SMTP 服务器地址
+	)
 
 	// 以下的参数组成msg内容(即为邮件内容)
 	/*
@@ -75,16 +73,16 @@ func (machineService *MyMachineService) SendEmail(to string, body string) (err e
 		to, user, user, subject, mailtype, body)
 	global.GVA_LOG.Info("send email: \n" + s)
 
-	//msg := []byte(s)
+	msg := []byte(s)
 
-	//err = smtp.SendMail(
-	//	"smtp.qq.com:587",
-	//	auth,
-	//	"2476100824@qq.com", //发送邮件的邮箱地址
-	//	[]string{to},        //接收邮箱
-	//	// []string{"xxx@qq.com", "xxx@qq.com", "xxx@qq.com"}, //接收邮箱
-	//	msg,
-	//)
+	err = smtp.SendMail(
+		"smtp.qq.com:587",
+		auth,
+		"2476100824@qq.com", //发送邮件的邮箱地址
+		[]string{to},        //接收邮箱
+		//[]string{"xxx@qq.com", "xxx@qq.com", "xxx@qq.com"}, //接收邮箱
+		msg,
+	)
 
 	if err != nil {
 		global.GVA_LOG.Error("smtp.SendMail error: " + err.Error())
@@ -104,16 +102,16 @@ func (machineService *MyMachineService) FormCmdParams(host string, params ...str
 }
 
 func (machineService *MyMachineService) ExecuteCmd(params []string) (string, error) {
-	//curlCmd := exec.Command("curl", "-sL", "file.jiangyj.tech/proj/monit/remote.py")
-	//pythonScript, _ := curlCmd.CombinedOutput()
-	//
-	//pythonCmd := exec.Command("python ../agent.py", params...)
-	//pythonCmd.Stdin = bytes.NewReader(pythonScript)
+	curlCmd := exec.Command("curl", "-sL", "file.jiangyj.tech/proj/monit/remote.py")
+	pythonScript, _ := curlCmd.CombinedOutput()
 
-	if params[0] == "-" {
-		params[0] = "../agent/remote.py"
-	}
-	pythonCmd := exec.Command("python.exe", params...)
+	pythonCmd := exec.Command("python", params...)
+	pythonCmd.Stdin = bytes.NewReader(pythonScript)
+
+	//if params[0] == "-" {
+	//	params[0] = "../agent/remote.py"
+	//}
+	//pythonCmd := exec.Command("python", params...)
 
 	// 执行python命令并等待结果
 	outputByte, err := pythonCmd.CombinedOutput()
