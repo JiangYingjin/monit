@@ -139,47 +139,40 @@ const weatherInfo = useWeatherInfo()
 
 const toolCards = ref([
   {
-    label: '用户管理',
+    label: '机器管理',
     icon: 'monitor',
-    name: 'user',
+    name: 'machine',
     color: '#ff9c6e',
     bg: 'rgba(255, 156, 110,.3)'
   },
   {
-    label: '角色管理',
-    icon: 'setting',
-    name: 'authority',
+    label: '数据检测',
+    icon: 'data-board',
+    name: 'data',
     color: '#69c0ff',
     bg: 'rgba(105, 192, 255,.3)'
   },
   {
-    label: '菜单管理',
-    icon: 'menu',
-    name: 'menu',
+    label: '数据类型',
+    icon: 'data-analysis',
+    name: 'data',
     color: '#b37feb',
     bg: 'rgba(179, 127, 235,.3)'
   },
   {
-    label: '代码生成器',
-    icon: 'cpu',
-    name: 'autoCode',
+    label: '告警记录',
+    icon: 'aim',
+    name: 'warningLog',
     color: '#ffd666',
     bg: 'rgba(255, 214, 102,.3)'
   },
   {
-    label: '表单生成器',
-    icon: 'document-checked',
-    name: 'formCreate',
+    label: '告警设置',
+    icon: 'alarm-clock',
+    name: 'alarm',
     color: '#ff85c0',
     bg: 'rgba(255, 133, 192,.3)'
   },
-  {
-    label: '关于我们',
-    icon: 'user',
-    name: 'about',
-    color: '#5cdbd3',
-    bg: 'rgba(92, 219, 211,.3)'
-  }
 ])
 
 const router = useRouter()

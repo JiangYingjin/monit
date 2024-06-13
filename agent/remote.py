@@ -113,10 +113,11 @@ if args.subcommand == "install":
     print("正在安装 Agent ...")
 
     # 获取运行本文件的用户 home 目录
-    home = subprocess.check_output(
-        "echo $HOME" if system == "Linux" else "echo %USERPROFILE%", shell=True
-    ).decode()
-    home = home.strip().replace("\\", "/")
+    # home = subprocess.check_output(
+    #     "echo $HOME" if system == "Linux" else "echo %USERPROFILE%", shell=True
+    # ).decode()
+    home = os.path.expanduser("~")
+    #home = home.strip().replace("\\", "/")
     # 检查本机是否存在 ~/.ssh/id_rsa.pub 文件
     if not os.path.exists(f"{home}/.ssh/id_rsa.pub"):
         print("本机不存在 ~/.ssh/id_rsa.pub 文件，先生成密钥对")

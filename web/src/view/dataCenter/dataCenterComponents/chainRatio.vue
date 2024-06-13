@@ -1,5 +1,5 @@
 <template>
-  <div class="chainRatio-box">
+  <div class="chainRatio-box" >
     <div
       ref="echart"
       class="chainRatio-box-echarts"
@@ -22,9 +22,10 @@ import {
 const chart = shallowRef(null)
 const echart = ref(null)
 const initChart = () => {
-  chart.value = echarts.init(echart.value)
-  setOptions()
-}
+  if (!echart.value) return;
+  chart.value = echarts.init(echart.value);
+  setOptions();
+};
 const setOptions = () => {
   chart.value.setOption({
     backgroundColor: '#fbfbfb',
@@ -118,12 +119,12 @@ const setOptions = () => {
 
 onMounted(() => {
   nextTick(() => {
-    initChart()
+    getCurrentMachines();
     window.addEventListener('resize', () => {
-      chart.value?.resize()
-    })
-  })
-})
+      chart.value?.resize();
+    });
+  });
+});
 
 onUnmounted(() => {
   if (!chart.value) {
@@ -132,14 +133,12 @@ onUnmounted(() => {
   chart.value.dispose()
   chart.value = null
 })
-
-
 const machineTypesLoaded = ref(false)
 const machines = ref([])
 const totalMachines = ref(0)
 const onlineMachines = ref(0)
 const offlineMachines = ref(0)
-
+const machineFlag=ref(false)
 const getCurrentMachines = async () => {
   const table = await getMachineList({ page: 0, pageSize: 10000 })
   if (table.code === 0) {
@@ -156,10 +155,14 @@ const getCurrentMachines = async () => {
 
     console.log(totalMachines.value)
   }
-
+  nextTick(() => {
+    initChart();
+  });
   machineTypesLoaded.value = true
 }
 getCurrentMachines()
+
+
 
 </script>
 <style lang="scss" scoped>
