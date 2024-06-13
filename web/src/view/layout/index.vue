@@ -16,7 +16,7 @@
           <img
             alt
             class="w-9 h-9 p-1 bg-white rounded-full"
-            :src="$GIN_VUE_ADMIN.appLogo"
+            src="@/assets/img.png"
           >
           <div
             v-if="isSider"
