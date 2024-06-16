@@ -116,13 +116,23 @@
           width="120"
         />
         <el-table-column
-            align="left"
-            label="告警机器"
-            prop="machineID"
-            width="120"
+          align="left"
+          label="告警机器"
+          prop="machineID"
+          width="120"
         >
           <template v-slot:="scope">
             {{ machineMap[scope.row.machineID] }}
+          </template>
+        </el-table-column>
+        <el-table-column
+            align="left"
+            label="比较类型"
+            prop="type"
+            width="100"
+        >
+          <template v-slot:="scope">
+            {{ typeMap[scope.row.type] }}
           </template>
         </el-table-column>
         <el-table-column
@@ -246,6 +256,16 @@
             placeholder="请输入告警机器ID"
           />
         </el-form-item>
+        <el-form-item
+          label="比较类型:"
+          prop="type"
+        >
+          <el-input
+            v-model.number="formData.type"
+            :clearable="true"
+            placeholder="请输入比较类型"
+          />
+        </el-form-item>
       </el-form>
     </el-drawer>
 
@@ -280,6 +300,9 @@
         <el-descriptions-item label="告警机器ID">
           {{ formData.machineID }}
         </el-descriptions-item>
+        <el-descriptions-item label="比较类型">
+          {{formData.type }}
+        </el-descriptions-item>
       </el-descriptions>
     </el-drawer>
   </div>
@@ -313,8 +336,11 @@ const formData = ref({
   dataTypeID: 0,
   limit: 0,
   machineID: 0,
+  type: 0,
 })
 
+const typeMap = ['大于', '小于']
+console.log(typeMap[0])
 // 验证规则
 const rule = reactive({
   description: [{
@@ -544,6 +570,7 @@ const closeDetailShow = () => {
     dataTypeID: 0,
     limit: 0,
     machineID: 0,
+    type: 0,
   }
 }
 
@@ -562,6 +589,7 @@ const closeDialog = () => {
     dataTypeID: 0,
     limit: 0,
     machineID: 0,
+    type: 0,
   }
 }
 // 弹窗确定
