@@ -146,7 +146,7 @@ const getCurrentMachines = async () => {
     machines.value = machineList.map(item => ({
       id: item.ID.toString(),
       name: item.name,
-      status: item.status // 假设status字段存在
+      status: item.status // 假设 status字段存在
     }))
 
     totalMachines.value = machines.value.length

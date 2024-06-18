@@ -68,7 +68,7 @@ const toolCards = ref([
     bg: 'rgba(255, 156, 110,.3)'
   },
   {
-    label: '数据检测',
+    label: '数据监测',
     icon: 'data-board',
     name: 'data',
     color: '#69c0ff',

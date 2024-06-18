@@ -50,7 +50,7 @@
       </el-form>
     </div>
     <div
-      v-if="dataTypesLoaded && machineTypesLoaded"
+      v-if="dataTypesLoaded && machineTypesLoaded && usersLoaded"
       class="gva-table-box"
     >
       <div class="gva-btn-list">
@@ -94,11 +94,15 @@
           width="120"
         />
         <el-table-column
-          align="left"
-          label="告警联系人ID"
-          prop="reporterID"
-          width="120"
-        />
+            align="left"
+            label="告警联系人ID"
+            prop="reporterID"
+            width="120"
+        >
+          <template v-slot:="scope">
+            {{ userMap[scope.row.reporterID] }}
+          </template>
+        </el-table-column>
         <el-table-column
           align="left"
           label="告警数据类型"
@@ -324,6 +328,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { ref, reactive } from 'vue'
 import { getDataTypeList } from '@/api/dataType'
 import { getMachineList } from '@/api/machine'
+import {getUserList} from "@/api/user";
 
 defineOptions({
   name: 'MachineWarning'
@@ -665,6 +670,28 @@ const getCurrentMachines = async() => {
   // getInitialData()
 }
 getCurrentMachines()
+
+const users = ref([])
+const userList = ref([])
+const userMap = {}
+const usersLoaded = ref(false)
+const getCurrentUsers = async() => {
+  const table = await getUserList({ page: 1, pageSize: 10000 })
+  if (table.code === 0) {
+    userList.value = table.data.list
+    users.value = userList.value.map(item => ({
+      id: item.ID.toString(),
+      name: item.nickName
+    }))
+  }
+
+  users.value.forEach(item => {
+    userMap[item.id] = item.name
+  })
+  usersLoaded.value = true
+}
+
+getCurrentUsers()
 
 </script>
 
