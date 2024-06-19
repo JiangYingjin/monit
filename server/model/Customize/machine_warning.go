@@ -2,7 +2,7 @@
 package Customize
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"my-server/global"
 )
 
 // 机器告警 结构体  MachineWarning

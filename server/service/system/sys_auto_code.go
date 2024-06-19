@@ -14,15 +14,15 @@ import (
 	"strings"
 	"text/template"
 
-	ast2 "github.com/flipped-aurora/gin-vue-admin/server/utils/ast"
+	ast2 "my-server/utils/ast"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/resource/autocode_template/subcontract"
 	cp "github.com/otiai10/copy"
 	"go.uber.org/zap"
+	"my-server/resource/autocode_template/subcontract"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
-	"github.com/flipped-aurora/gin-vue-admin/server/utils"
+	"my-server/global"
+	"my-server/model/system"
+	"my-server/utils"
 
 	"gorm.io/gorm"
 )

@@ -47,46 +47,6 @@
               <p class="text-gray-500 mt-2 text-md">这个家伙很懒，什么都没有留下</p>
             </div>
             <div class="w-full h-full text-left">
-              <ul class="inline-block h-full w-full">
-                <li class="info-list">
-                  <el-icon>
-                    <user />
-                  </el-icon>
-                  {{ userStore.userInfo.nickName }}
-                </li>
-                <el-tooltip
-                  class="item"
-                  effect="light"
-                  content="北京反转极光科技有限公司-技术部-前端事业群"
-                  placement="top"
-                >
-                  <li class="info-list">
-                    <el-icon>
-                      <data-analysis />
-                    </el-icon>
-                    北京反转极光科技有限公司-技术部-前端事业群
-                  </li>
-                </el-tooltip>
-                <li class="info-list">
-                  <el-icon>
-                    <video-camera />
-                  </el-icon>
-                  中国·北京市·朝阳区
-                </li>
-                <el-tooltip
-                  class="item"
-                  effect="light"
-                  content="GoLang/JavaScript/Vue/Gorm"
-                  placement="top"
-                >
-                  <li class="info-list">
-                    <el-icon>
-                      <medal />
-                    </el-icon>
-                    GoLang/JavaScript/Vue/Gorm
-                  </li>
-                </el-tooltip>
-              </ul>
             </div>
           </div>
         </div>
@@ -106,32 +66,22 @@
                   <p class="pb-2.5 text-xl text-gray-600">密保手机</p>
                   <p class="pb-2.5 text-lg text-gray-400">
                     已绑定手机:{{ userStore.userInfo.phone }}
-                    <a
+                    <!-- <a
                       href="javascript:void(0)"
                       class="float-right text-blue-400"
                       @click="changePhoneFlag = true"
-                    >立即修改</a>
+                    >立即修改</a> -->
                   </p>
                 </li>
                 <li class="borderd pt-2.5">
                   <p class="pb-2.5 text-xl text-gray-600">密保邮箱</p>
                   <p class="pb-2.5 text-lg text-gray-400">
                     已绑定邮箱：{{ userStore.userInfo.email }}
-                    <a
+                    <!-- <a
                       href="javascript:void(0)"
                       class="float-right text-blue-400"
                       @click="changeEmailFlag = true"
-                    >立即修改</a>
-                  </p>
-                </li>
-                <li class="borderd pt-2.5">
-                  <p class="pb-2.5 text-xl text-gray-600">密保问题</p>
-                  <p class="pb-2.5 text-lg text-gray-400">
-                    未设置密保问题
-                    <a
-                      href="javascript:void(0)"
-                      class="float-right text-blue-400"
-                    >去设置</a>
+                    >立即修改</a> -->
                   </p>
                 </li>
                 <li class="borderd pt-2.5">

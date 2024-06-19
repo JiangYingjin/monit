@@ -1,14 +1,13 @@
 package system
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/config"
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
-	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 	"go.uber.org/zap"
+	"my-server/config"
+	"my-server/global"
+	"my-server/model/system"
+	"my-server/utils"
 )
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: GetSystemConfig
 //@description: 读取配置文件
 //@return: conf config.Server, err error
@@ -20,7 +19,6 @@ func (systemConfigService *SystemConfigService) GetSystemConfig() (conf config.S
 }
 
 // @description   set system config,
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: SetSystemConfig
 //@description: 设置配置文件
 //@param: system model.System
@@ -35,7 +33,6 @@ func (systemConfigService *SystemConfigService) SetSystemConfig(system system.Sy
 	return err
 }
 
-//@author: [SliverHorn](https://github.com/SliverHorn)
 //@function: GetServerInfo
 //@description: 获取服务器信息
 //@return: server *utils.Server, err error

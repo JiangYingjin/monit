@@ -1,9 +1,9 @@
 package router
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/router/Customize"
-	"github.com/flipped-aurora/gin-vue-admin/server/router/example"
-	"github.com/flipped-aurora/gin-vue-admin/server/router/system"
+	"my-server/router/Customize"
+	"my-server/router/example"
+	"my-server/router/system"
 )
 
 type RouterGroup struct {

@@ -1,13 +1,12 @@
 package system
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
-	systemReq "github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
+	"my-server/global"
+	"my-server/model/common/request"
+	"my-server/model/system"
+	systemReq "my-server/model/system/request"
 )
 
-//@author: [granty1](https://github.com/granty1)
 //@function: CreateSysOperationRecord
 //@description: 创建记录
 //@param: sysOperationRecord model.SysOperationRecord
@@ -20,8 +19,6 @@ func (operationRecordService *OperationRecordService) CreateSysOperationRecord(s
 	return err
 }
 
-//@author: [granty1](https://github.com/granty1)
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: DeleteSysOperationRecordByIds
 //@description: 批量删除记录
 //@param: ids request.IdsReq
@@ -32,7 +29,6 @@ func (operationRecordService *OperationRecordService) DeleteSysOperationRecordBy
 	return err
 }
 
-//@author: [granty1](https://github.com/granty1)
 //@function: DeleteSysOperationRecord
 //@description: 删除操作记录
 //@param: sysOperationRecord model.SysOperationRecord
@@ -43,7 +39,6 @@ func (operationRecordService *OperationRecordService) DeleteSysOperationRecord(s
 	return err
 }
 
-//@author: [granty1](https://github.com/granty1)
 //@function: DeleteSysOperationRecord
 //@description: 根据id获取单条操作记录
 //@param: id uint
@@ -54,8 +49,6 @@ func (operationRecordService *OperationRecordService) GetSysOperationRecord(id u
 	return
 }
 
-//@author: [granty1](https://github.com/granty1)
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: GetSysOperationRecordInfoList
 //@description: 分页获取操作记录列表
 //@param: info systemReq.SysOperationRecordSearch

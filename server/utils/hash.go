@@ -18,7 +18,6 @@ func BcryptCheck(password, hash string) bool {
 	return err == nil
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: MD5V
 //@description: md5加密
 //@param: str []byte

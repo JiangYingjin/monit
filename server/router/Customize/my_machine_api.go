@@ -1,9 +1,9 @@
 package Customize
 
 import (
-	v1 "github.com/flipped-aurora/gin-vue-admin/server/api/v1"
-	"github.com/flipped-aurora/gin-vue-admin/server/api/v1/Customize"
 	"github.com/gin-gonic/gin"
+	v1 "my-server/api/v1"
+	"my-server/api/v1/Customize"
 )
 
 type MyMachineRouter struct {

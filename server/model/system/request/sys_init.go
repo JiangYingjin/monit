@@ -2,7 +2,7 @@ package request
 
 import (
 	"fmt"
-	"github.com/flipped-aurora/gin-vue-admin/server/config"
+	"my-server/config"
 	"os"
 )
 
@@ -17,7 +17,6 @@ type InitDB struct {
 }
 
 // MysqlEmptyDsn msyql 空数据库 建库链接
-// Author SliverHorn
 func (i *InitDB) MysqlEmptyDsn() string {
 	if i.Host == "" {
 		i.Host = "127.0.0.1"
@@ -29,7 +28,6 @@ func (i *InitDB) MysqlEmptyDsn() string {
 }
 
 // PgsqlEmptyDsn pgsql 空数据库 建库链接
-// Author SliverHorn
 func (i *InitDB) PgsqlEmptyDsn() string {
 	if i.Host == "" {
 		i.Host = "127.0.0.1"
@@ -41,7 +39,6 @@ func (i *InitDB) PgsqlEmptyDsn() string {
 }
 
 // SqliteEmptyDsn sqlite 空数据库 建库链接
-// Author Kafumio
 func (i *InitDB) SqliteEmptyDsn() string {
 	separator := string(os.PathSeparator)
 	return i.DBPath + separator + i.DBName + ".db"
@@ -52,7 +49,6 @@ func (i *InitDB) MssqlEmptyDsn() string {
 }
 
 // ToMysqlConfig 转换 config.Mysql
-// Author [SliverHorn](https://github.com/SliverHorn)
 func (i *InitDB) ToMysqlConfig() config.Mysql {
 	return config.Mysql{
 		GeneralDB: config.GeneralDB{
@@ -70,7 +66,6 @@ func (i *InitDB) ToMysqlConfig() config.Mysql {
 }
 
 // ToPgsqlConfig 转换 config.Pgsql
-// Author [SliverHorn](https://github.com/SliverHorn)
 func (i *InitDB) ToPgsqlConfig() config.Pgsql {
 	return config.Pgsql{
 		GeneralDB: config.GeneralDB{
@@ -88,7 +83,6 @@ func (i *InitDB) ToPgsqlConfig() config.Pgsql {
 }
 
 // ToSqliteConfig 转换 config.Sqlite
-// Author [Kafumio](https://github.com/Kafumio)
 func (i *InitDB) ToSqliteConfig() config.Sqlite {
 	return config.Sqlite{
 		GeneralDB: config.GeneralDB{

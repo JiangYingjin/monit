@@ -1,7 +1,7 @@
 package request
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
+	"my-server/model/common/request"
 )
 
 type MachineWarningLogSearch struct {

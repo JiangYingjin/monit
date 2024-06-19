@@ -1,10 +1,10 @@
 package utils
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	systemReq "github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
 	"github.com/gin-gonic/gin"
 	"github.com/gofrs/uuid/v5"
+	"my-server/global"
+	systemReq "my-server/model/system/request"
 	"net"
 )
 

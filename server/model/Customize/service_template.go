@@ -2,7 +2,7 @@
 package Customize
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"my-server/global"
 )
 
 // 命令模板 结构体  ServiceTemplate

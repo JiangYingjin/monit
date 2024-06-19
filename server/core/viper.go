@@ -3,21 +3,20 @@ package core
 import (
 	"flag"
 	"fmt"
-	"github.com/flipped-aurora/gin-vue-admin/server/core/internal"
 	"github.com/gin-gonic/gin"
+	"my-server/core/internal"
 	"os"
 	"path/filepath"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	_ "github.com/flipped-aurora/gin-vue-admin/server/packfile"
+	"my-server/global"
+	_ "my-server/packfile"
 )
 
 // Viper //
 // 优先级: 命令行 > 环境变量 > 默认值
-// Author [SliverHorn](https://github.com/SliverHorn)
 func Viper(path ...string) *viper.Viper {
 	var config string
 

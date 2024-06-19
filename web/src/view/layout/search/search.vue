@@ -6,10 +6,6 @@
       @click="handleReload"
     />
     <Screenfull class="search-icon" />
-    <div
-      class="gvaIcon gvaIcon-customer-service"
-      @click="toService"
-    />
   </div>
 </template>
 

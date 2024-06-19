@@ -1,13 +1,13 @@
 package Customize
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/Customize"
-	CustomizeReq "github.com/flipped-aurora/gin-vue-admin/server/model/Customize/request"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
-	"github.com/flipped-aurora/gin-vue-admin/server/service"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"my-server/global"
+	"my-server/model/Customize"
+	CustomizeReq "my-server/model/Customize/request"
+	"my-server/model/common/response"
+	"my-server/service"
 )
 
 type MachineWarningLogApi struct {

@@ -1,16 +1,14 @@
 package initialize
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/config"
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/initialize/internal"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"my-server/config"
+	"my-server/global"
+	"my-server/initialize/internal"
 )
 
 // GormPgSql 初始化 Postgresql 数据库
-// Author [piexlmax](https://github.com/piexlmax)
-// Author [SliverHorn](https://github.com/SliverHorn)
 func GormPgSql() *gorm.DB {
 	p := global.GVA_CONFIG.Pgsql
 	if p.Dbname == "" {

@@ -9,15 +9,14 @@
 package initialize
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/config"
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/initialize/internal"
 	"gorm.io/driver/sqlserver"
 	"gorm.io/gorm"
+	"my-server/config"
+	"my-server/global"
+	"my-server/initialize/internal"
 )
 
 // GormMssql 初始化Mssql数据库
-// Author [LouisZhang](191180776@qq.com)
 func GormMssql() *gorm.DB {
 	m := global.GVA_CONFIG.Mssql
 	if m.Dbname == "" {

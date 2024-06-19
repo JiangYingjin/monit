@@ -3,8 +3,8 @@ package internal
 import (
 	"fmt"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"gorm.io/gorm/logger"
+	"my-server/global"
 )
 
 type writer struct {
@@ -12,13 +12,11 @@ type writer struct {
 }
 
 // NewWriter writer 构造函数
-// Author [SliverHorn](https://github.com/SliverHorn)
 func NewWriter(w logger.Writer) *writer {
 	return &writer{Writer: w}
 }
 
 // Printf 格式化打印日志
-// Author [SliverHorn](https://github.com/SliverHorn)
 func (w *writer) Printf(message string, data ...interface{}) {
 	var logZap bool
 	switch global.GVA_CONFIG.System.DbType {

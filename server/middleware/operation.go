@@ -11,13 +11,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/utils"
+	"my-server/utils"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
-	"github.com/flipped-aurora/gin-vue-admin/server/service"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"my-server/global"
+	"my-server/model/system"
+	"my-server/service"
 )
 
 var operationRecordService = service.ServiceGroupApp.SystemServiceGroup.OperationRecordService

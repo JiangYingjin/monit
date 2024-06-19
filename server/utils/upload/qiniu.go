@@ -7,17 +7,14 @@ import (
 	"mime/multipart"
 	"time"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/qiniu/api.v7/v7/auth/qbox"
 	"github.com/qiniu/api.v7/v7/storage"
 	"go.uber.org/zap"
+	"my-server/global"
 )
 
 type Qiniu struct{}
 
-//@author: [piexlmax](https://github.com/piexlmax)
-//@author: [ccfish86](https://github.com/ccfish86)
-//@author: [SliverHorn](https://github.com/SliverHorn)
 //@object: *Qiniu
 //@function: UploadFile
 //@description: 上传文件
@@ -49,9 +46,6 @@ func (*Qiniu) UploadFile(file *multipart.FileHeader) (string, string, error) {
 	return global.GVA_CONFIG.Qiniu.ImgPath + "/" + ret.Key, ret.Key, nil
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
-//@author: [ccfish86](https://github.com/ccfish86)
-//@author: [SliverHorn](https://github.com/SliverHorn)
 //@object: *Qiniu
 //@function: DeleteFile
 //@description: 删除文件
@@ -69,7 +63,6 @@ func (*Qiniu) DeleteFile(key string) error {
 	return nil
 }
 
-//@author: [SliverHorn](https://github.com/SliverHorn)
 //@object: *Qiniu
 //@function: qiniuConfig
 //@description: 根据配置文件进行返回七牛云的配置

@@ -1,14 +1,14 @@
 package system
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
-	systemReq "github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
-	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"my-server/global"
+	"my-server/model/common/request"
+	"my-server/model/common/response"
+	"my-server/model/system"
+	systemReq "my-server/model/system/request"
+	"my-server/utils"
 )
 
 type OperationRecordApi struct{}

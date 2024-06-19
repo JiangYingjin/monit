@@ -3,8 +3,8 @@ package initialize
 import (
 	"github.com/songzhibin97/gkit/cache/local_cache"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/utils"
+	"my-server/global"
+	"my-server/utils"
 )
 
 func OtherInit() {

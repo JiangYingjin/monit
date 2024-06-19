@@ -3,11 +3,11 @@ package ast
 import (
 	"bytes"
 	"fmt"
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"go/ast"
 	"go/parser"
 	"go/printer"
 	"go/token"
+	"my-server/global"
 	"os"
 	"path/filepath"
 )

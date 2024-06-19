@@ -1,9 +1,9 @@
 package service
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/service/Customize"
-	"github.com/flipped-aurora/gin-vue-admin/server/service/example"
-	"github.com/flipped-aurora/gin-vue-admin/server/service/system"
+	"my-server/service/Customize"
+	"my-server/service/example"
+	"my-server/service/system"
 )
 
 type ServiceGroup struct {

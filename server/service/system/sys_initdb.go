@@ -5,9 +5,9 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
 	"gorm.io/gorm"
+	"my-server/global"
+	"my-server/model/system/request"
 	"sort"
 )
 

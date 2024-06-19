@@ -1,17 +1,15 @@
 package initialize
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/config"
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/initialize/internal"
 	_ "github.com/go-sql-driver/mysql"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"my-server/config"
+	"my-server/global"
+	"my-server/initialize/internal"
 )
 
 // GormMysql 初始化Mysql数据库
-// Author [piexlmax](https://github.com/piexlmax)
-// Author [SliverHorn](https://github.com/SliverHorn)
 func GormMysql() *gorm.DB {
 	m := global.GVA_CONFIG.Mysql
 	if m.Dbname == "" {

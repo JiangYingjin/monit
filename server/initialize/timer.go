@@ -2,11 +2,11 @@ package initialize
 
 import (
 	"fmt"
-	"github.com/flipped-aurora/gin-vue-admin/server/task"
+	"my-server/task"
 
 	"github.com/robfig/cron/v3"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"my-server/global"
 )
 
 func Timer() {

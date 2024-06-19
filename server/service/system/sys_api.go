@@ -3,14 +3,13 @@ package system
 import (
 	"errors"
 	"fmt"
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
+	"my-server/global"
+	"my-server/model/common/request"
+	"my-server/model/system"
 
 	"gorm.io/gorm"
 )
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: CreateApi
 //@description: 新增基础api
 //@param: api model.SysApi
@@ -27,7 +26,6 @@ func (apiService *ApiService) CreateApi(api system.SysApi) (err error) {
 	return global.GVA_DB.Create(&api).Error
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: DeleteApi
 //@description: 删除基础api
 //@param: api model.SysApi
@@ -50,7 +48,6 @@ func (apiService *ApiService) DeleteApi(api system.SysApi) (err error) {
 	return nil
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: GetAPIInfoList
 //@description: 分页获取数据,
 //@param: api model.SysApi, info request.PageInfo, order string, desc bool
@@ -113,7 +110,6 @@ func (apiService *ApiService) GetAPIInfoList(api system.SysApi, info request.Pag
 	return apiList, total, err
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: GetAllApis
 //@description: 获取所有的api
 //@return:  apis []model.SysApi, err error
@@ -123,7 +119,6 @@ func (apiService *ApiService) GetAllApis() (apis []system.SysApi, err error) {
 	return
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: GetApiById
 //@description: 根据id获取api
 //@param: id float64
@@ -134,7 +129,6 @@ func (apiService *ApiService) GetApiById(id int) (api system.SysApi, err error) 
 	return
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: UpdateApi
 //@description: 根据id更新api
 //@param: api model.SysApi
@@ -168,7 +162,6 @@ func (apiService *ApiService) UpdateApi(api system.SysApi) (err error) {
 	return err
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: DeleteApis
 //@description: 删除选中API
 //@param: apis []model.SysApi

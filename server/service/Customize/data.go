@@ -1,24 +1,22 @@
 package Customize
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/Customize"
-	CustomizeReq "github.com/flipped-aurora/gin-vue-admin/server/model/Customize/request"
 	"gorm.io/gorm"
+	"my-server/global"
+	"my-server/model/Customize"
+	CustomizeReq "my-server/model/Customize/request"
 )
 
 type DataService struct {
 }
 
 // CreateData 创建Data记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (dataService *DataService) CreateData(data *Customize.Data) (err error) {
 	err = global.GVA_DB.Create(data).Error
 	return err
 }
 
 // DeleteData 删除Data记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (dataService *DataService) DeleteData(ID string, userID uint) (err error) {
 	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&Customize.Data{}).Where("id = ?", ID).Update("deleted_by", userID).Error; err != nil {
@@ -33,7 +31,6 @@ func (dataService *DataService) DeleteData(ID string, userID uint) (err error) {
 }
 
 // DeleteDataByIds 批量删除Data记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (dataService *DataService) DeleteDataByIds(IDs []string, deleted_by uint) (err error) {
 	err = global.GVA_DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&Customize.Data{}).Where("id in ?", IDs).Update("deleted_by", deleted_by).Error; err != nil {
@@ -48,21 +45,18 @@ func (dataService *DataService) DeleteDataByIds(IDs []string, deleted_by uint) (
 }
 
 // UpdateData 更新Data记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (dataService *DataService) UpdateData(data Customize.Data) (err error) {
 	err = global.GVA_DB.Save(&data).Error
 	return err
 }
 
 // GetData 根据ID获取Data记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (dataService *DataService) GetData(ID string) (data Customize.Data, err error) {
 	err = global.GVA_DB.Where("id = ?", ID).First(&data).Error
 	return
 }
 
 // GetDataInfoList 分页获取Data记录
-// Author [piexlmax](https://github.com/piexlmax)
 func (dataService *DataService) GetDataInfoList(info CustomizeReq.DataSearch) (list []Customize.Data, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)

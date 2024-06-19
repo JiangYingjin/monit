@@ -5,13 +5,12 @@ import (
 	"mime/multipart"
 	"strings"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/example"
-	"github.com/flipped-aurora/gin-vue-admin/server/utils/upload"
+	"my-server/global"
+	"my-server/model/common/request"
+	"my-server/model/example"
+	"my-server/utils/upload"
 )
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: Upload
 //@description: 创建文件上传记录
 //@param: file model.ExaFileUploadAndDownload
@@ -21,7 +20,6 @@ func (e *FileUploadAndDownloadService) Upload(file example.ExaFileUploadAndDownl
 	return global.GVA_DB.Create(&file).Error
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: FindFile
 //@description: 查询文件记录
 //@param: id uint
@@ -33,7 +31,6 @@ func (e *FileUploadAndDownloadService) FindFile(id uint) (example.ExaFileUploadA
 	return file, err
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: DeleteFile
 //@description: 删除文件记录
 //@param: file model.ExaFileUploadAndDownload
@@ -59,7 +56,6 @@ func (e *FileUploadAndDownloadService) EditFileName(file example.ExaFileUploadAn
 	return global.GVA_DB.Where("id = ?", file.ID).First(&fileFromDb).Update("name", file.Name).Error
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: GetFileRecordInfoList
 //@description: 分页获取数据
 //@param: info request.PageInfo
@@ -82,7 +78,6 @@ func (e *FileUploadAndDownloadService) GetFileRecordInfoList(info request.PageIn
 	return fileLists, total, err
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: UploadFile
 //@description: 根据配置文件判断是文件上传到本地或者七牛云
 //@param: header *multipart.FileHeader, noSave string

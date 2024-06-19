@@ -1,13 +1,13 @@
 package system
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
-	systemRes "github.com/flipped-aurora/gin-vue-admin/server/model/system/response"
-	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"my-server/global"
+	"my-server/model/common/response"
+	"my-server/model/system/request"
+	systemRes "my-server/model/system/response"
+	"my-server/utils"
 )
 
 type CasbinApi struct{}

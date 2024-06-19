@@ -9,16 +9,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 	"go.uber.org/zap"
+	"my-server/global"
+	"my-server/utils"
 )
 
 type Local struct{}
 
-//@author: [piexlmax](https://github.com/piexlmax)
-//@author: [ccfish86](https://github.com/ccfish86)
-//@author: [SliverHorn](https://github.com/SliverHorn)
 //@object: *Local
 //@function: UploadFile
 //@description: 上传文件
@@ -66,9 +63,6 @@ func (*Local) UploadFile(file *multipart.FileHeader) (string, string, error) {
 	return filepath, filename, nil
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
-//@author: [ccfish86](https://github.com/ccfish86)
-//@author: [SliverHorn](https://github.com/SliverHorn)
 //@object: *Local
 //@function: DeleteFile
 //@description: 删除文件

@@ -1,7 +1,7 @@
 package request
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/model/Customize"
+	"my-server/model/Customize"
 )
 
 type GetDataReq struct {

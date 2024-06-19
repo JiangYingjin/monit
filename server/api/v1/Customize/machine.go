@@ -1,18 +1,18 @@
 package Customize
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/Customize"
-	CustomizeReq "github.com/flipped-aurora/gin-vue-admin/server/model/Customize/request"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
-	"github.com/flipped-aurora/gin-vue-admin/server/service"
-	Customize2 "github.com/flipped-aurora/gin-vue-admin/server/service/Customize"
-	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
+	"my-server/global"
+	"my-server/model/Customize"
+	CustomizeReq "my-server/model/Customize/request"
+	"my-server/model/common/response"
+	"my-server/service"
+	Customize2 "my-server/service/Customize"
+	"my-server/utils"
 	"time"
 )
 

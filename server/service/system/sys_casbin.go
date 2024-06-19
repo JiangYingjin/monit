@@ -9,13 +9,12 @@ import (
 	"github.com/casbin/casbin/v2"
 	"github.com/casbin/casbin/v2/model"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
-	"github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
 	_ "github.com/go-sql-driver/mysql"
 	"go.uber.org/zap"
+	"my-server/global"
+	"my-server/model/system/request"
 )
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: UpdateCasbin
 //@description: 更新casbin权限
 //@param: authorityId string, casbinInfos []request.CasbinInfo
@@ -46,7 +45,6 @@ func (casbinService *CasbinService) UpdateCasbin(AuthorityID uint, casbinInfos [
 	return nil
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: UpdateCasbinApi
 //@description: API更新随动
 //@param: oldPath string, newPath string, oldMethod string, newMethod string
@@ -65,7 +63,6 @@ func (casbinService *CasbinService) UpdateCasbinApi(oldPath string, newPath stri
 	return err
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: GetPolicyPathByAuthorityId
 //@description: 获取权限列表
 //@param: authorityId string
@@ -84,7 +81,6 @@ func (casbinService *CasbinService) GetPolicyPathByAuthorityId(AuthorityID uint)
 	return pathMaps
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: ClearCasbin
 //@description: 清除匹配的权限
 //@param: v int, p ...string
@@ -96,7 +92,6 @@ func (casbinService *CasbinService) ClearCasbin(v int, p ...string) bool {
 	return success
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: RemoveFilteredPolicy
 //@description: 使用数据库方法清理筛选的politicy 此方法需要调用FreshCasbin方法才可以在系统中即刻生效
 //@param: db *gorm.DB, authorityId string
@@ -106,7 +101,6 @@ func (casbinService *CasbinService) RemoveFilteredPolicy(db *gorm.DB, authorityI
 	return db.Delete(&gormadapter.CasbinRule{}, "v0 = ?", authorityId).Error
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: RemoveFilteredPolicy
 //@description: 同步目前数据库的policy 此方法需要调用FreshCasbin方法才可以在系统中即刻生效
 //@param: db *gorm.DB, authorityId string, rules [][]string
@@ -120,7 +114,6 @@ func (casbinService *CasbinService) SyncPolicy(db *gorm.DB, authorityId string, 
 	return casbinService.AddPolicies(db, rules)
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: ClearCasbin
 //@description: 清除匹配的权限
 //@param: v int, p ...string
@@ -145,7 +138,6 @@ func (CasbinService *CasbinService) FreshCasbin() (err error) {
 	return err
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
 //@function: Casbin
 //@description: 持久化到数据库  引入自定义规则
 //@return: *casbin.Enforcer
