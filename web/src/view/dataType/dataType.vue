@@ -210,12 +210,15 @@ const onReset = () => {
 
 // 搜索
 const onSubmit = () => {
-  elSearchFormRef.value?.validate(async(valid) => {
-    if (!valid) return
-    page.value = 1
-    pageSize.value = 10
-    getTableData()
-  })
+  elSearchFormRef.value?.validate(async (valid) => {
+    if (!valid) return;
+    page.value = 1;
+    pageSize.value = 10;
+    if (searchInfo.value.status === "") {
+      searchInfo.value.status = null;
+    }
+    getTableData();
+  });
 }
 
 // 分页

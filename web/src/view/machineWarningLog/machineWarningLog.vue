@@ -26,7 +26,7 @@
 
           <el-table-column
               align="left"
-              label="上传用户"
+              label="信息发布人"
               prop="userId"
               width="120"
           >
@@ -44,7 +44,7 @@
               {{ warningMap[scope.row.warningId] }}
             </template>
           </el-table-column>
-         <el-table-column align="left" label="sendTime" width="220">
+         <el-table-column align="left" label="告警时间" width="220">
             <template #default="scope">{{ formatDate(scope.row.sendTime) }}</template>
          </el-table-column>
         <el-table-column align="left" label="操作" fixed="right" min-width="240">
