@@ -468,7 +468,7 @@ function submitForm() {
 }
 
 const updateMachineServiceFunc = async (data) => {
-  const res = await setMachineService({ data });
+  const res = await setMachineService(data);
   console.log(res);
   if (res.code === 0) {
     ElMessage.success("更新成功");
