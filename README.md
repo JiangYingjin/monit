@@ -10,8 +10,6 @@ This platform empowers IT personnel to:
 - **Collect and display multi-dimensional data**: Gain insights through intuitive, real-time data charts.
 - **Automate machine management**: Easily manage multiple machines remotely via an integrated interface.
 
----
-
 ## Key Features
 
 1. **Automated Installation & Deployment**
@@ -40,8 +38,6 @@ This platform empowers IT personnel to:
    - Enforce **JWT authentication** for all API operations.
    - Prevent unauthorized access and protect sensitive data.
 
----
-
 ## Tech Stack
 
 ### Backend
@@ -65,16 +61,12 @@ This platform empowers IT personnel to:
   - **Sqlite3**: Manage local monitor data for offline storage.
   - Others include **PyMySQL** (MySQL data fetching) and **Redis libraries**.
 
----
-
 ## System Architecture
 
 1. **Agent Installation**: Deploy monitoring agents to target machines via SSH.
 2. **Data Transmission**: Agents collect system and service metrics and send them to the backend.
 3. **Backend Processing**: The backend processes and stores the data while running alert-based checks.
 4. **Frontend Visualization**: The frontend allows users to view machine statuses, generate time-based charts, and manage operations.
-
----
 
 ## Getting Started
 
@@ -96,8 +88,6 @@ This platform empowers IT personnel to:
 - Target system requirements:
   - OS: Linux (CentOS/Ubuntu/Debian)
   - Python: `>= 3.6`
-
----
 
 ### Deployment
 
@@ -155,8 +145,6 @@ This platform empowers IT personnel to:
    python remote.py install --host <IP> --port <SSH_Port> --username <User> --password <Password> --machine-id <UUID>
    ```
 
----
-
 ### Main Functionalities
 
 #### Login:
@@ -185,8 +173,6 @@ Configure custom alert thresholds to receive real-time notifications:
 - Alerts are sent via email.
 - Integration with enterprise WeChat for instant alerts.
 
----
-
 ## Project Structure
 
 ```plaintext
@@ -198,8 +184,6 @@ project-name/
 └── README.md              # Project overview & guide
 ```
 
----
-
 # Demo
 
 ![](./demo/25.png)
@@ -209,8 +193,6 @@ project-name/
 ![](./demo/45.png)
 ![](./demo/55.png)
 
----
-
 ## Core Team
 
 - **Dijia Zhan (詹迪佳)**
@@ -218,13 +200,9 @@ project-name/
 - **Xuan Gan (甘轩)**
 - **Peng Qian (钱鹏)**
 
----
-
 ## License
 
 This project is licensed under the [MIT License](LICENSE). You're free to use, distribute, and modify the software under these terms.
-
----
 
 ## Contact
 
