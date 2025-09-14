@@ -42,3 +42,5 @@ agent/*
 !agent/remote.py
 !agent/datatype.txt
 !agent/options.json
+
+rm_file
